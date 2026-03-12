@@ -1,9 +1,9 @@
 'use client';
 
-export const dynamic = "force-dynamic";
-
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 
 type Pitch = {
   id: string;
@@ -13,9 +13,10 @@ type Pitch = {
   status: 'DRAFT' | 'QUEUED' | 'SENT';
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://127.0.0.1:3100';
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3100';
 
-export default function NewPitchPage() {
+function NewPitchContent() {
   const sp = useSearchParams();
   const matchId = sp.get('matchId');
 
@@ -63,10 +64,11 @@ export default function NewPitchPage() {
       setSending(true);
       setError(null);
 
-      const res = await fetch(`${API_BASE}/pitches/${pitch.id}/send`, { method: 'POST' });
+      const res = await fetch(`${API_BASE}/pitches/${pitch.id}/send`, {
+        method: 'POST',
+      });
 
       if (!res.ok) {
-        // ✅ 429 = limit reached → show nice message
         if (res.status === 429) {
           const txt = await res.text();
           setError(
@@ -91,7 +93,7 @@ export default function NewPitchPage() {
     <div className="max-w-3xl mx-auto p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">✉️ Pitch</h1>
-        <a className="px-3 py-2 rounded border" href="/Pitches">
+        <a className="px-3 py-2 rounded border" href="/pitches">
           ← Back
         </a>
       </div>
@@ -100,7 +102,9 @@ export default function NewPitchPage() {
 
       {error && (
         <div className="border rounded p-4 bg-red-50 text-red-700 whitespace-pre-wrap space-y-3">
-          <div><b>Error</b></div>
+          <div>
+            <b>Error</b>
+          </div>
           <div>{error}</div>
           <button
             className="px-3 py-2 rounded bg-black text-white"
@@ -131,13 +135,27 @@ export default function NewPitchPage() {
               disabled={sending || pitch.status === 'SENT'}
               className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
             >
-              {pitch.status === 'SENT' ? 'Sent ✅' : sending ? 'Sending...' : 'Send pitch'}
+              {pitch.status === 'SENT'
+                ? 'Sent ✅'
+                : sending
+                ? 'Sending...'
+                : 'Send pitch'}
             </button>
 
-            <span className="text-sm text-gray-600">Status: {pitch.status}</span>
+            <span className="text-sm text-gray-600">
+              Status: {pitch.status}
+            </span>
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+export default function NewPitchPage() {
+  return (
+    <Suspense fallback={<div className="max-w-3xl mx-auto p-8">Loading...</div>}>
+      <NewPitchContent />
+    </Suspense>
   );
 }
