@@ -23,6 +23,7 @@ export default function UpgradePage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -94,6 +95,34 @@ export default function UpgradePage() {
     }
   }
 
+  async function startCheckout() {
+    setCheckoutLoading(true);
+    setErr(null);
+    setMsg(null);
+
+    try {
+      const res = await fetch(`${API}/billing/create-checkout-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(ARTIST_ID ? { "x-artist-id": ARTIST_ID } : {}),
+        },
+      });
+
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+
+      const data = JSON.parse(text);
+      if (!data?.url) throw new Error("No checkout URL returned");
+
+      window.location.href = data.url;
+    } catch (e: any) {
+      setErr(e?.message ?? "Start checkout failed");
+    } finally {
+      setCheckoutLoading(false);
+    }
+  }
+
   async function openPortal() {
     setPortalLoading(true);
     setErr(null);
@@ -144,7 +173,7 @@ export default function UpgradePage() {
       {msg && <p className="text-green-700 whitespace-pre-wrap">{msg}</p>}
 
       {usage && (
-        <div className="border rounded-xl p-6 space-y-3">
+        <div className="border rounded-xl p-6 space-y-4">
           <div className="text-sm text-gray-600">Current plan</div>
           <div className="text-2xl font-bold">{usage.plan}</div>
 
@@ -173,7 +202,27 @@ export default function UpgradePage() {
             <div className="text-gray-700">Unlimited pitches</div>
           )}
 
+          <div className="border rounded-lg p-4 bg-gray-50 space-y-2">
+            <div className="font-semibold">PRO plan</div>
+            <div className="text-sm text-gray-700">
+              Unlimited pitches, campaign launch, auto pitch + send, billing portal access.
+            </div>
+            <div className="text-sm text-gray-700">
+              Price: <b>$19/month</b>
+            </div>
+          </div>
+
           <div className="pt-2 flex flex-wrap gap-3">
+            {usage.plan !== "PRO" && (
+              <button
+                onClick={startCheckout}
+                disabled={checkoutLoading}
+                className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
+              >
+                {checkoutLoading ? "Opening checkout…" : "Upgrade to PRO"}
+              </button>
+            )}
+
             <button
               onClick={startTrial}
               disabled={busy || usage.plan === "TRIAL" || usage.plan === "PRO"}
