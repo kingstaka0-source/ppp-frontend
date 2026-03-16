@@ -46,13 +46,13 @@ export default function PitchButton({
       // Alleen AI generate-and-save doen als het een nieuwe of draft pitch is
       if (pitch.status === "DRAFT") {
         const aiRes = await fetch(`${API}/ai/generate-and-save-pitch`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-artist-id": ARTIST_ID,
-          },
-          body: JSON.stringify({ pitchId: pitch.id }),
-        });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-artist-id": ARTIST_ID,
+  },
+  body: JSON.stringify({ matchId }),
+});
 
         const aiJson = await aiRes.json().catch(() => ({}));
 
