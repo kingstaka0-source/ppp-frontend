@@ -1,10 +1,7 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import UpgradeButton from "@/app/components/UpgradeButton";
 
 type Usage = {
@@ -42,8 +39,6 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
 const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
 export default function UpgradePage() {
-  const searchParams = useSearchParams();
-
   const [usage, setUsage] = useState<Usage | null>(null);
   const [billing, setBilling] = useState<BillingStatus | null>(null);
 
@@ -55,16 +50,19 @@ export default function UpgradePage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
-  const success = searchParams.get("success");
-  const canceled = searchParams.get("canceled");
-
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get("success");
+    const canceled = params.get("canceled");
+
     if (success === "1") {
       setMsg("Payment or trial checkout completed. Your billing status is updating.");
     } else if (canceled === "1") {
       setMsg("Checkout canceled. No payment was completed.");
     }
-  }, [success, canceled]);
+  }, []);
 
   async function loadAll() {
     setLoading(true);
