@@ -48,6 +48,7 @@ export default function UpgradePage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [trialCheckoutLoading, setTrialCheckoutLoading] = useState(false);
 
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -57,9 +58,9 @@ export default function UpgradePage() {
 
   useEffect(() => {
     if (success === "1") {
-      setMsg("Payment successful. Your subscription is being activated.");
+      setMsg("Payment or trial checkout completed. Your billing status is updating.");
     } else if (canceled === "1") {
-      setMsg("Checkout canceled. No payment was taken.");
+      setMsg("Checkout canceled. No payment was completed.");
     }
   }, [success, canceled]);
 
@@ -112,27 +113,36 @@ export default function UpgradePage() {
   }, []);
 
   async function startTrial() {
-    setBusy(true);
+    setTrialCheckoutLoading(true);
     setErr(null);
     setMsg(null);
 
     try {
       const res = await fetch(`${API}/artists/${ARTIST_ID}/start-trial`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(ARTIST_ID ? { "x-artist-id": ARTIST_ID } : {}),
+        },
       });
 
       const text = await res.text();
+
       if (!res.ok) {
         throw new Error(text || `HTTP ${res.status}`);
       }
 
       const data = JSON.parse(text);
-      setMsg(data.message || "Trial started");
-      await loadAll();
+
+      if (!data?.url) {
+        throw new Error("No Stripe checkout URL returned for trial");
+      }
+
+      window.location.href = data.url;
     } catch (e: any) {
       setErr(e?.message ?? "Start trial failed");
     } finally {
-      setBusy(false);
+      setTrialCheckoutLoading(false);
     }
   }
 
@@ -147,6 +157,7 @@ export default function UpgradePage() {
       });
 
       const text = await res.text();
+
       if (!res.ok) {
         throw new Error(text || `HTTP ${res.status}`);
       }
@@ -175,11 +186,13 @@ export default function UpgradePage() {
       });
 
       const text = await res.text();
+
       if (!res.ok) {
         throw new Error(text || `HTTP ${res.status}`);
       }
 
       const data = JSON.parse(text);
+
       if (!data?.url) {
         throw new Error("No portal URL returned");
       }
@@ -291,17 +304,30 @@ export default function UpgradePage() {
             </div>
           </div>
 
+          <div className="border rounded-lg p-4 bg-yellow-50 space-y-2">
+            <div className="font-semibold">7-day trial</div>
+            <div className="text-sm text-gray-700">
+              Trial now requires card details upfront through Stripe checkout.
+            </div>
+            <div className="text-sm text-gray-700">
+              After 7 days, Stripe will automatically attempt the first payment.
+            </div>
+          </div>
+
           <div className="pt-2 flex flex-wrap gap-3">
-            {effectivePlan !== "PRO" && (
-              <UpgradeButton />
-            )}
+            {effectivePlan !== "PRO" && <UpgradeButton />}
 
             <button
               onClick={startTrial}
-              disabled={busy || effectivePlan === "TRIAL" || effectivePlan === "PRO"}
+              disabled={
+                trialCheckoutLoading ||
+                busy ||
+                effectivePlan === "TRIAL" ||
+                effectivePlan === "PRO"
+              }
               className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
             >
-              {busy ? "Working…" : "Start 7-day trial"}
+              {trialCheckoutLoading ? "Opening Stripe…" : "Start 7-day trial"}
             </button>
 
             <button
