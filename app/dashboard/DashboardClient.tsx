@@ -253,7 +253,7 @@ export default function DashboardClient() {
       {loading && <p>Loading…</p>}
       {err && <p className="text-red-600 whitespace-pre-wrap">Error: {err}</p>}
 
-      {!loading && !err && <IntakeTrackCard onDone={() => loadAll(artistId)} />}
+      {!loading && !err && <IntakeTrackCard artistId={artistId} onDone={() => loadAll(artistId)} />}
 
       {!loading && !err && usage && access && (
         <div className="space-y-3">

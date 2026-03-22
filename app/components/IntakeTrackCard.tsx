@@ -4,9 +4,9 @@ import { useMatchJob } from "./useMatchJob";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
 type Props = {
+  artistId: string;
   onDone?: () => Promise<void> | void;
 };
 
@@ -18,7 +18,7 @@ function prettyJson(x: any) {
   }
 }
 
-export default function IntakeTrackCard({ onDone }: Props) {
+export default function IntakeTrackCard({ artistId, onDone }: Props) {
   const [spotifyUrl, setSpotifyUrl] = useState(
     "https://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6"
   );
@@ -42,15 +42,15 @@ export default function IntakeTrackCard({ onDone }: Props) {
     setJobId(null);
 
     try {
-      if (!ARTIST_ID) {
-        throw new Error("Missing NEXT_PUBLIC_ARTIST_ID (.env.local).");
+      if (!artistId) {
+        throw new Error("Missing artistId.");
       }
 
       const res = await fetch(`${API}/intake/track`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          artistId: ARTIST_ID,
+          artistId,
           spotifyTrackUrl: spotifyUrl,
         }),
       });
@@ -69,7 +69,7 @@ export default function IntakeTrackCard({ onDone }: Props) {
 
       const newJobId = data?.matchJob?.jobId ?? null;
       if (!newJobId) {
-        setSubmitErr("Geen matchJob terug. Check: plan gating of enqueueMatchJob.");
+        setSubmitErr("Geen matchJob terug. Check intake response.");
         return;
       }
 
