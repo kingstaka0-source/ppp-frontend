@@ -1,15 +1,21 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
 export default function LaunchCampaignButton({
   trackId,
+  artistId,
+  disabled = false,
+  lockedReason,
 }: {
   trackId: string;
+  artistId: string;
+  disabled?: boolean;
+  lockedReason?: string;
 }) {
   const router = useRouter();
   const [running, setRunning] = useState(false);
@@ -17,8 +23,13 @@ export default function LaunchCampaignButton({
   const [error, setError] = useState("");
 
   async function launchCampaign() {
-    if (!ARTIST_ID) {
-      setError("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
+    if (disabled) {
+      setError(lockedReason || "Upgrade required");
+      return;
+    }
+
+    if (!artistId) {
+      setError("Missing artistId");
       return;
     }
 
@@ -31,7 +42,7 @@ export default function LaunchCampaignButton({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-artist-id": ARTIST_ID,
+          "x-artist-id": artistId,
         },
         body: JSON.stringify({
           trackId,
@@ -41,13 +52,18 @@ export default function LaunchCampaignButton({
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
+        if (res.status === 403 && data?.upgradeRequired) {
+          setError(data?.message || "Upgrade required");
+          return;
+        }
+
         throw new Error(
           data?.message || data?.error || `Launch campaign failed (${res.status})`
         );
       }
 
       setMessage(
-        `Campaign launched. Matches: ${data?.totalMatches ?? 0}. Created: ${data?.created ?? 0}. Queued: ${data?.queued ?? 0}. Drafted: ${data?.drafted ?? 0}. Skipped: ${data?.skipped ?? 0}.`
+        `Campaign launched. Created: ${data?.created ?? 0}. Skipped existing: ${data?.skippedExisting ?? 0}. Skipped no email: ${data?.skippedNoEmail ?? 0}.`
       );
 
       router.refresh();
@@ -62,11 +78,27 @@ export default function LaunchCampaignButton({
     <div className="space-y-3">
       <button
         onClick={launchCampaign}
-        disabled={running}
-        className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-60"
+        disabled={disabled || running}
+        className={`px-4 py-2 rounded transition ${
+          disabled || running
+            ? "cursor-not-allowed bg-gray-200 text-gray-500"
+            : "bg-blue-600 text-white"
+        }`}
       >
         {running ? "Launching..." : "Launch Campaign"}
       </button>
+
+      {disabled && lockedReason ? (
+        <div className="text-xs text-amber-700">
+          {lockedReason}{" "}
+          <Link
+            href={`/upgrade?artistId=${encodeURIComponent(artistId)}`}
+            className="underline"
+          >
+            Upgrade
+          </Link>
+        </div>
+      ) : null}
 
       {message ? (
         <div className="border rounded p-2 text-sm bg-green-100">
@@ -76,7 +108,19 @@ export default function LaunchCampaignButton({
 
       {error ? (
         <div className="border rounded p-2 text-sm bg-red-100">
-          {error}
+          {error.toLowerCase().includes("upgrade") ? (
+            <>
+              {error}{" "}
+              <Link
+                href={`/upgrade?artistId=${encodeURIComponent(artistId)}`}
+                className="underline"
+              >
+                Upgrade
+              </Link>
+            </>
+          ) : (
+            error
+          )}
         </div>
       ) : null}
     </div>

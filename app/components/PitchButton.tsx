@@ -1,33 +1,46 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
 export default function PitchButton({
   matchId,
   already,
+  artistId,
+  disabled = false,
+  lockedReason,
 }: {
   matchId: string;
   already: boolean;
+  artistId: string;
+  disabled?: boolean;
+  lockedReason?: string;
 }) {
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function createOrOpenPitch() {
-    if (!ARTIST_ID) {
-      alert("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
+    if (disabled) {
+      setMessage(lockedReason || "Upgrade required");
+      return;
+    }
+
+    if (!artistId) {
+      setMessage("Missing artistId");
       return;
     }
 
     setLoading(true);
+    setMessage("");
 
     try {
       const createRes = await fetch(`${API}/pitches`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-artist-id": ARTIST_ID,
+          "x-artist-id": artistId,
         },
         body: JSON.stringify({ matchId, channel: "EMAIL" }),
       });
@@ -35,35 +48,48 @@ export default function PitchButton({
       const createJson = await createRes.json().catch(() => ({}));
 
       if (!createRes.ok) {
-        throw new Error(createJson?.error || createJson?.message || `Pitch failed (${createRes.status})`);
+        if (createRes.status === 403 && createJson?.upgradeRequired) {
+          setMessage(createJson?.message || "Upgrade required");
+          return;
+        }
+
+        throw new Error(
+          createJson?.error ||
+            createJson?.message ||
+            `Pitch failed (${createRes.status})`
+        );
       }
 
       const pitch = createJson?.pitch;
+
       if (!pitch?.id) {
         throw new Error("Pitch was created but no pitch id was returned");
       }
 
-      // Alleen AI generate-and-save doen als het een nieuwe of draft pitch is
       if (pitch.status === "DRAFT") {
         const aiRes = await fetch(`${API}/ai/generate-and-save-pitch`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "x-artist-id": ARTIST_ID,
-  },
-  body: JSON.stringify({ matchId }),
-});
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-artist-id": artistId,
+          },
+          body: JSON.stringify({ matchId }),
+        });
 
         const aiJson = await aiRes.json().catch(() => ({}));
 
         if (!aiRes.ok) {
-          throw new Error(aiJson?.error || aiJson?.message || `AI failed (${aiRes.status})`);
+          throw new Error(
+            aiJson?.error || aiJson?.message || `AI failed (${aiRes.status})`
+          );
         }
       }
 
-      window.location.href = `/pitches/${pitch.id}`;
+      window.location.href = `/pitches/${pitch.id}?artistId=${encodeURIComponent(
+        artistId
+      )}`;
     } catch (e: any) {
-      alert(e?.message || "Pitch failed");
+      setMessage(e?.message || "Pitch failed");
     } finally {
       setLoading(false);
     }
@@ -78,12 +104,48 @@ export default function PitchButton({
   }
 
   return (
-    <button
-      className="px-3 py-2 rounded bg-black text-white disabled:opacity-60"
-      disabled={loading}
-      onClick={createOrOpenPitch}
-    >
-      {loading ? "Preparing…" : "Pitch →"}
-    </button>
+    <div className="space-y-2">
+      <button
+        className={`px-3 py-2 rounded transition ${
+          disabled || loading
+            ? "cursor-not-allowed bg-gray-200 text-gray-500"
+            : "bg-black text-white"
+        }`}
+        disabled={disabled || loading}
+        onClick={createOrOpenPitch}
+      >
+        {loading ? "Preparing…" : "Pitch →"}
+      </button>
+
+      {disabled && lockedReason ? (
+        <div className="text-xs text-amber-700">
+          {lockedReason}{" "}
+          <Link
+            href={`/upgrade?artistId=${encodeURIComponent(artistId)}`}
+            className="underline"
+          >
+            Upgrade
+          </Link>
+        </div>
+      ) : null}
+
+      {message ? (
+        <div className="text-xs text-gray-700">
+          {message.toLowerCase().includes("upgrade") ? (
+            <>
+              {message}{" "}
+              <Link
+                href={`/upgrade?artistId=${encodeURIComponent(artistId)}`}
+                className="underline"
+              >
+                Upgrade
+              </Link>
+            </>
+          ) : (
+            message
+          )}
+        </div>
+      ) : null}
+    </div>
   );
 }

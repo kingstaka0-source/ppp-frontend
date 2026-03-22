@@ -6,7 +6,7 @@ import LaunchCampaignButton from "./LaunchCampaignButton";
 export const dynamic = "force-dynamic";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
+const DEFAULT_ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
 function msToMinSec(ms?: number | null) {
   const totalMs = typeof ms === "number" && Number.isFinite(ms) ? ms : 0;
@@ -19,6 +19,40 @@ function msToMinSec(ms?: number | null) {
 function safeNumber(value: unknown) {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }
+
+function linkWithArtistId(path: string, artistId: string) {
+  if (!artistId) return path;
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}artistId=${encodeURIComponent(artistId)}`;
+}
+
+type BillingAccess = {
+  plan: "FREE" | "TRIAL" | "PRO";
+  isPaid: boolean;
+  trialUntil: string | null;
+  subscriptionStatus: string;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  limits: {
+    pitchesPerMonth: number | null;
+    createdThisMonth: number;
+    remaining: number | null;
+  };
+  features: {
+    canCreatePitch: boolean;
+    canLaunchCampaign: boolean;
+    canAutoSend: boolean;
+    canBulkQueue: boolean;
+    canUseUnlimitedPitches: boolean;
+  };
+};
+
+type BillingAccessResponse = {
+  ok?: boolean;
+  access?: BillingAccess;
+  error?: string;
+  message?: string;
+};
 
 type TrackDetail = {
   id?: string | null;
@@ -72,10 +106,10 @@ type PitchesApiRes = {
   pitches?: PitchApiItem[] | null;
 };
 
-async function apiJson(url: string) {
+async function apiJson(url: string, artistId: string) {
   const headers: Record<string, string> = {};
-  if (ARTIST_ID) {
-    headers["x-artist-id"] = ARTIST_ID;
+  if (artistId) {
+    headers["x-artist-id"] = artistId;
   }
 
   const response = await fetch(url, {
@@ -86,9 +120,7 @@ async function apiJson(url: string) {
   const json = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(
-      json?.error || json?.message || `HTTP ${response.status}`
-    );
+    throw new Error(json?.error || json?.message || `HTTP ${response.status}`);
   }
 
   return json;
@@ -121,19 +153,25 @@ function Badge({
 
 export default async function TrackDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ artistId?: string }>;
 }) {
   const { id: trackId } = await params;
+  const resolvedSearchParams = await searchParams;
 
-  if (!ARTIST_ID) {
+  const artistId =
+    resolvedSearchParams?.artistId?.trim() || DEFAULT_ARTIST_ID || "";
+
+  if (!artistId) {
     return (
       <div className="max-w-5xl mx-auto p-8 space-y-6">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <h1 className="text-4xl font-bold">Track</h1>
             <p className="mt-2 text-sm text-gray-600">
-              Could not load this page because NEXT_PUBLIC_ARTIST_ID is missing.
+              Could not load this page because artistId is missing.
             </p>
           </div>
 
@@ -143,8 +181,8 @@ export default async function TrackDetailPage({
         </div>
 
         <div className="border rounded p-4 bg-yellow-50 text-sm text-yellow-900">
-          Add <strong>NEXT_PUBLIC_ARTIST_ID</strong> to <strong>.env.local</strong> and
-          restart the frontend.
+          Add <strong>?artistId=...</strong> to the URL or set{" "}
+          <strong>NEXT_PUBLIC_ARTIST_ID</strong>.
         </div>
       </div>
     );
@@ -153,13 +191,18 @@ export default async function TrackDetailPage({
   let track: TrackDetail | null = null;
   let matches: MatchRow[] = [];
   let pitchApi: PitchesApiRes = {};
+  let access: BillingAccess | null = null;
   let loadError = "";
 
   try {
-    const [trackRes, matchesRes, pitchesRes] = await Promise.all([
-      apiJson(`${API}/tracks/${trackId}`),
-      apiJson(`${API}/matches?trackId=${trackId}`),
-      apiJson(`${API}/pitches?trackId=${trackId}`),
+    const [trackRes, matchesRes, pitchesRes, accessRes] = await Promise.all([
+      apiJson(`${API}/tracks/${trackId}`, artistId),
+      apiJson(`${API}/matches?trackId=${trackId}`, artistId),
+      apiJson(`${API}/pitches?trackId=${trackId}`, artistId),
+      apiJson(
+        `${API}/billing/access?artistId=${encodeURIComponent(artistId)}`,
+        artistId
+      ),
     ]);
 
     track = trackRes as TrackDetail;
@@ -173,6 +216,8 @@ export default async function TrackDetailPage({
     }
 
     pitchApi = (pitchesRes as PitchesApiRes) ?? {};
+    access = ((accessRes as BillingAccessResponse)?.access ??
+      null) as BillingAccess | null;
   } catch (error) {
     loadError =
       error instanceof Error ? error.message : "Could not load track page.";
@@ -189,7 +234,10 @@ export default async function TrackDetailPage({
             </p>
           </div>
 
-          <Link href="/dashboard" className="px-4 py-2 rounded border border-black">
+          <Link
+            href={linkWithArtistId("/dashboard", artistId)}
+            className="px-4 py-2 rounded border border-black"
+          >
             ← Dashboard
           </Link>
         </div>
@@ -211,7 +259,10 @@ export default async function TrackDetailPage({
             <p className="mt-2 text-sm text-gray-600">Track not found.</p>
           </div>
 
-          <Link href="/dashboard" className="px-4 py-2 rounded border border-black">
+          <Link
+            href={linkWithArtistId("/dashboard", artistId)}
+            className="px-4 py-2 rounded border border-black"
+          >
             ← Dashboard
           </Link>
         </div>
@@ -247,6 +298,11 @@ export default async function TrackDetailPage({
   const duration = msToMinSec(track.durationMs);
   const matchCount = safeNumber(track.matchCount);
 
+  const plan = access?.plan ?? "FREE";
+  const canCreatePitch = access?.features.canCreatePitch ?? false;
+  const canLaunchCampaign = access?.features.canLaunchCampaign ?? false;
+  const canAutoSend = access?.features.canAutoSend ?? false;
+
   return (
     <div className="max-w-5xl mx-auto p-8 space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -258,6 +314,7 @@ export default async function TrackDetailPage({
           </div>
 
           <div className="mt-2 flex flex-wrap gap-2">
+            <Badge tone="neutral">Plan: {plan}</Badge>
             <Badge tone="neutral">Total matches: {matches.length}</Badge>
             <Badge tone={sendableCount > 0 ? "green" : "yellow"}>
               Sendable: {sendableCount}
@@ -280,13 +337,64 @@ export default async function TrackDetailPage({
         </div>
 
         <div className="flex gap-3 flex-wrap">
-          <SendAllPitchesButton trackId={trackId} />
-          <LaunchCampaignButton trackId={trackId} />
-          <Link href="/dashboard" className="px-4 py-2 rounded border border-black">
+          <SendAllPitchesButton
+            trackId={trackId}
+            artistId={artistId}
+            disabled={!canAutoSend}
+            lockedReason={
+              !canAutoSend
+                ? "Auto send is available on TRIAL or PRO."
+                : undefined
+            }
+          />
+
+          <LaunchCampaignButton
+            trackId={trackId}
+            artistId={artistId}
+            disabled={!canLaunchCampaign}
+            lockedReason={
+              !canLaunchCampaign
+                ? "Campaign launch is available on TRIAL or PRO."
+                : undefined
+            }
+          />
+
+          <Link
+            href={linkWithArtistId("/dashboard", artistId)}
+            className="px-4 py-2 rounded border border-black"
+          >
             ← Dashboard
           </Link>
         </div>
       </div>
+
+      {access?.plan === "FREE" && (
+        <div className="border rounded-xl p-4 bg-amber-50 border-amber-300">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <div className="font-semibold">FREE plan active</div>
+              <div className="text-sm text-gray-700">
+                Remaining pitches this month:{" "}
+                <b>{access.limits.remaining ?? 0}</b>
+                {typeof access.limits.pitchesPerMonth === "number" ? (
+                  <>
+                    {" "}
+                    / <b>{access.limits.pitchesPerMonth}</b>
+                  </>
+                ) : null}
+                . Campaign launch and auto send are locked on FREE.
+              </div>
+            </div>
+
+            <Link
+              href={linkWithArtistId("/upgrade", artistId)}
+              className="px-4 py-2 rounded bg-black text-white hover:opacity-90 transition"
+            >
+              Upgrade →
+            </Link>
+          </div>
+        </div>
+      )}
 
       {process.env.NODE_ENV !== "production" ? (
         <details className="text-xs">
@@ -295,7 +403,11 @@ export default async function TrackDetailPage({
             {JSON.stringify(
               {
                 trackId,
-                artistId: ARTIST_ID,
+                artistId,
+                plan,
+                canCreatePitch,
+                canLaunchCampaign,
+                canAutoSend,
                 pitchesCount: pitches.length,
                 sendableCount,
               },
@@ -387,7 +499,17 @@ export default async function TrackDetailPage({
 
                   <div className="mt-3">
                     {match.id ? (
-                      <PitchButton matchId={match.id} already={already} />
+                      <PitchButton
+                        matchId={match.id}
+                        already={already}
+                        artistId={artistId}
+                        disabled={!canCreatePitch}
+                        lockedReason={
+                          !canCreatePitch
+                            ? "You reached your free pitch limit. Upgrade to PRO for unlimited pitches."
+                            : undefined
+                        }
+                      />
                     ) : (
                       <div className="text-sm text-gray-500">
                         Match id missing.

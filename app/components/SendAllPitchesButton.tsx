@@ -1,15 +1,36 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
-export default function SendAllPitchesButton({ trackId }: { trackId: string }) {
+export default function SendAllPitchesButton({
+  trackId,
+  artistId,
+  disabled = false,
+  lockedReason,
+}: {
+  trackId: string;
+  artistId: string;
+  disabled?: boolean;
+  lockedReason?: string;
+}) {
   const [sendingDrafts, setSendingDrafts] = useState(false);
   const [autoSending, setAutoSending] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function callEndpoint(url: string, mode: "drafts" | "auto") {
+    if (disabled) {
+      setMessage(lockedReason || "Upgrade required");
+      return;
+    }
+
+    if (!artistId) {
+      setMessage("Missing artistId");
+      return;
+    }
+
     const confirmText =
       mode === "drafts"
         ? "Send all existing DRAFT pitches for this track now?\n\nIn test mode this sends to kingstaka0@gmail.com."
@@ -19,6 +40,8 @@ export default function SendAllPitchesButton({ trackId }: { trackId: string }) {
     if (!ok) return;
 
     try {
+      setMessage("");
+
       if (mode === "drafts") setSendingDrafts(true);
       if (mode === "auto") setAutoSending(true);
 
@@ -26,13 +49,18 @@ export default function SendAllPitchesButton({ trackId }: { trackId: string }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-artist-id": ARTIST_ID,
+          "x-artist-id": artistId,
         },
       });
 
       const j = await r.json().catch(() => ({}));
 
       if (!r.ok) {
+        if (r.status === 403 && j?.upgradeRequired) {
+          setMessage(j?.message || "Upgrade required");
+          return;
+        }
+
         throw new Error(j?.error || j?.message || "Request failed");
       }
 
@@ -42,30 +70,74 @@ export default function SendAllPitchesButton({ trackId }: { trackId: string }) {
 
       window.location.reload();
     } catch (e: any) {
-      alert(e?.message || "Request failed");
+      setMessage(e?.message || "Request failed");
     } finally {
       setSendingDrafts(false);
       setAutoSending(false);
     }
   }
 
-  return (
-    <div className="flex gap-3">
-      <button
-        onClick={() => callEndpoint(`${API}/tracks/${trackId}/send-all`, "drafts")}
-        disabled={sendingDrafts || autoSending}
-        className="px-4 py-2 rounded bg-green-600 text-white disabled:opacity-50"
-      >
-        {sendingDrafts ? "Sending..." : "Send All Draft Pitches"}
-      </button>
+  const isBusy = sendingDrafts || autoSending;
 
-      <button
-        onClick={() => callEndpoint(`${API}/tracks/${trackId}/auto-pitch-send`, "auto")}
-        disabled={autoSending || sendingDrafts}
-        className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
-      >
-        {autoSending ? "Auto Sending..." : "Auto Pitch + Send"}
-      </button>
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-3 flex-wrap">
+        <button
+          onClick={() => callEndpoint(`${API}/tracks/${trackId}/send-all`, "drafts")}
+          disabled={disabled || isBusy}
+          className={`px-4 py-2 rounded transition ${
+            disabled || isBusy
+              ? "cursor-not-allowed bg-gray-200 text-gray-500"
+              : "bg-green-600 text-white"
+          }`}
+        >
+          {sendingDrafts ? "Sending..." : "Send All Draft Pitches"}
+        </button>
+
+        <button
+          onClick={() =>
+            callEndpoint(`${API}/tracks/${trackId}/auto-pitch-send`, "auto")
+          }
+          disabled={disabled || isBusy}
+          className={`px-4 py-2 rounded transition ${
+            disabled || isBusy
+              ? "cursor-not-allowed bg-gray-200 text-gray-500"
+              : "bg-blue-600 text-white"
+          }`}
+        >
+          {autoSending ? "Auto Sending..." : "Auto Pitch + Send"}
+        </button>
+      </div>
+
+      {disabled && lockedReason ? (
+        <div className="text-xs text-amber-700">
+          {lockedReason}{" "}
+          <Link
+            href={`/upgrade?artistId=${encodeURIComponent(artistId)}`}
+            className="underline"
+          >
+            Upgrade
+          </Link>
+        </div>
+      ) : null}
+
+      {message ? (
+        <div className="text-xs text-gray-700">
+          {message.toLowerCase().includes("upgrade") ? (
+            <>
+              {message}{" "}
+              <Link
+                href={`/upgrade?artistId=${encodeURIComponent(artistId)}`}
+                className="underline"
+              >
+                Upgrade
+              </Link>
+            </>
+          ) : (
+            message
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

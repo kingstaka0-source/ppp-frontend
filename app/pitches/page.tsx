@@ -48,6 +48,34 @@ type PitchesApiResponse = {
   message?: string;
 };
 
+type BillingAccess = {
+  plan: "FREE" | "TRIAL" | "PRO";
+  isPaid: boolean;
+  trialUntil: string | null;
+  subscriptionStatus: string;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  limits: {
+    pitchesPerMonth: number | null;
+    createdThisMonth: number;
+    remaining: number | null;
+  };
+  features: {
+    canCreatePitch: boolean;
+    canLaunchCampaign: boolean;
+    canAutoSend: boolean;
+    canBulkQueue: boolean;
+    canUseUnlimitedPitches: boolean;
+  };
+};
+
+type BillingAccessResponse = {
+  ok?: boolean;
+  access?: BillingAccess;
+  error?: string;
+  message?: string;
+};
+
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
 const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
@@ -60,16 +88,61 @@ function formatDate(value?: string | null) {
   return date.toLocaleDateString();
 }
 
+function PlanBadge({ plan }: { plan: "FREE" | "TRIAL" | "PRO" }) {
+  const styles =
+    plan === "PRO"
+      ? "bg-green-100 text-green-800 border-green-300"
+      : plan === "TRIAL"
+      ? "bg-blue-100 text-blue-800 border-blue-300"
+      : "bg-amber-100 text-amber-800 border-amber-300";
+
+  return (
+    <span className={`inline-flex rounded-full border px-3 py-1 text-sm font-medium ${styles}`}>
+      {plan}
+    </span>
+  );
+}
+
+function PaywallNotice({
+  title,
+  message,
+}: {
+  title: string;
+  message: string;
+}) {
+  return (
+    <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-base font-semibold">{title}</h2>
+          <p className="mt-1 text-sm text-gray-700">{message}</p>
+        </div>
+
+        <Link
+          href="/upgrade"
+          className="inline-flex items-center justify-center rounded border border-black px-4 py-2 text-sm font-medium hover:bg-black hover:text-white"
+        >
+          Upgrade to PRO
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export default function PitchesPage() {
   const [loading, setLoading] = useState(true);
   const [pitches, setPitches] = useState<PitchRow[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const [accessLoading, setAccessLoading] = useState(true);
+  const [access, setAccess] = useState<BillingAccess | null>(null);
+  const [accessError, setAccessError] = useState<string | null>(null);
+
   const [status, setStatus] = useState<"ALL" | "SENT" | "DRAFT" | "QUEUED">("ALL");
   const [playlistId, setPlaylistId] = useState<string>("ALL");
   const [curatorId, setCuratorId] = useState<string>("ALL");
 
-  async function load() {
+  async function loadPitches() {
     setLoading(true);
     setError(null);
 
@@ -100,8 +173,43 @@ export default function PitchesPage() {
     }
   }
 
+  async function loadAccess() {
+    setAccessLoading(true);
+    setAccessError(null);
+
+    try {
+      if (!ARTIST_ID) {
+        throw new Error("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
+      }
+
+      const res = await fetch(`${API}/billing/access?artistId=${encodeURIComponent(ARTIST_ID)}`, {
+        headers: {
+          "x-artist-id": ARTIST_ID,
+        },
+        cache: "no-store",
+      });
+
+      const json: BillingAccessResponse = await res.json().catch(() => ({}));
+
+      if (!res.ok || !json.access) {
+        throw new Error(json?.error || json?.message || `HTTP ${res.status}`);
+      }
+
+      setAccess(json.access);
+    } catch (error) {
+      setAccessError(error instanceof Error ? error.message : "Failed to load billing access");
+      setAccess(null);
+    } finally {
+      setAccessLoading(false);
+    }
+  }
+
+  async function refreshAll() {
+    await Promise.all([loadPitches(), loadAccess()]);
+  }
+
   useEffect(() => {
-    load();
+    refreshAll();
   }, []);
 
   const playlistOptions = useMemo(() => {
@@ -139,15 +247,78 @@ export default function PitchesPage() {
     });
   }, [pitches, status, playlistId, curatorId]);
 
+  const showFreeBanner =
+    access?.plan === "FREE" &&
+    typeof access.limits.pitchesPerMonth === "number";
+
+  const limitReached =
+    access?.plan === "FREE" && access.features.canCreatePitch === false;
+
   return (
     <div className="max-w-6xl mx-auto p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Your Pitches</h1>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Your Pitches</h1>
 
-        <Link href="/dashboard" className="border px-4 py-2 rounded">
-          ← Dashboard
-        </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            {access?.plan ? <PlanBadge plan={access.plan} /> : null}
+
+            {access?.subscriptionStatus ? (
+              <span className="inline-flex rounded-full border px-3 py-1 text-sm text-gray-700">
+                Status: {access.subscriptionStatus}
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link href="/upgrade" className="border px-4 py-2 rounded">
+            Upgrade
+          </Link>
+
+          <Link href="/dashboard" className="border px-4 py-2 rounded">
+            ← Dashboard
+          </Link>
+        </div>
       </div>
+
+      {accessLoading ? <p>Loading plan…</p> : null}
+      {accessError ? <p className="text-red-600">{accessError}</p> : null}
+
+      {showFreeBanner && access && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-base font-semibold">Free plan: 3 pitches per month</h2>
+              <p className="mt-1 text-sm text-gray-700">
+                Used {access.limits.createdThisMonth} / {access.limits.pitchesPerMonth}. Remaining:{" "}
+                {access.limits.remaining ?? 0}.
+              </p>
+            </div>
+
+            <Link
+              href="/upgrade"
+              className="inline-flex items-center justify-center rounded border border-black px-4 py-2 text-sm font-medium hover:bg-black hover:text-white"
+            >
+              Upgrade to PRO
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {limitReached && (
+        <PaywallNotice
+          title="Free limit reached"
+          message="You reached your monthly free pitch limit. Upgrade to PRO for unlimited pitches and campaign launch."
+        />
+      )}
+
+      {access?.plan === "FREE" && (
+        <PaywallNotice
+          title="Campaign launch is locked on FREE"
+          message="Start your 7-day trial or upgrade to PRO to unlock campaign launch, bulk actions, and unlimited pitching."
+        />
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <label className="text-sm">
@@ -206,7 +377,7 @@ export default function PitchesPage() {
 
       <div className="flex gap-2">
         <button
-          onClick={load}
+          onClick={refreshAll}
           className="px-3 py-2 rounded bg-black text-white"
         >
           Refresh
@@ -220,10 +391,10 @@ export default function PitchesPage() {
       {!loading && !error && filtered.length === 0 ? <p>No pitches yet.</p> : null}
 
       <div
-  className="border rounded-lg overflow-x-scroll"
-  style={{ scrollbarGutter: "stable" }}
->
-  <table className="min-w-[1400px] text-left">
+        className="border rounded-lg overflow-x-scroll"
+        style={{ scrollbarGutter: "stable" }}
+      >
+        <table className="min-w-[1400px] text-left">
           <thead className="border-b bg-gray-100">
             <tr>
               <th className="p-3">Track</th>
@@ -247,19 +418,12 @@ export default function PitchesPage() {
               return (
                 <tr key={pitch.id} className="border-b align-top">
                   <td className="p-3">{track?.title ?? "—"}</td>
-
                   <td className="p-3">{playlist?.name ?? "—"}</td>
-
                   <td className="p-3">{curator?.name ?? "—"}</td>
-
                   <td className="p-3">{curator?.email ?? "—"}</td>
-
                   <td className="p-3">{pitch.sentTo ?? "—"}</td>
-
                   <td className="p-3">{pitch.channel}</td>
-
                   <td className="p-3">{pitch.status}</td>
-
                   <td className="p-3">{formatDate(pitch.createdAt)}</td>
 
                   <td className="p-3">
