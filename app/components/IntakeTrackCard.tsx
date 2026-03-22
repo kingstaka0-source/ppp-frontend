@@ -7,7 +7,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
 const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
 type Props = {
-  onDone?: () => Promise<void> | void; // refresh parent
+  onDone?: () => Promise<void> | void;
 };
 
 function prettyJson(x: any) {
@@ -19,7 +19,9 @@ function prettyJson(x: any) {
 }
 
 export default function IntakeTrackCard({ onDone }: Props) {
-  const [spotifyUrl, setSpotifyUrl] = useState("https://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6");
+  const [spotifyUrl, setSpotifyUrl] = useState(
+    "https://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6"
+  );
   const [submitting, setSubmitting] = useState(false);
   const [submitErr, setSubmitErr] = useState<string | null>(null);
 
@@ -40,7 +42,9 @@ export default function IntakeTrackCard({ onDone }: Props) {
     setJobId(null);
 
     try {
-      if (!ARTIST_ID) throw new Error("Missing NEXT_PUBLIC_ARTIST_ID (.env.local).");
+      if (!ARTIST_ID) {
+        throw new Error("Missing NEXT_PUBLIC_ARTIST_ID (.env.local).");
+      }
 
       const res = await fetch(`${API}/intake/track`, {
         method: "POST",
@@ -56,9 +60,10 @@ export default function IntakeTrackCard({ onDone }: Props) {
 
       const data = JSON.parse(text);
 
-      // gated? (free plan)
       if (data?.gated) {
-        setSubmitErr(`Auto-match is gated: ${data.gated}. Upgrade/TRIAL/PRO nodig.`);
+        setSubmitErr(
+          `Auto-match is gated: ${data.gated}. Upgrade/TRIAL/PRO nodig.`
+        );
         return;
       }
 
@@ -76,24 +81,20 @@ export default function IntakeTrackCard({ onDone }: Props) {
     }
   }
 
-  // Auto refresh wanneer SUCCEEDED
   const didNotifyRef = useRef(false);
 
-useEffect(() => {
-  if (!jobId) return; // nog geen job gestart
+  useEffect(() => {
+    if (!jobId) return;
 
-  // reset wanneer job opnieuw start / opnieuw submitted
-  if (status === "QUEUED" || status === "RUNNING") {
-    didNotifyRef.current = false;
-  }
+    if (status === "QUEUED" || status === "RUNNING") {
+      didNotifyRef.current = false;
+    }
 
-  // fire 1x wanneer job klaar is
-  if (status === "SUCCEEDED" && !didNotifyRef.current) {
-    didNotifyRef.current = true;
-    // onDone?.();
-  }
-}, [jobId, status, onDone]);
-  
+    if (status === "SUCCEEDED" && !didNotifyRef.current) {
+      didNotifyRef.current = true;
+      onDone?.();
+    }
+  }, [jobId, status, onDone]);
 
   return (
     <div className="border rounded-xl p-6 space-y-4">
@@ -117,7 +118,9 @@ useEffect(() => {
         {submitting ? "Submitting…" : "Submit & start matching"}
       </button>
 
-      {submitErr && <div className="text-red-600 whitespace-pre-wrap">{submitErr}</div>}
+      {submitErr && (
+        <div className="text-red-600 whitespace-pre-wrap">{submitErr}</div>
+      )}
 
       {jobId && (
         <div className="border rounded-lg p-4 space-y-2 bg-gray-50">
@@ -134,7 +137,11 @@ useEffect(() => {
             </span>
           </div>
 
-          {pollErr && <div className="text-red-600 text-sm whitespace-pre-wrap">{pollErr}</div>}
+          {pollErr && (
+            <div className="text-red-600 text-sm whitespace-pre-wrap">
+              {pollErr}
+            </div>
+          )}
 
           {job?.status === "FAILED" && (
             <div className="text-red-700 text-sm whitespace-pre-wrap">
@@ -144,7 +151,9 @@ useEffect(() => {
 
           {job?.status === "SUCCEEDED" && (
             <div className="space-y-2">
-              <div className="text-green-700 text-sm font-semibold">✅ Matching klaar</div>
+              <div className="text-green-700 text-sm font-semibold">
+                ✅ Matching klaar
+              </div>
 
               {top.length > 0 ? (
                 <div className="space-y-2">
@@ -152,15 +161,23 @@ useEffect(() => {
                   <div className="space-y-2">
                     {top.map((m: any) => (
                       <div key={m.matchId} className="border rounded p-3 bg-white">
-                        <div className="font-semibold">{m.playlistName ?? m.playlistId}</div>
-                        <div className="text-sm text-gray-700">Score: {m.fitScore}</div>
-                        <div className="text-xs text-gray-500 font-mono">matchId: {m.matchId}</div>
+                        <div className="font-semibold">
+                          {m.playlistName ?? m.playlistId}
+                        </div>
+                        <div className="text-sm text-gray-700">
+                          Score: {m.fitScore}
+                        </div>
+                        <div className="text-xs text-gray-500 font-mono">
+                          matchId: {m.matchId}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className="text-sm text-gray-700">Geen matches in result.top</div>
+                <div className="text-sm text-gray-700">
+                  Geen matches in result.top
+                </div>
               )}
 
               <details className="text-xs">
