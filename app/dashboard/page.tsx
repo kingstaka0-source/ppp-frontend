@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import LegalGate from "@/app/components/LegalGate";
 import IntakeTrackCard from "@/app/components/IntakeTrackCard";
 import AccountSwitcher from "@/app/components/AccountSwitcher";
@@ -107,12 +108,6 @@ function PlanBadge({ plan }: { plan: "FREE" | "TRIAL" | "PRO" }) {
   );
 }
 
-function getArtistIdFromBrowser() {
-  if (typeof window === "undefined") return DEFAULT_ARTIST_ID;
-  const params = new URLSearchParams(window.location.search);
-  return params.get("artistId")?.trim() || DEFAULT_ARTIST_ID;
-}
-
 function linkWithArtistId(path: string, artistId: string) {
   if (!artistId) return path;
   const separator = path.includes("?") ? "&" : "?";
@@ -120,7 +115,11 @@ function linkWithArtistId(path: string, artistId: string) {
 }
 
 export default function DashboardPage() {
-  const [artistId, setArtistId] = useState<string>(DEFAULT_ARTIST_ID);
+  const searchParams = useSearchParams();
+  const resolvedArtistId =
+    searchParams.get("artistId")?.trim() || DEFAULT_ARTIST_ID;
+
+  const [artistId, setArtistId] = useState<string>(resolvedArtistId);
   const [usage, setUsage] = useState<Usage | null>(null);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [legal, setLegal] = useState<LegalBlock | null>(null);
@@ -129,34 +128,32 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
 
-  async function loadAll(explicitArtistId?: string) {
-    const resolvedArtistId = explicitArtistId || getArtistIdFromBrowser();
-
-    setArtistId(resolvedArtistId);
+  async function loadAll(currentArtistId: string) {
+    setArtistId(currentArtistId);
     setLoading(true);
     setErr(null);
 
     try {
-      if (!resolvedArtistId) {
+      if (!currentArtistId) {
         throw new Error(
           "Missing artistId. Add ?artistId=... in the URL or set NEXT_PUBLIC_ARTIST_ID."
         );
       }
 
       const [uRes, oRes, aRes] = await Promise.all([
-        fetch(`${API}/artists/${resolvedArtistId}/usage`, {
+        fetch(`${API}/artists/${currentArtistId}/usage`, {
           cache: "no-store",
-          headers: { "x-artist-id": resolvedArtistId },
+          headers: { "x-artist-id": currentArtistId },
         }),
-        fetch(`${API}/dashboard/artist/${resolvedArtistId}/overview`, {
+        fetch(`${API}/dashboard/artist/${currentArtistId}/overview`, {
           cache: "no-store",
-          headers: { "x-artist-id": resolvedArtistId },
+          headers: { "x-artist-id": currentArtistId },
         }),
         fetch(
-          `${API}/billing/access?artistId=${encodeURIComponent(resolvedArtistId)}`,
+          `${API}/billing/access?artistId=${encodeURIComponent(currentArtistId)}`,
           {
             cache: "no-store",
-            headers: { "x-artist-id": resolvedArtistId },
+            headers: { "x-artist-id": currentArtistId },
           }
         ),
       ]);
@@ -185,19 +182,9 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    const currentArtistId = getArtistIdFromBrowser();
-    loadAll(currentArtistId);
-  }, []);
-
-  useEffect(() => {
-    function handlePopState() {
-      const currentArtistId = getArtistIdFromBrowser();
-      loadAll(currentArtistId);
-    }
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
+    setArtistId(resolvedArtistId);
+    loadAll(resolvedArtistId);
+  }, [resolvedArtistId]);
 
   const trialDaysLeft = useMemo(
     () => daysLeft(usage?.trial?.until ?? access?.trialUntil ?? null),
