@@ -60,12 +60,11 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
 
       const data = JSON.parse(text);
 
-      if (data?.gated) {
-        setSubmitErr(
-          `Auto-match is gated: ${data.gated}. Upgrade/TRIAL/PRO nodig.`
-        );
-        return;
-      }
+    if (data?.gated) {
+  setSubmitErr(`Auto-match is gated: ${data.gated}. Upgrade/TRIAL/PRO nodig.`);
+  onDone?.();
+  return;
+}
 
       const newJobId = data?.matchJob?.jobId ?? null;
       if (!newJobId) {
