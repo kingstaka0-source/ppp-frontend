@@ -194,33 +194,61 @@ export default async function TrackDetailPage({
   let access: BillingAccess | null = null;
   let loadError = "";
 
-  try {
-    const [trackRes, matchesRes, pitchesRes, accessRes] = await Promise.all([
-      apiJson(`${API}/tracks/${trackId}`, artistId),
-      apiJson(`${API}/matches?trackId=${trackId}`, artistId),
-      apiJson(`${API}/pitches?trackId=${trackId}`, artistId),
-      apiJson(
-        `${API}/billing/access?artistId=${encodeURIComponent(artistId)}`,
-        artistId
-      ),
-    ]);
-
+   try {
+    const trackRes = await apiJson(`${API}/tracks/${trackId}`, artistId);
     track = trackRes as TrackDetail;
-
-    if (Array.isArray(matchesRes)) {
-      matches = matchesRes as MatchRow[];
-    } else if (Array.isArray(matchesRes?.matches)) {
-      matches = matchesRes.matches as MatchRow[];
-    } else {
-      matches = [];
-    }
-
-    pitchApi = (pitchesRes as PitchesApiRes) ?? {};
-    access = ((accessRes as BillingAccessResponse)?.access ??
-      null) as BillingAccess | null;
   } catch (error) {
     loadError =
-      error instanceof Error ? error.message : "Could not load track page.";
+      error instanceof Error
+        ? `track endpoint failed: ${error.message}`
+        : "track endpoint failed";
+  }
+
+  if (!loadError) {
+    try {
+      const matchesRes = await apiJson(`${API}/matches?trackId=${trackId}`, artistId);
+
+      if (Array.isArray(matchesRes)) {
+        matches = matchesRes as MatchRow[];
+      } else if (Array.isArray((matchesRes as any)?.matches)) {
+        matches = (matchesRes as any).matches as MatchRow[];
+      } else {
+        matches = [];
+      }
+    } catch (error) {
+      loadError =
+        error instanceof Error
+          ? `matches endpoint failed: ${error.message}`
+          : "matches endpoint failed";
+    }
+  }
+
+  if (!loadError) {
+    try {
+      const pitchesRes = await apiJson(`${API}/pitches?trackId=${trackId}`, artistId);
+      pitchApi = (pitchesRes as PitchesApiRes) ?? {};
+    } catch (error) {
+      loadError =
+        error instanceof Error
+          ? `pitches endpoint failed: ${error.message}`
+          : "pitches endpoint failed";
+    }
+  }
+
+  if (!loadError) {
+    try {
+      const accessRes = await apiJson(
+        `${API}/billing/access?artistId=${encodeURIComponent(artistId)}`,
+        artistId
+      );
+      access = ((accessRes as BillingAccessResponse)?.access ??
+        null) as BillingAccess | null;
+    } catch (error) {
+      loadError =
+        error instanceof Error
+          ? `billing access endpoint failed: ${error.message}`
+          : "billing access endpoint failed";
+    }
   }
 
   if (loadError) {
