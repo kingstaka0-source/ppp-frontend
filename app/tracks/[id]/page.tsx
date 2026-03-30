@@ -159,6 +159,8 @@ export default async function TrackDetailPage({
   searchParams: Promise<{ artistId?: string }>;
 }) {
   const { id: trackId } = await params;
+
+  console.log("TRACK PAGE LOADED", trackId);
   const resolvedSearchParams = await searchParams;
 
   const artistId =
