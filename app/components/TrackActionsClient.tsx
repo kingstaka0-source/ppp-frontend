@@ -68,7 +68,7 @@ export function GeneratePitchButton({
         type="button"
         onClick={handleGenerate}
         disabled={disabled || loading}
-        className="rounded-xl border px-4 py-2 text-sm font-medium disabled:opacity-50"
+        className="rounded-xl border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Generating..." : "Generate Pitch"}
       </button>
@@ -130,7 +130,7 @@ export function SendPitchButton({
         type="button"
         onClick={handleSend}
         disabled={disabled || loading}
-        className="rounded-xl border px-4 py-2 text-sm font-medium disabled:opacity-50"
+        className="rounded-xl border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Sending..." : "Send"}
       </button>
