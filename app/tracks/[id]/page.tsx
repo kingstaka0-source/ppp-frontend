@@ -260,9 +260,13 @@ export default async function TrackDetailPage({
     const visibleMatchCount =
       typeof backendMatchCount === "number" ? backendMatchCount : matches.length;
 
-    const plan = billing?.plan || "UNKNOWN";
-    const canCreatePitch = billing?.canCreatePitch !== false;
-    const canSendEmails = billing?.canSendEmails === true;
+    const plan = billing?.access?.plan || "UNKNOWN";
+
+const canCreatePitch =
+  billing?.access?.features?.canCreatePitch === true;
+
+const canSendEmails =
+  billing?.access?.features?.canAutoSend === true;
 
     return (
       <main className="mx-auto max-w-5xl p-6">
