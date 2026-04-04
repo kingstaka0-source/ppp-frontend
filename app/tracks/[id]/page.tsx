@@ -1,6 +1,8 @@
 import Link from "next/link";
-import GeneratePitchButton from "@/app/components/GeneratePitchButton";
-import SendPitchButton from "@/app/components/SendPitchButton";
+import {
+  GeneratePitchButton,
+  SendPitchButton,
+} from "@/app/components/TrackActionsClient";
 
 type PageProps = {
   params: Promise<{ id: string }>;
