@@ -56,12 +56,27 @@ type PitchItem = {
 type PitchesResponse = PitchItem[] | { pitches?: PitchItem[] };
 
 type BillingAccessResponse = {
-  plan?: string;
-  canLaunchCampaign?: boolean;
-  canBulkQueue?: boolean;
-  canAutoSend?: boolean;
-  canSendEmails?: boolean;
-  canCreatePitch?: boolean;
+  ok?: boolean;
+  access?: {
+    plan?: string;
+    isPaid?: boolean;
+    trialUntil?: string | null;
+    subscriptionStatus?: string | null;
+    currentPeriodEnd?: string | null;
+    cancelAtPeriodEnd?: boolean;
+    limits?: {
+      pitchesPerMonth?: number;
+      createdThisMonth?: number;
+      remaining?: number;
+    };
+    features?: {
+      canCreatePitch?: boolean;
+      canLaunchCampaign?: boolean;
+      canAutoSend?: boolean;
+      canBulkQueue?: boolean;
+      canUseUnlimitedPitches?: boolean;
+    };
+  };
 };
 
 function getSingleParam(value?: string | string[]) {
@@ -267,6 +282,8 @@ const canCreatePitch =
 
 const canSendEmails =
   billing?.access?.features?.canAutoSend === true;
+
+  console.log("BILLING DEBUG", JSON.stringify(billing, null, 2));
 
     return (
       <main className="mx-auto max-w-5xl p-6">
