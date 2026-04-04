@@ -17,6 +17,18 @@ type TrackResponse = {
   matchesCount?: number;
 };
 
+type MatchItem = {
+  id: string;
+  fitScore?: number | null;
+  explanation?: string | null;
+  playlist?: {
+    id: string;
+    name?: string | null;
+  } | null;
+};
+
+type MatchesResponse = MatchItem[] | { matches?: MatchItem[] };
+
 function getSingleParam(value?: string | string[]) {
   if (Array.isArray(value)) return value[0];
   return value;
@@ -30,11 +42,15 @@ function formatDuration(ms?: number) {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
+function normalizeMatches(data: MatchesResponse): MatchItem[] {
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.matches)) return data.matches;
+  return [];
+}
+
 async function getTrack(id: string, artistId: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!baseUrl) {
-    throw new Error("NEXT_PUBLIC_API_URL is missing");
-  }
+  if (!baseUrl) throw new Error("NEXT_PUBLIC_API_URL is missing");
 
   const url = `${baseUrl}/tracks/${encodeURIComponent(id)}?artistId=${encodeURIComponent(
     artistId
@@ -57,6 +73,35 @@ async function getTrack(id: string, artistId: string) {
   return (await res.json()) as TrackResponse;
 }
 
+async function getMatches(trackId: string, artistId: string): Promise<MatchItem[]> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!baseUrl) return [];
+
+  const url = `${baseUrl}/matches?trackId=${encodeURIComponent(
+    trackId
+  )}&artistId=${encodeURIComponent(artistId)}`;
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-artist-id": artistId,
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = (await res.json()) as MatchesResponse;
+    return normalizeMatches(data);
+  } catch {
+    return [];
+  }
+}
+
 export default async function TrackDetailPage({
   params,
   searchParams,
@@ -71,7 +116,7 @@ export default async function TrackDetailPage({
 
   if (!artistId) {
     return (
-      <main className="mx-auto max-w-3xl p-6">
+      <main className="mx-auto max-w-5xl p-6">
         <div className="rounded-2xl border p-6">
           <h1 className="text-2xl font-semibold">Track not available</h1>
           <p className="mt-3 text-sm text-gray-600">
@@ -93,6 +138,7 @@ export default async function TrackDetailPage({
 
   try {
     const track = await getTrack(id, artistId);
+    const matches = await getMatches(track.id, artistId);
 
     const title = track.title || track.name || "Untitled track";
     const artists =
@@ -100,10 +146,12 @@ export default async function TrackDetailPage({
         ? track.artists.join(", ")
         : "—";
     const durationMs = track.durationMs ?? track.duration;
-    const matchCount = track.matchCount ?? track.matchesCount;
+    const backendMatchCount = track.matchCount ?? track.matchesCount;
+    const visibleMatchCount =
+      typeof backendMatchCount === "number" ? backendMatchCount : matches.length;
 
     return (
-      <main className="mx-auto max-w-3xl p-6">
+      <main className="mx-auto max-w-5xl p-6">
         <div className="mb-6">
           <Link
             href={`/dashboard?artistId=${encodeURIComponent(artistId)}`}
@@ -137,9 +185,7 @@ export default async function TrackDetailPage({
               <p className="text-xs uppercase tracking-wide text-gray-500">
                 Match count
               </p>
-              <p className="mt-2 text-base font-medium">
-                {typeof matchCount === "number" ? matchCount : "—"}
-              </p>
+              <p className="mt-2 text-base font-medium">{visibleMatchCount}</p>
             </div>
 
             <div className="rounded-xl border p-4">
@@ -150,6 +196,47 @@ export default async function TrackDetailPage({
             </div>
           </div>
         </div>
+
+        <div className="mt-6 rounded-2xl border p-6 shadow-sm">
+          <h2 className="text-2xl font-semibold">Matches</h2>
+
+          {matches.length === 0 ? (
+            <p className="mt-4 text-sm text-gray-600">
+              No matches found yet.
+            </p>
+          ) : (
+            <div className="mt-4 space-y-4">
+              {matches.map((match) => (
+                <div key={match.id} className="rounded-xl border p-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Playlist</p>
+                      <p className="text-base font-semibold">
+                        {match.playlist?.name || "Unnamed playlist"}
+                      </p>
+                    </div>
+
+                    <div className="sm:text-right">
+                      <p className="text-sm text-gray-500">Fit score</p>
+                      <p className="text-base font-semibold">
+                        {typeof match.fitScore === "number"
+                          ? match.fitScore
+                          : "—"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-500">Explanation</p>
+                    <p className="mt-1 text-sm">
+                      {match.explanation?.trim() || "No explanation available."}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </main>
     );
   } catch (error) {
@@ -157,7 +244,7 @@ export default async function TrackDetailPage({
       error instanceof Error ? error.message : "Unknown error loading track";
 
     return (
-      <main className="mx-auto max-w-3xl p-6">
+      <main className="mx-auto max-w-5xl p-6">
         <div className="mb-6">
           <Link
             href={`/dashboard?artistId=${encodeURIComponent(artistId)}`}
