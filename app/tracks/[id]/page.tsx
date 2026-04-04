@@ -1,4 +1,6 @@
 import Link from "next/link";
+import GeneratePitchButton from "@/app/components/GeneratePitchButton";
+import SendPitchButton from "@/app/components/SendPitchButton";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -52,6 +54,15 @@ type PitchItem = {
 };
 
 type PitchesResponse = PitchItem[] | { pitches?: PitchItem[] };
+
+type BillingAccessResponse = {
+  plan?: string;
+  canLaunchCampaign?: boolean;
+  canBulkQueue?: boolean;
+  canAutoSend?: boolean;
+  canSendEmails?: boolean;
+  canCreatePitch?: boolean;
+};
 
 function getSingleParam(value?: string | string[]) {
   if (Array.isArray(value)) return value[0];
@@ -171,6 +182,32 @@ async function getPitches(trackId: string, artistId: string): Promise<PitchItem[
   }
 }
 
+async function getBillingAccess(
+  artistId: string
+): Promise<BillingAccessResponse | null> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!baseUrl) return null;
+
+  const url = `${baseUrl}/billing/access?artistId=${encodeURIComponent(artistId)}`;
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-artist-id": artistId,
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) return null;
+
+    return (await res.json()) as BillingAccessResponse;
+  } catch {
+    return null;
+  }
+}
+
 export default async function TrackDetailPage({
   params,
   searchParams,
@@ -207,9 +244,10 @@ export default async function TrackDetailPage({
 
   try {
     const track = await getTrack(id, artistId);
-    const [matches, pitches] = await Promise.all([
+    const [matches, pitches, billing] = await Promise.all([
       getMatches(track.id, artistId),
       getPitches(track.id, artistId),
+      getBillingAccess(artistId),
     ]);
 
     const title = track.title || track.name || "Untitled track";
@@ -222,15 +260,23 @@ export default async function TrackDetailPage({
     const visibleMatchCount =
       typeof backendMatchCount === "number" ? backendMatchCount : matches.length;
 
+    const plan = billing?.plan || "UNKNOWN";
+    const canCreatePitch = billing?.canCreatePitch !== false;
+    const canSendEmails = billing?.canSendEmails === true;
+
     return (
       <main className="mx-auto max-w-5xl p-6">
-        <div className="mb-6">
+        <div className="mb-6 flex flex-wrap items-center gap-3">
           <Link
             href={`/dashboard?artistId=${encodeURIComponent(artistId)}`}
             className="inline-flex rounded-xl border px-4 py-2 text-sm font-medium"
           >
             ← Back to dashboard
           </Link>
+
+          <div className="rounded-xl border px-3 py-2 text-sm">
+            Plan: <span className="font-semibold">{plan}</span>
+          </div>
         </div>
 
         <div className="rounded-2xl border p-6 shadow-sm">
@@ -300,6 +346,18 @@ export default async function TrackDetailPage({
                       {match.explanation?.trim() || "No explanation available."}
                     </p>
                   </div>
+
+                  <GeneratePitchButton
+                    matchId={match.id}
+                    artistId={artistId}
+                    disabled={!canCreatePitch}
+                  />
+
+                  {!canCreatePitch ? (
+                    <p className="mt-2 text-xs text-gray-600">
+                      Upgrade required to generate more pitches.
+                    </p>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -369,6 +427,18 @@ export default async function TrackDetailPage({
                       <p className="text-sm text-gray-500">Updated</p>
                       <p className="mt-1 text-sm">{formatDate(pitch.updatedAt)}</p>
                     </div>
+
+                    <SendPitchButton
+                      pitchId={pitch.id}
+                      artistId={artistId}
+                      disabled={!canSendEmails || pitch.status === "SENT"}
+                    />
+
+                    {!canSendEmails ? (
+                      <p className="mt-2 text-xs text-gray-600">
+                        Upgrade required to send emails.
+                      </p>
+                    ) : null}
                   </div>
                 );
               })}
