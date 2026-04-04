@@ -29,6 +29,30 @@ type MatchItem = {
 
 type MatchesResponse = MatchItem[] | { matches?: MatchItem[] };
 
+type PitchItem = {
+  id: string;
+  subject?: string | null;
+  body?: string | null;
+  status?: "DRAFT" | "QUEUED" | "SENT" | string | null;
+  channel?: "INAPP" | "EMAIL" | string | null;
+  sentTo?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  match?: {
+    id: string;
+    playlist?: {
+      id: string;
+      name?: string | null;
+    } | null;
+  } | null;
+  playlist?: {
+    id: string;
+    name?: string | null;
+  } | null;
+};
+
+type PitchesResponse = PitchItem[] | { pitches?: PitchItem[] };
+
 function getSingleParam(value?: string | string[]) {
   if (Array.isArray(value)) return value[0];
   return value;
@@ -42,9 +66,29 @@ function formatDuration(ms?: number) {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
+function formatDate(value?: string | null) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleString();
+}
+
+function truncate(text?: string | null, max = 220) {
+  if (!text) return "—";
+  const clean = text.trim();
+  if (clean.length <= max) return clean;
+  return `${clean.slice(0, max)}...`;
+}
+
 function normalizeMatches(data: MatchesResponse): MatchItem[] {
   if (Array.isArray(data)) return data;
   if (data && Array.isArray(data.matches)) return data.matches;
+  return [];
+}
+
+function normalizePitches(data: PitchesResponse): PitchItem[] {
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.pitches)) return data.pitches;
   return [];
 }
 
@@ -91,12 +135,37 @@ async function getMatches(trackId: string, artistId: string): Promise<MatchItem[
       cache: "no-store",
     });
 
-    if (!res.ok) {
-      return [];
-    }
+    if (!res.ok) return [];
 
     const data = (await res.json()) as MatchesResponse;
     return normalizeMatches(data);
+  } catch {
+    return [];
+  }
+}
+
+async function getPitches(trackId: string, artistId: string): Promise<PitchItem[]> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!baseUrl) return [];
+
+  const url = `${baseUrl}/pitches?trackId=${encodeURIComponent(
+    trackId
+  )}&artistId=${encodeURIComponent(artistId)}`;
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-artist-id": artistId,
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) return [];
+
+    const data = (await res.json()) as PitchesResponse;
+    return normalizePitches(data);
   } catch {
     return [];
   }
@@ -138,7 +207,10 @@ export default async function TrackDetailPage({
 
   try {
     const track = await getTrack(id, artistId);
-    const matches = await getMatches(track.id, artistId);
+    const [matches, pitches] = await Promise.all([
+      getMatches(track.id, artistId),
+      getPitches(track.id, artistId),
+    ]);
 
     const title = track.title || track.name || "Untitled track";
     const artists =
@@ -201,9 +273,7 @@ export default async function TrackDetailPage({
           <h2 className="text-2xl font-semibold">Matches</h2>
 
           {matches.length === 0 ? (
-            <p className="mt-4 text-sm text-gray-600">
-              No matches found yet.
-            </p>
+            <p className="mt-4 text-sm text-gray-600">No matches found yet.</p>
           ) : (
             <div className="mt-4 space-y-4">
               {matches.map((match) => (
@@ -219,9 +289,7 @@ export default async function TrackDetailPage({
                     <div className="sm:text-right">
                       <p className="text-sm text-gray-500">Fit score</p>
                       <p className="text-base font-semibold">
-                        {typeof match.fitScore === "number"
-                          ? match.fitScore
-                          : "—"}
+                        {typeof match.fitScore === "number" ? match.fitScore : "—"}
                       </p>
                     </div>
                   </div>
@@ -234,6 +302,76 @@ export default async function TrackDetailPage({
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6 rounded-2xl border p-6 shadow-sm">
+          <h2 className="text-2xl font-semibold">Pitches</h2>
+
+          {pitches.length === 0 ? (
+            <p className="mt-4 text-sm text-gray-600">No pitches found yet.</p>
+          ) : (
+            <div className="mt-4 space-y-4">
+              {pitches.map((pitch) => {
+                const playlistName =
+                  pitch.playlist?.name ||
+                  pitch.match?.playlist?.name ||
+                  "Unknown playlist";
+
+                return (
+                  <div key={pitch.id} className="rounded-xl border p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="text-sm text-gray-500">Subject</p>
+                        <p className="text-base font-semibold">
+                          {pitch.subject?.trim() || "Untitled pitch"}
+                        </p>
+                      </div>
+
+                      <div className="sm:text-right">
+                        <p className="text-sm text-gray-500">Status</p>
+                        <p className="text-base font-semibold">
+                          {pitch.status || "—"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 grid gap-4 sm:grid-cols-3">
+                      <div>
+                        <p className="text-sm text-gray-500">Playlist</p>
+                        <p className="mt-1 text-sm font-medium">{playlistName}</p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-gray-500">Channel</p>
+                        <p className="mt-1 text-sm font-medium">
+                          {pitch.channel || "—"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-gray-500">Sent to</p>
+                        <p className="mt-1 break-all text-sm font-medium">
+                          {pitch.sentTo || "—"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-3">
+                      <p className="text-sm text-gray-500">Body</p>
+                      <p className="mt-1 text-sm">
+                        {truncate(pitch.body, 260)}
+                      </p>
+                    </div>
+
+                    <div className="mt-3">
+                      <p className="text-sm text-gray-500">Updated</p>
+                      <p className="mt-1 text-sm">{formatDate(pitch.updatedAt)}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
