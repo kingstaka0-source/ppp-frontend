@@ -65,8 +65,8 @@ export default function SendAllPitchesButton({
       }
 
       alert(
-        `Done ✅\n\nTotal: ${j.total ?? j.totalDraftsFound ?? 0}\nSent: ${j.sentCount ?? j.sent ?? 0}\nFailed: ${j.failedCount ?? j.failed ?? 0}`
-      );
+  `Done ✅\n\nTotal: ${j.total ?? 0}\nSent: ${j.sentCount ?? 0}\nFailed: ${j.failedCount ?? 0}\n\nFirst error:\n${j.results?.find((r: any) => !r.ok)?.error || "none"}`
+);
 
       window.location.reload();
     } catch (e: any) {
