@@ -4,6 +4,7 @@ import {
   SendPitchButton,
 } from "@/app/components/TrackActionsClient";
 import LaunchCampaignButton from "./LaunchCampaignButton";
+import SendAllPitchesButton from "@/app/components/SendAllPitchesButton";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -275,8 +276,7 @@ export default async function TrackDetailPage({
         : "—";
     const durationMs = track.durationMs ?? track.duration;
     const backendMatchCount = track.matchCount ?? track.matchesCount;
-    const visibleMatchCount =
-      typeof backendMatchCount === "number" ? backendMatchCount : matches.length;
+    const visibleMatchCount = matches.length;
 
     const plan = billing?.access?.plan || "UNKNOWN";
 
@@ -345,6 +345,12 @@ const canSendEmails =
   trackId={track.id}
   artistId={artistId}
   disabled={!canLaunchCampaign}
+/>
+
+<SendAllPitchesButton
+  trackId={track.id}
+  artistId={artistId}
+  disabled={!canSendEmails}
 />
 
         <div className="mt-6 rounded-2xl border p-6 shadow-sm">

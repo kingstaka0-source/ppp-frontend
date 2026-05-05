@@ -33,8 +33,8 @@ export default function SendAllPitchesButton({
 
     const confirmText =
       mode === "drafts"
-        ? "Send all existing DRAFT pitches for this track now?\n\nIn test mode this sends to kingstaka0@gmail.com."
-        : "Auto create/generate/send pitches for this track now?\n\nIn test mode this sends to kingstaka0@gmail.com.";
+        ? "Send all existing DRAFT pitches for this track now?\n\nThis will send emails using your current backend email configuration."
+        : "Auto create/generate/send pitches for this track now?\n\nThis will send emails using your current backend email configuration.";
 
     const ok = window.confirm(confirmText);
     if (!ok) return;
@@ -65,7 +65,7 @@ export default function SendAllPitchesButton({
       }
 
       alert(
-        `Done ✅\n\nTotal: ${j.total ?? 0}\nSent: ${j.sentCount ?? 0}\nFailed: ${j.failedCount ?? 0}`
+        `Done ✅\n\nTotal: ${j.total ?? j.totalDraftsFound ?? 0}\nSent: ${j.sentCount ?? j.sent ?? 0}\nFailed: ${j.failedCount ?? j.failed ?? 0}`
       );
 
       window.location.reload();
