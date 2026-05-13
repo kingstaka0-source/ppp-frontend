@@ -95,19 +95,64 @@ export default function SendAllPitchesButton({
         </button>
 
         <button
-          onClick={() =>
-            callEndpoint(`${API}/tracks/${trackId}/auto-pitch-send`, "auto")
-          }
-          disabled={disabled || isBusy}
-          className={`px-4 py-2 rounded transition ${
-            disabled || isBusy
-              ? "cursor-not-allowed bg-gray-200 text-gray-500"
-              : "bg-blue-600 text-white"
-          }`}
-        >
-          {autoSending ? "Auto Sending..." : "Auto Pitch + Send"}
-        </button>
+  onClick={() =>
+    callEndpoint(`${API}/tracks/${trackId}/auto-pitch-send`, "auto")
+  }
+  disabled={disabled || isBusy}
+  className={`px-4 py-2 rounded transition ${
+    disabled || isBusy
+      ? "cursor-not-allowed bg-gray-200 text-gray-500"
+      : "bg-blue-600 text-white"
+  }`}
+>
+  {autoSending ? "Auto Sending..." : "Auto Pitch + Send"}
+</button>
+
+<button
+  onClick={async () => {
+    try {
+      const res = await fetch(
+        `${API}/tracks/${trackId}/send-batch`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-artist-id": artistId,
+          },
+          body: JSON.stringify({
+            limit: 5,
+            resend: true,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      alert(
+        [
+          "Resend Batch Done ✅",
+          "",
+          `Sent: ${data.sentCount || 0}`,
+          `Failed: ${data.failedCount || 0}`,
+          `Remaining drafts: ${data.remainingDrafts || 0}`,
+        ].join("\n")
+      );
+    } catch (e: any) {
+      alert(e?.message || "Resend batch failed");
+    }
+  }}
+  disabled={disabled || isBusy}
+  className={`px-4 py-2 rounded transition ${
+    disabled || isBusy
+      ? "cursor-not-allowed bg-gray-200 text-gray-500"
+      : "bg-purple-600 text-white"
+  }`}
+>
+  Resend Batch (5)
+</button>
       </div>
+
+      
 
       {disabled && lockedReason ? (
         <div className="text-xs text-amber-700">
