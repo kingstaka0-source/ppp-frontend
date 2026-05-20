@@ -5,6 +5,7 @@ import {
 } from "@/app/components/TrackActionsClient";
 import LaunchCampaignButton from "./LaunchCampaignButton";
 import SendAllPitchesButton from "@/app/components/SendAllPitchesButton";
+import DetectPlaylistButton from "./DetectPlaylistButton";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -351,6 +352,11 @@ const canSendEmails =
   trackId={track.id}
   artistId={artistId}
   disabled={!canSendEmails}
+/>
+
+<DetectPlaylistButton
+  trackId={track.id}
+  artistId={artistId}
 />
 
         <div className="mt-6 rounded-2xl border p-6 shadow-sm">
