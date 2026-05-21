@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import FoundPlaylists from "./FoundPlaylists";
+import { useRouter } from "next/navigation";
 
 type Placement = {
   id: string;
@@ -23,6 +24,8 @@ export default function ClientPlacements({
     useState<Placement[]>(initialPlacements);
 
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   async function refreshPlacements() {
     try {
@@ -54,8 +57,9 @@ export default function ClientPlacements({
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
-    }
+  setLoading(false);
+  router.refresh();
+}
   }
 
   return (
