@@ -54,6 +54,7 @@ export default function ClientPlacements({
       const data = await res.json();
 
       setPlacements(data);
+      window.location.reload();
     } catch (err) {
       console.error(err);
     } finally {
