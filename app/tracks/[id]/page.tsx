@@ -7,6 +7,7 @@ import LaunchCampaignButton from "./LaunchCampaignButton";
 import SendAllPitchesButton from "@/app/components/SendAllPitchesButton";
 import DetectPlaylistButton from "./DetectPlaylistButton";
 import FoundPlaylists from "./FoundPlaylists";
+import ClientPlacements from "./ClientPlacements";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -362,11 +363,11 @@ const canSendEmails =
   disabled={!canSendEmails}
 />
 
-<DetectPlaylistButton
+<ClientPlacements
+  initialPlacements={foundPlaylists}
   trackId={track.id}
   artistId={artistId}
 />
-<FoundPlaylists placements={foundPlaylists} />
 
         <div className="mt-6 rounded-2xl border p-6 shadow-sm">
           <h2 className="text-2xl font-semibold">Matches</h2>
