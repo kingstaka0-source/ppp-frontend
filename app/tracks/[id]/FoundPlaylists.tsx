@@ -4,7 +4,7 @@ type Placement = {
   id: string;
   name: string;
   followers?: number;
-  spotifyUrl?: string;
+  spotifyUrl?: string | null;
 };
 
 export default function FoundPlaylists({
