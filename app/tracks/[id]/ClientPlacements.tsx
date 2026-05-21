@@ -68,7 +68,7 @@ export default function ClientPlacements({
       <button
         onClick={refreshPlacements}
         disabled={loading}
-        className="rounded-xl bg-green-600 px-5 py-3 text-white font-semibold"
+        className="rounded-xl bg-purple-600 hover:bg-purple-700 px-5 py-3 text-white font-semibold disabled:opacity-50"
       >
         {loading
           ? "Checking placements..."
