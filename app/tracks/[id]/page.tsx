@@ -6,6 +6,7 @@ import {
 import LaunchCampaignButton from "./LaunchCampaignButton";
 import SendAllPitchesButton from "@/app/components/SendAllPitchesButton";
 import DetectPlaylistButton from "./DetectPlaylistButton";
+import FoundPlaylists from "./FoundPlaylists";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -236,34 +237,41 @@ export default async function TrackDetailPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
 
   const artistId =
-    getSingleParam(resolvedSearchParams?.artistId) ||
-    process.env.NEXT_PUBLIC_ARTIST_ID ||
-    "";
+  getSingleParam(resolvedSearchParams?.artistId) ||
+  process.env.NEXT_PUBLIC_ARTIST_ID ||
+  "";
 
-  if (!artistId) {
-    return (
-      <main className="mx-auto max-w-5xl p-6">
-        <div className="rounded-2xl border p-6">
-          <h1 className="text-2xl font-semibold">Track not available</h1>
-          <p className="mt-3 text-sm text-gray-600">
-            Missing artistId in query string and no default artist is set.
-          </p>
+ 
 
-          <div className="mt-6">
-            <Link
-              href="/dashboard"
-              className="inline-flex rounded-xl border px-4 py-2 text-sm font-medium"
-            >
-              Back to dashboard
-            </Link>
-          </div>
-        </div>
-      </main>
-    );
-  }
+ if (!artistId) {
+  return (
+    <main className="mx-auto max-w-5xl p-6">
+      <div className="rounded-2xl border p-6">
+        <h1 className="text-2xl font-semibold">Track not available</h1>
+        <p className="mt-3 text-sm text-gray-600">
+          Missing artistId in query string and no default artist is set.
+        </p>
+      </div>
+    </main>
+  );
+}
 
   try {
     const track = await getTrack(id, artistId);
+
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
+const placementsRes = await fetch(
+  `${baseUrl}/tracks/${track.id}/placements`,
+  {
+    cache: "no-store",
+  }
+);
+
+const foundPlaylists = placementsRes.ok
+  ? await placementsRes.json()
+  : [];
+
     const [matches, pitches, billing] = await Promise.all([
       getMatches(track.id, artistId),
       getPitches(track.id, artistId),
@@ -358,6 +366,7 @@ const canSendEmails =
   trackId={track.id}
   artistId={artistId}
 />
+<FoundPlaylists placements={foundPlaylists} />
 
         <div className="mt-6 rounded-2xl border p-6 shadow-sm">
           <h2 className="text-2xl font-semibold">Matches</h2>
