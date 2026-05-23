@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type Props = {
@@ -12,62 +11,64 @@ type Props = {
 export default function LaunchCampaignButton({
   trackId,
   artistId,
-  disabled = false,
+  disabled,
 }: Props) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
-  async function handleLaunch() {
-    if (disabled || loading) return;
-
+  async function launchCampaign() {
     try {
       setLoading(true);
-      setMessage("");
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!baseUrl) throw new Error("API URL missing");
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-      const res = await fetch(`${baseUrl}/pitches/launch-campaign`, {
+      const sendRes = await fetch(
+        `${apiUrl}/tracks/${trackId}/auto-pitch-send`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-artist-id": artistId,
+          },
+        }
+      );
+
+      const sendData = await sendRes.json();
+
+      if (!sendRes.ok) {
+        alert(sendData?.message || sendData?.error || "Campaign launch failed");
+        return;
+      }
+
+      await fetch(`${apiUrl}/tracks/${trackId}/check-placements`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-artist-id": artistId,
         },
-        body: JSON.stringify({ trackId }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data?.message || "Failed to launch campaign");
-      }
-
-      setMessage(
-        `Campaign done: ${data.created} created, ${data.skippedExisting} skipped`
+      alert(
+        `Campaign completed!\n\nSent: ${sendData.sentCount || 0}\nFailed: ${
+          sendData.failedCount || 0
+        }\nSkipped: ${sendData.skippedCount || 0}`
       );
 
-      router.refresh();
-    } catch (err: any) {
-      setMessage(err.message || "Failed");
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("Campaign launch failed");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="mb-4">
-      <button
-        onClick={handleLaunch}
-        disabled={disabled || loading}
-        className="rounded-xl border px-4 py-2 text-sm font-medium disabled:opacity-50"
-      >
-        {loading ? "Launching..." : "🚀 Launch Campaign"}
-      </button>
-
-      {message && (
-        <p className="mt-2 text-xs text-gray-600">{message}</p>
-      )}
-    </div>
+    <button
+      onClick={launchCampaign}
+      disabled={disabled || loading}
+      className="rounded-xl bg-orange-600 hover:bg-orange-700 px-5 py-3 text-white font-semibold disabled:opacity-50"
+    >
+      {loading ? "Launching campaign..." : "🚀 Launch Campaign"}
+    </button>
   );
 }
