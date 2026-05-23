@@ -15,6 +15,12 @@ export default function LaunchCampaignButton({
 }: Props) {
   const [loading, setLoading] = useState(false);
 
+  const [result, setResult] = useState<{
+  sent: number;
+  failed: number;
+  skipped: number;
+} | null>(null);
+
   async function launchCampaign() {
     try {
       setLoading(true);
@@ -47,13 +53,13 @@ export default function LaunchCampaignButton({
         },
       });
 
-      alert(
-        `Campaign completed!\n\nSent: ${sendData.sentCount || 0}\nFailed: ${
-          sendData.failedCount || 0
-        }\nSkipped: ${sendData.skippedCount || 0}`
-      );
+      setResult({
+  sent: sendData.sentCount || 0,
+  failed: sendData.failedCount || 0,
+  skipped: sendData.skippedCount || 0,
+});
 
-      window.location.reload();
+      
     } catch (err) {
       console.error(err);
       alert("Campaign launch failed");
@@ -63,12 +69,36 @@ export default function LaunchCampaignButton({
   }
 
   return (
+  <div className="space-y-4">
     <button
       onClick={launchCampaign}
       disabled={disabled || loading}
       className="rounded-xl bg-amber-600 hover:bg-amber-700 px-5 py-3 text-white font-semibold shadow-md disabled:opacity-50"
     >
-      {loading ? "Launching campaign..." : "🚀 Launch Campaign"}
+      {loading ? "Launching campaign..." : "Launch Campaign"}
     </button>
-  );
+
+    {result && (
+      <div className="rounded-2xl border border-green-300 bg-green-50 p-5">
+        <h3 className="text-xl font-bold mb-3">
+          Campaign Results
+        </h3>
+
+        <div className="space-y-2 text-sm">
+          <div>
+            ✅ Sent: <strong>{result.sent}</strong>
+          </div>
+
+          <div>
+            ❌ Failed: <strong>{result.failed}</strong>
+          </div>
+
+          <div>
+            ⏭️ Skipped: <strong>{result.skipped}</strong>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+);
 }
