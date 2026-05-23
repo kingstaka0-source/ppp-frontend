@@ -8,6 +8,7 @@ import SendAllPitchesButton from "@/app/components/SendAllPitchesButton";
 import DetectPlaylistButton from "./DetectPlaylistButton";
 import FoundPlaylists from "./FoundPlaylists";
 import ClientPlacements from "./ClientPlacements";
+import ResetCampaignButton from "./ResetCampaignButton";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -355,6 +356,11 @@ const canSendEmails =
   trackId={track.id}
   artistId={artistId}
   disabled={!canLaunchCampaign}
+/>
+
+<ResetCampaignButton
+  trackId={track.id}
+  artistId={artistId}
 />
 
 <SendAllPitchesButton
