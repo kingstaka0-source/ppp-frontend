@@ -66,7 +66,7 @@ export default function LaunchCampaignButton({
     <button
       onClick={launchCampaign}
       disabled={disabled || loading}
-      className="rounded-xl bg-orange-600 hover:bg-orange-700 px-5 py-3 text-white font-semibold disabled:opacity-50"
+      className="rounded-xl bg-amber-600 hover:bg-amber-700 px-5 py-3 text-white font-semibold shadow-md disabled:opacity-50"
     >
       {loading ? "Launching campaign..." : "🚀 Launch Campaign"}
     </button>
