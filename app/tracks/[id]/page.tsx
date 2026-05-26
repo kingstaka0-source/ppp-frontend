@@ -34,6 +34,12 @@ type MatchItem = {
   playlist?: {
     id: string;
     name?: string | null;
+    curator?: {
+      id?: string;
+      name?: string | null;
+      email?: string | null;
+      contactConfidence?: number | null;
+    } | null;
   } | null;
 };
 
@@ -56,9 +62,12 @@ type PitchItem = {
     } | null;
   } | null;
   playlist?: {
-    id: string;
-    name?: string | null;
+  id: string;
+  name?: string | null;
+  curator?: {
+    contactConfidence?: number | null;
   } | null;
+} | null;
 };
 
 type PitchesResponse = PitchItem[] | { pitches?: PitchItem[] };
@@ -263,168 +272,273 @@ export default async function TrackDetailPage({
 
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const placementsRes = await fetch(
-  `${baseUrl}/tracks/${track.id}/placements`,
-  {
-    cache: "no-store",
-  }
-);
+  const placementsRes = await fetch(
+    `${baseUrl}/tracks/${track.id}/placements`,
+    {
+      cache: "no-store",
+    }
+  );
 
-const foundPlaylists = placementsRes.ok
-  ? await placementsRes.json()
-  : [];
+  const foundPlaylists = placementsRes.ok
+    ? await placementsRes.json()
+    : [];
 
-    const [matches, pitches, billing] = await Promise.all([
-      getMatches(track.id, artistId),
-      getPitches(track.id, artistId),
-      getBillingAccess(artistId),
-    ]);
+      const [matches, pitches, billing] = await Promise.all([
+        getMatches(track.id, artistId),
+        getPitches(track.id, artistId),
+        getBillingAccess(artistId),
+      ]);
 
-    const title = track.title || track.name || "Untitled track";
-    const artists =
-      Array.isArray(track.artists) && track.artists.length > 0
-        ? track.artists.join(", ")
-        : "—";
-    const durationMs = track.durationMs ?? track.duration;
-    const backendMatchCount = track.matchCount ?? track.matchesCount;
-    const visibleMatchCount = matches.length;
+      const title = track.title || track.name || "Untitled track";
+      const artists =
+        Array.isArray(track.artists) && track.artists.length > 0
+          ? track.artists.join(", ")
+          : "—";
+      const durationMs = track.durationMs ?? track.duration;
+      const backendMatchCount = track.matchCount ?? track.matchesCount;
+      const visibleMatchCount = matches.length;
 
-    const plan = billing?.access?.plan || "UNKNOWN";
+      const plan = billing?.access?.plan || "UNKNOWN";
 
-const canCreatePitch =
-  billing?.access?.features?.canCreatePitch === true;
+  const canCreatePitch =
+    billing?.access?.features?.canCreatePitch === true;
 
-const canLaunchCampaign =
-  billing?.access?.features?.canLaunchCampaign === true;
+  const canLaunchCampaign =
+    billing?.access?.features?.canLaunchCampaign === true;
 
-const canSendEmails =
-  billing?.access?.features?.canAutoSend === true;
+  const canSendEmails =
+    billing?.access?.features?.canAutoSend === true;
 
-  
-    return (
-      <main className="mx-auto max-w-5xl p-6">
-        <div className="mb-6 flex flex-wrap items-center gap-3">
-          <Link
-            href={`/dashboard?artistId=${encodeURIComponent(artistId)}`}
-            className="inline-flex rounded-xl border px-4 py-2 text-sm font-medium"
-          >
-            ← Back to dashboard
-          </Link>
+    
+      return (
+        <main className="mx-auto max-w-5xl p-6">
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <Link
+              href={`/dashboard?artistId=${encodeURIComponent(artistId)}`}
+              className="inline-flex rounded-xl border px-4 py-2 text-sm font-medium"
+            >
+              ← Back to dashboard
+            </Link>
 
-          <div className="rounded-xl border px-3 py-2 text-sm">
-            Plan: <span className="font-semibold">{plan}</span>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border p-6 shadow-sm">
-          <h1 className="text-3xl font-bold">{title}</h1>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl border p-4">
-              <p className="text-xs uppercase tracking-wide text-gray-500">
-                Artists
-              </p>
-              <p className="mt-2 text-base font-medium">{artists}</p>
-            </div>
-
-            <div className="rounded-xl border p-4">
-              <p className="text-xs uppercase tracking-wide text-gray-500">
-                Duration
-              </p>
-              <p className="mt-2 text-base font-medium">
-                {formatDuration(durationMs)}
-              </p>
-            </div>
-
-            <div className="rounded-xl border p-4">
-              <p className="text-xs uppercase tracking-wide text-gray-500">
-                Match count
-              </p>
-              <p className="mt-2 text-base font-medium">{visibleMatchCount}</p>
-            </div>
-
-            <div className="rounded-xl border p-4">
-              <p className="text-xs uppercase tracking-wide text-gray-500">
-                Track ID
-              </p>
-              <p className="mt-2 break-all text-sm font-medium">{track.id}</p>
+            <div className="rounded-xl border px-3 py-2 text-sm">
+              Plan: <span className="font-semibold">{plan}</span>
             </div>
           </div>
-        </div>
 
-        <LaunchCampaignButton
-  trackId={track.id}
-  artistId={artistId}
-  disabled={!canLaunchCampaign}
-/>
+          <div className="rounded-2xl border p-6 shadow-sm">
+            <h1 className="text-3xl font-bold">{title}</h1>
 
-<ResetCampaignButton
-  trackId={track.id}
-  artistId={artistId}
-/>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-xl border p-4">
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  Artists
+                </p>
+                <p className="mt-2 text-base font-medium">{artists}</p>
+              </div>
 
-<SendAllPitchesButton
-  trackId={track.id}
-  artistId={artistId}
-  disabled={!canSendEmails}
-/>
+              <div className="rounded-xl border p-4">
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  Duration
+                </p>
+                <p className="mt-2 text-base font-medium">
+                  {formatDuration(durationMs)}
+                </p>
+              </div>
 
-<ClientPlacements
-  initialPlacements={foundPlaylists}
-  trackId={track.id}
-  artistId={artistId}
-/>
+              <div className="rounded-xl border p-4">
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  Match count
+                </p>
+                <p className="mt-2 text-base font-medium">{visibleMatchCount}</p>
+              </div>
 
-        <div className="mt-6 rounded-2xl border p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold">Matches</h2>
-
-          {matches.length === 0 ? (
-            <p className="mt-4 text-sm text-gray-600">No matches found yet.</p>
-          ) : (
-            <div className="mt-4 space-y-4">
-              {matches.map((match) => (
-                <div key={match.id} className="rounded-xl border p-4">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">Playlist</p>
-                      <p className="text-base font-semibold">
-                        {match.playlist?.name || "Unnamed playlist"}
-                      </p>
-                    </div>
-
-                    <div className="sm:text-right">
-                      <p className="text-sm text-gray-500">Fit score</p>
-                      <p className="text-base font-semibold">
-                        {typeof match.fitScore === "number" ? match.fitScore : "—"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-500">Explanation</p>
-                    <p className="mt-1 text-sm">
-                      {match.explanation?.trim() || "No explanation available."}
-                    </p>
-                  </div>
-
-                  <GeneratePitchButton
-                    matchId={match.id}
-                    artistId={artistId}
-                    disabled={!canCreatePitch}
-                  />
-
-                  {!canCreatePitch ? (
-                    <p className="mt-2 text-xs text-gray-600">
-                      Upgrade required to generate more pitches.
-                    </p>
-                  ) : null}
-                </div>
-              ))}
+              <div className="rounded-xl border p-4">
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  Track ID
+                </p>
+                <p className="mt-2 break-all text-sm font-medium">{track.id}</p>
+              </div>
             </div>
-          )}
-        </div>
+          </div>
 
-        <div className="mt-6 rounded-2xl border p-6 shadow-sm">
+          <LaunchCampaignButton
+    trackId={track.id}
+    artistId={artistId}
+    disabled={!canLaunchCampaign}
+  />
+
+  <ResetCampaignButton
+    trackId={track.id}
+    artistId={artistId}
+  />
+
+  <SendAllPitchesButton
+    trackId={track.id}
+    artistId={artistId}
+    disabled={!canSendEmails}
+  />
+
+  <ClientPlacements
+    initialPlacements={foundPlaylists}
+    trackId={track.id}
+    artistId={artistId}
+  />
+
+          <div className="mt-6 rounded-2xl border p-6 shadow-sm">
+            <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="rounded-xl border p-4">
+      <p className="text-xs uppercase text-gray-500">
+        Matches
+      </p>
+
+      <p className="mt-2 text-2xl font-bold">
+        {matches.length}
+      </p>
+    </div>
+
+    <div className="rounded-xl border p-4">
+      <p className="text-xs uppercase text-gray-500">
+        Sendable
+      </p>
+
+      <p className="mt-2 text-2xl font-bold">
+        {
+          matches.filter(
+            (m) => m.playlist?.curator?.canEmail
+          ).length
+        }
+      </p>
+    </div>
+
+    <div className="rounded-xl border p-4">
+      <p className="text-xs uppercase text-gray-500">
+        High Priority
+      </p>
+
+      <p className="mt-2 text-2xl font-bold">
+        {
+          matches.filter(
+            (m) =>
+              (m.playlist?.curator
+                ?.contactConfidence || 0) >= 70
+          ).length
+        }
+      </p>
+    </div>
+
+    <div className="rounded-xl border p-4">
+      <p className="text-xs uppercase text-gray-500">
+        Placements
+      </p>
+
+      <p className="mt-2 text-2xl font-bold">
+        {foundPlaylists.length}
+      </p>
+    </div>
+  </div>
+            <h2 className="text-2xl font-semibold">Matches</h2>
+
+            {matches.length === 0 ? (
+  <p className="mt-4 text-sm text-gray-600">
+    No matches found yet.
+  </p>
+) : (
+  <div className="mt-4 space-y-4">
+    {matches.map((match) => {
+      const confidence = Number(
+        match.playlist?.curator?.contactConfidence ?? 0
+      );
+
+      const priority =
+        confidence >= 70
+          ? "HIGH"
+          : confidence >= 40
+          ? "MEDIUM"
+          : "LOW";
+
+      return (
+        <div
+          key={match.id}
+          className="rounded-xl border p-4"
+        >
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-500">
+                Playlist
+              </p>
+
+              <p className="text-base font-semibold">
+                {match.playlist?.name ||
+                  "Unnamed playlist"}
+              </p>
+            </div>
+
+            <div className="sm:text-right">
+              <p className="text-sm text-gray-500">
+                Fit score
+              </p>
+
+              <p className="text-base font-semibold">
+                {typeof match.fitScore === "number"
+                  ? match.fitScore
+                  : "—"}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-3">
+            <p className="text-sm text-gray-500">
+              Explanation
+            </p>
+
+            <p className="mt-1 text-sm">
+              {match.explanation?.trim() ||
+                "No explanation available."}
+            </p>
+          </div>
+
+          <div className="mt-3 text-sm font-medium">
+            Confidence:{" "}
+            <span
+              className={
+                confidence >= 70
+                  ? "text-green-600"
+                  : confidence >= 40
+                  ? "text-yellow-600"
+                  : "text-red-600"
+              }
+            >
+              {confidence}
+            </span>
+          </div>
+
+          <div className="mt-2 text-sm">
+            Priority:{" "}
+            <span
+              className={
+                priority === "HIGH"
+                  ? "text-green-600 font-semibold"
+                  : priority === "MEDIUM"
+                  ? "text-yellow-600 font-semibold"
+                  : "text-red-600 font-semibold"
+              }
+            >
+              {priority}
+            </span>
+          </div>
+
+          <div className="mt-4">
+            <GeneratePitchButton
+              matchId={match.id}
+              artistId={artistId}
+              disabled={!canCreatePitch}
+            />
+          </div>
+        </div>
+      );
+    })}
+  </div>
+)}
           <h2 className="text-2xl font-semibold">Pitches</h2>
 
           {pitches.length === 0 ? (

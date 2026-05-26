@@ -15,11 +15,13 @@ export default function LaunchCampaignButton({
 }: Props) {
   const [loading, setLoading] = useState(false);
 
-  const [result, setResult] = useState<{
+ const [result, setResult] = useState<{
   sent: number;
   failed: number;
   skipped: number;
+  noRecipient: number;
 } | null>(null);
+
 
   async function launchCampaign() {
     try {
@@ -57,6 +59,7 @@ export default function LaunchCampaignButton({
   sent: sendData.sentCount || 0,
   failed: sendData.failedCount || 0,
   skipped: sendData.skippedCount || 0,
+  noRecipient: sendData.noRecipientCount || 0,
 });
 
       
@@ -85,18 +88,22 @@ export default function LaunchCampaignButton({
         </h3>
 
         <div className="space-y-2 text-sm">
-          <div>
-            ✅ Sent: <strong>{result.sent}</strong>
-          </div>
+  <div>
+    ✅ Sent: <strong>{result.sent}</strong>
+  </div>
 
-          <div>
-            ❌ Failed: <strong>{result.failed}</strong>
-          </div>
+  <div>
+    ❌ Failed: <strong>{result.failed}</strong>
+  </div>
 
-          <div>
-            ⏭️ Skipped: <strong>{result.skipped}</strong>
-          </div>
-        </div>
+  <div>
+    ⏭️ Skipped: <strong>{result.skipped}</strong>
+  </div>
+
+  <div>
+    📭 No recipient: <strong>{result.noRecipient}</strong>
+  </div>
+</div>
       </div>
     )}
   </div>
