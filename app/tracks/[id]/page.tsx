@@ -327,6 +327,24 @@ const successRate =
       )
     : 0;
 
+    const largeAudienceCount = foundPlaylists.filter(
+  (p: any) => (p.followers || 0) >= 10000
+).length;
+
+const campaignStrength = Math.min(
+  100,
+  Math.round(
+    successRate * 0.6 +
+      placementRate * 0.3 +
+      Math.min(avgMatchScore, 100) * 0.1
+  )
+);
+
+const recommendedSendCount = Math.min(
+  10,
+  highPriorityCount || matches.length
+);
+
       const plan = billing?.access?.plan || "UNKNOWN";
 
   const canCreatePitch =
@@ -414,6 +432,18 @@ const successRate =
   />
 
           <div className="mt-6 rounded-2xl border p-6 shadow-sm">
+            <div className="mb-6 rounded-2xl border bg-amber-50 p-5">
+  <h3 className="text-xl font-bold">
+    Campaign Recommendations
+  </h3>
+
+  <div className="mt-3 space-y-2 text-sm">
+    <p>🔥 Recommended sends: <strong>{recommendedSendCount}</strong></p>
+    <p>✅ High priority playlists: <strong>{highPriorityCount}</strong></p>
+    <p>📈 Large audience playlists: <strong>{largeAudienceCount}</strong></p>
+    <p>🎯 Campaign strength: <strong>{campaignStrength}%</strong></p>
+  </div>
+</div>
             <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <div className="rounded-xl border p-4">
       <p className="text-xs uppercase text-gray-500">
@@ -497,11 +527,17 @@ const successRate =
 
 <div className="rounded-xl border p-4">
   <p className="text-xs uppercase text-gray-500">
-    High Priority
+    Estimated Reach
   </p>
 
   <p className="mt-2 text-2xl font-bold">
-    {highPriorityCount}
+    {foundPlaylists
+      .reduce(
+        (sum: number, p: any) =>
+          sum + (p.followers || 0),
+        0
+      )
+      .toLocaleString()}
   </p>
 </div>
 
