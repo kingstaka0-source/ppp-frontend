@@ -298,6 +298,34 @@ export default async function TrackDetailPage({
       const durationMs = track.durationMs ?? track.duration;
       const backendMatchCount = track.matchCount ?? track.matchesCount;
       const visibleMatchCount = matches.length;
+      const placementRate =
+  matches.length > 0
+    ? Math.round(
+        (foundPlaylists.length / matches.length) * 100
+      )
+    : 0;
+
+const avgMatchScore =
+  matches.length > 0
+    ? Math.round(
+        matches.reduce(
+          (sum, m) => sum + (m.fitScore || 0),
+          0
+        ) / matches.length
+      )
+    : 0;
+
+const highPriorityCount = matches.filter(
+  (m) =>
+    (m.playlist?.curator?.contactConfidence || 0) >= 70
+).length;
+
+const successRate =
+  matches.length > 0
+    ? Math.round(
+        (highPriorityCount / matches.length) * 100
+      )
+    : 0;
 
       const plan = billing?.access?.plan || "UNKNOWN";
 
@@ -427,16 +455,57 @@ export default async function TrackDetailPage({
       </p>
     </div>
 
-    <div className="rounded-xl border p-4">
-      <p className="text-xs uppercase text-gray-500">
-        Placements
-      </p>
+<div className="rounded-xl border p-4">
+  <p className="text-xs uppercase text-gray-500">
+    Placements
+  </p>
 
-      <p className="mt-2 text-2xl font-bold">
-        {foundPlaylists.length}
-      </p>
-    </div>
-  </div>
+  <p className="mt-2 text-2xl font-bold">
+    {foundPlaylists.length}
+  </p>
+</div>
+
+<div className="rounded-xl border p-4">
+  <p className="text-xs uppercase text-gray-500">
+    Placement Rate
+  </p>
+
+  <p className="mt-2 text-2xl font-bold">
+    {placementRate}%
+  </p>
+</div>
+
+<div className="rounded-xl border p-4">
+  <p className="text-xs uppercase text-gray-500">
+    Avg Match Score
+  </p>
+
+  <p className="mt-2 text-2xl font-bold">
+    {avgMatchScore}
+  </p>
+</div>
+
+<div className="rounded-xl border p-4">
+  <p className="text-xs uppercase text-gray-500">
+    Success Rate
+  </p>
+
+  <p className="mt-2 text-2xl font-bold">
+    {successRate}%
+  </p>
+</div>
+
+<div className="rounded-xl border p-4">
+  <p className="text-xs uppercase text-gray-500">
+    High Priority
+  </p>
+
+  <p className="mt-2 text-2xl font-bold">
+    {highPriorityCount}
+  </p>
+</div>
+
+</div>
             <h2 className="text-2xl font-semibold">Matches</h2>
 
             {matches.length === 0 ? (
