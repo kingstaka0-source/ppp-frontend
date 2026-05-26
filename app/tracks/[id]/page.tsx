@@ -39,6 +39,7 @@ type MatchItem = {
       name?: string | null;
       email?: string | null;
       contactConfidence?: number | null;
+      canEmail?: boolean;
     } | null;
   } | null;
 };
