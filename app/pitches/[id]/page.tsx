@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
 const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
@@ -33,6 +34,12 @@ type Pitch = {
 export default function PitchEditorPage() {
   const params = useParams();
   const pitchId = params?.id as string;
+  const searchParams = useSearchParams();
+
+const artistId =
+  searchParams.get("artistId") ||
+  process.env.NEXT_PUBLIC_ARTIST_ID ||
+  "";
 
   const [pitch, setPitch] = useState<Pitch | null>(null);
   const [subject, setSubject] = useState("");
@@ -48,11 +55,11 @@ export default function PitchEditorPage() {
   const [error, setError] = useState<string | null>(null);
 
   function authHeaders() {
-    return {
-      "Content-Type": "application/json",
-      ...(ARTIST_ID ? { "x-artist-id": ARTIST_ID } : {}),
-    };
-  }
+  return {
+    "Content-Type": "application/json",
+    ...(artistId ? { "x-artist-id": artistId } : {}),
+  };
+}
 
   async function load() {
     try {
@@ -286,7 +293,10 @@ export default function PitchEditorPage() {
         )}
       </div>
 
-      <Link href="/pitches" className="underline">
+      <Link
+  href={`/pitches?artistId=${encodeURIComponent(artistId)}`}
+  className="underline"
+>
         ← Back
       </Link>
 

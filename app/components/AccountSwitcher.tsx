@@ -3,7 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-const DEFAULT_ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
+const ACCOUNTS = [
+  {
+    name: "King Staka (PRO)",
+    id: "cmmnjti0n0004112o3orl713x",
+  },
+  {
+    name: "Free Test",
+    id: "cmn1gunx60000bjtk1jeaq5hg",
+  },
+];
+
+const DEFAULT_ARTIST_ID = ACCOUNTS[0].id;
 
 const STORAGE_KEY = "ppp_recent_artist_ids";
 
@@ -12,6 +23,8 @@ function normalize(value: string) {
 }
 
 export default function AccountSwitcher() {
+  console.log("ACCOUNT SWITCHER LOADED");
+  
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -97,17 +110,19 @@ export default function AccountSwitcher() {
 
       {options.length > 0 ? (
         <div className="flex flex-wrap gap-2">
-          {options.map((id) => (
-            <button
-              key={id}
-              onClick={() => goToArtist(id)}
-              className={`px-3 py-1 rounded border text-sm ${
-                id === currentArtistId ? "bg-black text-white" : ""
-              }`}
-            >
-              {id}
-            </button>
-          ))}
+          {ACCOUNTS.map((account) => (
+  <button
+    key={account.id}
+    onClick={() => goToArtist(account.id)}
+    className={`px-3 py-1 rounded border text-sm ${
+      account.id === currentArtistId
+        ? "bg-black text-white"
+        : ""
+    }`}
+  >
+    {account.name}
+  </button>
+))}
         </div>
       ) : null}
 

@@ -97,6 +97,15 @@ type BillingAccessResponse = {
   };
 };
 
+type CampaignHistoryItem = {
+  id: string;
+  trackId: string;
+  matchesCount: number;
+  placementsCount: number;
+  successRate: number;
+  createdAt: string;
+};
+
 function getSingleParam(value?: string | string[]) {
   if (Array.isArray(value)) return value[0];
   return value;
@@ -112,9 +121,11 @@ function formatDuration(ms?: number) {
 
 function formatDate(value?: string | null) {
   if (!value) return "—";
+
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleString();
+
+  return date.toISOString().replace("T", " ").slice(0, 16);
 }
 
 function truncate(text?: string | null, max = 220) {
@@ -241,6 +252,30 @@ async function getBillingAccess(
   }
 }
 
+async function getCampaignHistory(
+  trackId: string
+): Promise<CampaignHistoryItem[]> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!baseUrl) return [];
+
+  try {
+    const res = await fetch(
+      `${baseUrl}/tracks/${trackId}/campaign-history`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    if (!res.ok) return [];
+
+    const data = await res.json();
+
+    return Array.isArray(data.history) ? data.history : [];
+  } catch {
+    return [];
+  }
+}
+
 export default async function TrackDetailPage({
   params,
   searchParams,
@@ -284,11 +319,13 @@ export default async function TrackDetailPage({
     ? await placementsRes.json()
     : [];
 
-      const [matches, pitches, billing] = await Promise.all([
-        getMatches(track.id, artistId),
-        getPitches(track.id, artistId),
-        getBillingAccess(artistId),
-      ]);
+      const [matches, pitches, billing, campaignHistory] =
+  await Promise.all([
+    getMatches(track.id, artistId),
+    getPitches(track.id, artistId),
+    getBillingAccess(artistId),
+    getCampaignHistory(track.id),
+  ]);
 
       const title = track.title || track.name || "Untitled track";
       const artists =
@@ -430,6 +467,52 @@ const recommendedSendCount = Math.min(
     trackId={track.id}
     artistId={artistId}
   />
+
+  <div className="mt-6 rounded-2xl border p-6 shadow-sm">
+  <h2 className="text-2xl font-semibold">Campaign History</h2>
+
+  {campaignHistory.length === 0 ? (
+    <p className="mt-4 text-sm text-gray-600">
+      No campaign history yet.
+    </p>
+  ) : (
+    <div className="mt-4 space-y-3">
+      {campaignHistory.map((item) => (
+        <div key={item.id} className="rounded-xl border p-4">
+          <div className="grid gap-4 sm:grid-cols-4">
+            <div>
+              <p className="text-xs uppercase text-gray-500">Date</p>
+              <p className="mt-1 text-sm font-medium">
+                {formatDate(item.createdAt)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase text-gray-500">Matches</p>
+              <p className="mt-1 text-sm font-medium">
+                {item.matchesCount}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase text-gray-500">Placements</p>
+              <p className="mt-1 text-sm font-medium">
+                {item.placementsCount}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase text-gray-500">Success</p>
+              <p className="mt-1 text-sm font-medium">
+                {item.successRate}%
+              </p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 
           <div className="mt-6 rounded-2xl border p-6 shadow-sm">
             <div className="mb-6 rounded-2xl border bg-amber-50 p-5">
@@ -709,6 +792,13 @@ const recommendedSendCount = Math.min(
                       <p className="text-sm text-gray-500">Updated</p>
                       <p className="mt-1 text-sm">{formatDate(pitch.updatedAt)}</p>
                     </div>
+
+                    <Link
+  href={`/pitches/${pitch.id}?artistId=${encodeURIComponent(artistId)}`}
+  className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-medium"
+>
+  View full pitch →
+</Link>
 
                     <SendPitchButton
                       pitchId={pitch.id}

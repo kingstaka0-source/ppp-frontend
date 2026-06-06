@@ -28,6 +28,7 @@ export default function LaunchCampaignButton({
       setLoading(true);
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      alert(`API URL: ${apiUrl}`);
 
       const sendRes = await fetch(
         `${apiUrl}/tracks/${trackId}/auto-pitch-send`,
