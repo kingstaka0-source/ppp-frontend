@@ -79,6 +79,12 @@ type Overview = {
   };
   legal: LegalBlock;
   tracks: OverviewTrack[];
+  analytics?: {
+  totalCampaigns?: number;
+  totalSentPitches?: number;
+  totalPlacements?: number;
+  placementRate?: number;
+};
 };
 
 function daysLeft(untilIso?: string | null) {
@@ -201,6 +207,13 @@ export default function DashboardClient() {
     0
   );
 
+  const analytics = overview?.analytics;
+
+const totalCampaigns = analytics?.totalCampaigns ?? 0;
+const totalSentPitches = analytics?.totalSentPitches ?? 0;
+const totalPlacements = analytics?.totalPlacements ?? 0;
+const placementRate = analytics?.placementRate ?? 0;
+
   return (
     <div className="max-w-5xl mx-auto p-8 space-y-6">
       {!loading && !err && artistId && (
@@ -249,6 +262,34 @@ export default function DashboardClient() {
       <div className="text-sm text-gray-600">
         API: {API} • Artist: {artistId || "(missing artistId)"}
       </div>
+
+      {!loading && !err && overview && (
+  <div className="rounded-2xl border p-6 shadow-sm">
+    <h2 className="text-2xl font-semibold">Campaign Analytics</h2>
+
+    <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="rounded-xl border p-4">
+        <p className="text-xs uppercase text-gray-500">Campaigns</p>
+        <p className="mt-2 text-2xl font-bold">{totalCampaigns}</p>
+      </div>
+
+      <div className="rounded-xl border p-4">
+        <p className="text-xs uppercase text-gray-500">Pitches Sent</p>
+        <p className="mt-2 text-2xl font-bold">{totalSentPitches}</p>
+      </div>
+
+      <div className="rounded-xl border p-4">
+        <p className="text-xs uppercase text-gray-500">Placements</p>
+        <p className="mt-2 text-2xl font-bold">{totalPlacements}</p>
+      </div>
+
+      <div className="rounded-xl border p-4">
+        <p className="text-xs uppercase text-gray-500">Placement Rate</p>
+        <p className="mt-2 text-2xl font-bold">{placementRate}%</p>
+      </div>
+    </div>
+  </div>
+)}
 
       {loading && <p>Loading…</p>}
       {err && <p className="text-red-600 whitespace-pre-wrap">Error: {err}</p>}
