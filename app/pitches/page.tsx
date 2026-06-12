@@ -14,10 +14,30 @@ type PitchRow = {
   sentAt?: string | null;
   sentTo?: string | null;
   match?: {
+  id: string;
+  trackId: string;
+  playlistId: string;
+  track?: {
     id: string;
-    trackId: string;
-    playlistId: string;
+    title: string;
+    spotifyTrackId?: string | null;
+    artists?: string[];
   } | null;
+  playlist?: {
+    id: string;
+    name: string;
+    spotifyPlaylistId?: string | null;
+    genres?: string[];
+    curator?: {
+      id: string;
+      name: string | null;
+      email?: string | null;
+      contactMethod?: string;
+      consent?: boolean;
+      canEmail?: boolean;
+    } | null;
+  } | null;
+} | null;
   track?: {
     id: string;
     title: string;
@@ -151,20 +171,20 @@ export default function PitchesPage() {
         throw new Error("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
       }
 
-      const res = await fetch(`${API}/pitches`, {
-        headers: {
-          "x-artist-id": ARTIST_ID,
-        },
-        cache: "no-store",
-      });
+      const res = await fetch(`${API}/pitches/all`, {
+  headers: {
+    "x-artist-id": ARTIST_ID,
+  },
+  cache: "no-store",
+});
 
-      const json: PitchesApiResponse = await res.json().catch(() => ({}));
+      const json = await res.json().catch(() => []);
 
-      if (!res.ok) {
-        throw new Error(json?.error || json?.message || `HTTP ${res.status}`);
-      }
+if (!res.ok) {
+  throw new Error(`HTTP ${res.status}`);
+}
 
-      setPitches(Array.isArray(json?.pitches) ? json.pitches : []);
+setPitches(Array.isArray(json) ? json : []);
     } catch (error) {
       setError(error instanceof Error ? error.message : "Failed to load pitches");
       setPitches([]);
@@ -216,7 +236,7 @@ export default function PitchesPage() {
     const map = new Map<string, string>();
 
     for (const pitch of pitches) {
-      const playlist = pitch.playlist;
+     const playlist = pitch.playlist ?? pitch.match?.playlist ?? null;
       if (playlist?.id) {
         map.set(playlist.id, playlist.name || playlist.id);
       }
@@ -229,7 +249,8 @@ export default function PitchesPage() {
     const map = new Map<string, string>();
 
     for (const pitch of pitches) {
-      const curator = pitch.curator;
+      const curator =
+  pitch.curator ?? pitch.match?.playlist?.curator ?? null;
       if (curator?.id) {
         map.set(curator.id, curator.name || curator.id);
       }
@@ -241,8 +262,11 @@ export default function PitchesPage() {
   const filtered = useMemo(() => {
     return pitches.filter((pitch) => {
       if (status !== "ALL" && pitch.status !== status) return false;
-      if (playlistId !== "ALL" && pitch.playlist?.id !== playlistId) return false;
-      if (curatorId !== "ALL" && pitch.curator?.id !== curatorId) return false;
+      const playlist = pitch.playlist ?? pitch.match?.playlist ?? null;
+const curator = pitch.curator ?? pitch.match?.playlist?.curator ?? null;
+
+if (playlistId !== "ALL" && playlist?.id !== playlistId) return false;
+if (curatorId !== "ALL" && curator?.id !== curatorId) return false;
       return true;
     });
   }, [pitches, status, playlistId, curatorId]);
@@ -411,9 +435,10 @@ export default function PitchesPage() {
 
           <tbody>
             {filtered.map((pitch) => {
-              const track = pitch.track;
-              const playlist = pitch.playlist;
-              const curator = pitch.curator;
+              const track = pitch.track ?? pitch.match?.track ?? null;
+const playlist = pitch.playlist ?? pitch.match?.playlist ?? null;
+const curator =
+  pitch.curator ?? pitch.match?.playlist?.curator ?? null;
 
               return (
                 <tr key={pitch.id} className="border-b align-top">
