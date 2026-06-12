@@ -264,31 +264,48 @@ const placementRate = analytics?.placementRate ?? 0;
       </div>
 
       {!loading && !err && overview && (
-  <div className="rounded-2xl border p-6 shadow-sm">
-    <h2 className="text-2xl font-semibold">Campaign Analytics</h2>
+  <section className="rounded-2xl border bg-white p-6 shadow-sm">
+    <div className="flex flex-col gap-1">
+      <h2 className="text-2xl font-semibold">Campaign Analytics</h2>
+      <p className="text-sm text-gray-600">
+        Track your pitching activity and placement performance.
+      </p>
+    </div>
 
-    <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div className="rounded-xl border p-4">
-        <p className="text-xs uppercase text-gray-500">Campaigns</p>
-        <p className="mt-2 text-2xl font-bold">{totalCampaigns}</p>
+    <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="rounded-xl border bg-gray-50 p-4">
+        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+          Campaigns
+        </p>
+        <p className="mt-2 text-3xl font-bold">{totalCampaigns}</p>
+        <p className="mt-1 text-xs text-gray-500">Campaign runs created</p>
       </div>
 
-      <div className="rounded-xl border p-4">
-        <p className="text-xs uppercase text-gray-500">Pitches Sent</p>
-        <p className="mt-2 text-2xl font-bold">{totalSentPitches}</p>
+      <div className="rounded-xl border bg-gray-50 p-4">
+        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+          Pitches Sent
+        </p>
+        <p className="mt-2 text-3xl font-bold">{totalSentPitches}</p>
+        <p className="mt-1 text-xs text-gray-500">Emails sent to curators</p>
       </div>
 
-      <div className="rounded-xl border p-4">
-        <p className="text-xs uppercase text-gray-500">Placements</p>
-        <p className="mt-2 text-2xl font-bold">{totalPlacements}</p>
+      <div className="rounded-xl border bg-gray-50 p-4">
+        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+          Placements
+        </p>
+        <p className="mt-2 text-3xl font-bold">{totalPlacements}</p>
+        <p className="mt-1 text-xs text-gray-500">Detected playlist adds</p>
       </div>
 
-      <div className="rounded-xl border p-4">
-        <p className="text-xs uppercase text-gray-500">Placement Rate</p>
-        <p className="mt-2 text-2xl font-bold">{placementRate}%</p>
+      <div className="rounded-xl border bg-gray-50 p-4">
+        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+          Placement Rate
+        </p>
+        <p className="mt-2 text-3xl font-bold">{placementRate}%</p>
+        <p className="mt-1 text-xs text-gray-500">Placements / pitches sent</p>
       </div>
     </div>
-  </div>
+  </section>
 )}
 
       {loading && <p>Loading…</p>}
