@@ -84,6 +84,11 @@ type Overview = {
   totalSentPitches?: number;
   totalPlacements?: number;
   placementRate?: number;
+  replyRate?: number;
+  openRate?: number;
+  draftCount?: number;
+  queuedCount?: number;
+  sentCount?: number;
 };
 };
 
@@ -273,38 +278,88 @@ const placementRate = analytics?.placementRate ?? 0;
     </div>
 
     <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div className="rounded-xl border bg-gray-50 p-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-          Campaigns
-        </p>
-        <p className="mt-2 text-3xl font-bold">{totalCampaigns}</p>
-        <p className="mt-1 text-xs text-gray-500">Campaign runs created</p>
-      </div>
 
-      <div className="rounded-xl border bg-gray-50 p-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-          Pitches Sent
-        </p>
-        <p className="mt-2 text-3xl font-bold">{totalSentPitches}</p>
-        <p className="mt-1 text-xs text-gray-500">Emails sent to curators</p>
-      </div>
+  <div className="rounded-xl border bg-gray-50 p-4">
+    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+      Campaigns
+    </p>
+    <p className="mt-2 text-3xl font-bold">
+      {overview.analytics?.totalCampaigns ?? 0}
+    </p>
+    <p className="mt-1 text-xs text-gray-500">Campaign runs created</p>
+  </div>
 
-      <div className="rounded-xl border bg-gray-50 p-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-          Placements
-        </p>
-        <p className="mt-2 text-3xl font-bold">{totalPlacements}</p>
-        <p className="mt-1 text-xs text-gray-500">Detected playlist adds</p>
-      </div>
+  <div className="rounded-xl border bg-gray-50 p-4">
+    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+      Sent
+    </p>
+    <p className="mt-2 text-3xl font-bold">
+      {overview.analytics?.sentCount ?? 0}
+    </p>
+    <p className="mt-1 text-xs text-gray-500">Emails sent to curators</p>
+  </div>
 
-      <div className="rounded-xl border bg-gray-50 p-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-          Placement Rate
-        </p>
-        <p className="mt-2 text-3xl font-bold">{placementRate}%</p>
-        <p className="mt-1 text-xs text-gray-500">Placements / pitches sent</p>
-      </div>
-    </div>
+  <div className="rounded-xl border bg-gray-50 p-4">
+    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+      Drafts
+    </p>
+    <p className="mt-2 text-3xl font-bold">
+      {overview.analytics?.draftCount ?? 0}
+    </p>
+    <p className="mt-1 text-xs text-gray-500">Ready to edit/send</p>
+  </div>
+
+  <div className="rounded-xl border bg-gray-50 p-4">
+    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+      Queued
+    </p>
+    <p className="mt-2 text-3xl font-bold">
+      {overview.analytics?.queuedCount ?? 0}
+    </p>
+    <p className="mt-1 text-xs text-gray-500">Waiting to send</p>
+  </div>
+
+  <div className="rounded-xl border bg-gray-50 p-4">
+    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+      Placements
+    </p>
+    <p className="mt-2 text-3xl font-bold">
+      {overview.analytics?.totalPlacements ?? 0}
+    </p>
+    <p className="mt-1 text-xs text-gray-500">Detected playlist adds</p>
+  </div>
+
+  <div className="rounded-xl border bg-gray-50 p-4">
+    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+      Placement Rate
+    </p>
+    <p className="mt-2 text-3xl font-bold">
+      {overview.analytics?.placementRate ?? 0}%
+    </p>
+    <p className="mt-1 text-xs text-gray-500">Placements / sent pitches</p>
+  </div>
+
+  <div className="rounded-xl border bg-gray-50 p-4">
+    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+      Reply Rate
+    </p>
+    <p className="mt-2 text-3xl font-bold">
+      {overview.analytics?.replyRate ?? 0}%
+    </p>
+    <p className="mt-1 text-xs text-gray-500">Coming soon</p>
+  </div>
+
+  <div className="rounded-xl border bg-gray-50 p-4">
+    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+      Open Rate
+    </p>
+    <p className="mt-2 text-3xl font-bold">
+      {overview.analytics?.openRate ?? 0}%
+    </p>
+    <p className="mt-1 text-xs text-gray-500">Coming soon</p>
+  </div>
+
+</div>
   </section>
 )}
 
