@@ -89,6 +89,37 @@ type Overview = {
   draftCount?: number;
   queuedCount?: number;
   sentCount?: number;
+
+  topPerformingTrack?: {
+    title: string;
+    placementCount: number;
+    sentCount: number;
+  };
+
+  mostPitchedTrack?: {
+    title: string;
+    pitchCount: number;
+  };
+
+  bestPlaylistCategory?: {
+    category: string;
+    pitchCount: number;
+  };
+
+  topCuratorSources?: {
+    source: string;
+    sentCount: number;
+  }[];
+
+  conversionFunnel?: {
+    drafts: number;
+    queued: number;
+    sent: number;
+    placements: number;
+    draftToQueuedRate: number;
+    queuedToSentRate: number;
+    sentToPlacementRate: number;
+  };
 };
 };
 
@@ -360,6 +391,104 @@ const placementRate = analytics?.placementRate ?? 0;
   </div>
 
 </div>
+  </section>
+)}
+
+{!loading && !err && overview?.analytics && (
+  <section className="rounded-2xl border bg-white p-6 shadow-sm">
+    <h2 className="text-2xl font-semibold">Advanced Analytics</h2>
+
+    <div className="mt-5 grid gap-4 md:grid-cols-2">
+
+      <div className="rounded-xl border p-4">
+        <div className="text-sm text-gray-500">
+          Top Performing Track
+        </div>
+        <div className="mt-2 text-xl font-bold">
+          {overview.analytics.topPerformingTrack?.title ?? "-"}
+        </div>
+      </div>
+
+      <div className="rounded-xl border p-4">
+        <div className="text-sm text-gray-500">
+          Most Pitched Track
+        </div>
+        <div className="mt-2 text-xl font-bold">
+          {overview.analytics.mostPitchedTrack?.title ?? "-"}
+        </div>
+      </div>
+
+      <div className="rounded-xl border p-4">
+        <div className="text-sm text-gray-500">
+          Best Playlist Category
+        </div>
+        <div className="mt-2 text-xl font-bold">
+          {overview.analytics.bestPlaylistCategory?.category ?? "-"}
+        </div>
+      </div>
+
+      <div className="rounded-xl border p-4">
+        <div className="text-sm text-gray-500">
+          Top Curator Source
+        </div>
+        <div className="mt-2 text-xl font-bold">
+          {overview.analytics.topCuratorSources?.[0]?.source ?? "-"}
+        </div>
+      </div>
+
+    </div>
+
+    <div className="mt-6 rounded-xl border p-4">
+      <h3 className="font-semibold mb-3">
+        Conversion Funnel
+      </h3>
+
+      <div className="grid grid-cols-4 gap-4">
+
+        <div>
+          <div className="text-xs text-gray-500">Drafts</div>
+          <div className="text-2xl font-bold">
+            {overview.analytics.conversionFunnel?.drafts ?? 0}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-xs text-gray-500">Queued</div>
+          <div className="text-2xl font-bold">
+            {overview.analytics.conversionFunnel?.queued ?? 0}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-xs text-gray-500">Sent</div>
+          <div className="text-2xl font-bold">
+            {overview.analytics.conversionFunnel?.sent ?? 0}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-xs text-gray-500">Placements</div>
+          <div className="text-2xl font-bold">
+            {overview.analytics.conversionFunnel?.placements ?? 0}
+          </div>
+        </div>
+
+      </div>
+
+      <div className="mt-4 text-sm text-gray-600">
+        Draft → Queue:
+        {" "}
+        {overview.analytics.conversionFunnel?.draftToQueuedRate ?? 0}%
+        {" • "}
+        Queue → Sent:
+        {" "}
+        {overview.analytics.conversionFunnel?.queuedToSentRate ?? 0}%
+        {" • "}
+        Sent → Placement:
+        {" "}
+        {overview.analytics.conversionFunnel?.sentToPlacementRate ?? 0}%
+      </div>
+    </div>
   </section>
 )}
 
