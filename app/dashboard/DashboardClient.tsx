@@ -86,6 +86,15 @@ type Overview = {
   placementRate?: number;
   replyRate?: number;
   openRate?: number;
+  clickRate?: number;
+
+  totalOpens?: number;
+  totalClicks?: number;
+  totalReplies?: number;
+
+  interestedCurators?: number;
+  negativeReplies?: number;
+
   draftCount?: number;
   queuedCount?: number;
   sentCount?: number;
@@ -309,87 +318,28 @@ const placementRate = analytics?.placementRate ?? 0;
     </div>
 
     <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-
-  <div className="rounded-xl border bg-gray-50 p-4">
-    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-      Campaigns
-    </p>
-    <p className="mt-2 text-3xl font-bold">
-      {overview.analytics?.totalCampaigns ?? 0}
-    </p>
-    <p className="mt-1 text-xs text-gray-500">Campaign runs created</p>
-  </div>
-
-  <div className="rounded-xl border bg-gray-50 p-4">
-    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-      Sent
-    </p>
-    <p className="mt-2 text-3xl font-bold">
-      {overview.analytics?.sentCount ?? 0}
-    </p>
-    <p className="mt-1 text-xs text-gray-500">Emails sent to curators</p>
-  </div>
-
-  <div className="rounded-xl border bg-gray-50 p-4">
-    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-      Drafts
-    </p>
-    <p className="mt-2 text-3xl font-bold">
-      {overview.analytics?.draftCount ?? 0}
-    </p>
-    <p className="mt-1 text-xs text-gray-500">Ready to edit/send</p>
-  </div>
-
-  <div className="rounded-xl border bg-gray-50 p-4">
-    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-      Queued
-    </p>
-    <p className="mt-2 text-3xl font-bold">
-      {overview.analytics?.queuedCount ?? 0}
-    </p>
-    <p className="mt-1 text-xs text-gray-500">Waiting to send</p>
-  </div>
-
-  <div className="rounded-xl border bg-gray-50 p-4">
-    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-      Placements
-    </p>
-    <p className="mt-2 text-3xl font-bold">
-      {overview.analytics?.totalPlacements ?? 0}
-    </p>
-    <p className="mt-1 text-xs text-gray-500">Detected playlist adds</p>
-  </div>
-
-  <div className="rounded-xl border bg-gray-50 p-4">
-    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-      Placement Rate
-    </p>
-    <p className="mt-2 text-3xl font-bold">
-      {overview.analytics?.placementRate ?? 0}%
-    </p>
-    <p className="mt-1 text-xs text-gray-500">Placements / sent pitches</p>
-  </div>
-
-  <div className="rounded-xl border bg-gray-50 p-4">
-    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-      Reply Rate
-    </p>
-    <p className="mt-2 text-3xl font-bold">
-      {overview.analytics?.replyRate ?? 0}%
-    </p>
-    <p className="mt-1 text-xs text-gray-500">Coming soon</p>
-  </div>
-
-  <div className="rounded-xl border bg-gray-50 p-4">
-    <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-      Open Rate
-    </p>
-    <p className="mt-2 text-3xl font-bold">
-      {overview.analytics?.openRate ?? 0}%
-    </p>
-    <p className="mt-1 text-xs text-gray-500">Coming soon</p>
-  </div>
-
+  {[
+    ["Campaigns", overview.analytics?.totalCampaigns ?? 0, "Campaign runs created"],
+    ["Sent", overview.analytics?.sentCount ?? 0, "Emails sent to curators"],
+    ["Drafts", overview.analytics?.draftCount ?? 0, "Ready to edit/send"],
+    ["Queued", overview.analytics?.queuedCount ?? 0, "Waiting to send"],
+    ["Placements", overview.analytics?.totalPlacements ?? 0, "Detected playlist adds"],
+    ["Placement Rate", `${overview.analytics?.placementRate ?? 0}%`, "Placements / sent pitches"],
+    ["Reply Rate", `${overview.analytics?.replyRate ?? 0}%`, "Email replies"],
+    ["Open Rate", `${overview.analytics?.openRate ?? 0}%`, "Email opens"],
+    ["Click Rate", `${overview.analytics?.clickRate ?? 0}%`, "Spotify link clicks"],
+    ["Interested Curators", overview.analytics?.interestedCurators ?? 0, "Positive responses"],
+    ["Total Opens", overview.analytics?.totalOpens ?? 0, "Tracked email opens"],
+    ["Total Clicks", overview.analytics?.totalClicks ?? 0, "Tracked Spotify clicks"],
+  ].map(([label, value, sub]) => (
+    <div key={label} className="rounded-xl border bg-gray-50 p-4">
+      <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+        {label}
+      </p>
+      <p className="mt-2 text-3xl font-bold">{value}</p>
+      <p className="mt-1 text-xs text-gray-500">{sub}</p>
+    </div>
+  ))}
 </div>
   </section>
 )}
