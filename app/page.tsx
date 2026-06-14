@@ -1,249 +1,247 @@
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import LegalGate from "@/app/components/LegalGate";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
+export const dynamic = "force-dynamic";
 
-type Usage = {
-  artistId: string;
-  plan: "FREE" | "TRIAL" | "PRO";
-  trial: null | { until: string };
-  month: { sentThisMonth: number; limit: number | null; remaining: number | null };
-};
+const artistId = "cmmnjti0n0004112o3orl713x";
 
-type DashboardStats = {
-  artistId: string;
-  month: { sentThisMonth: number; matchesThisMonth: number };
-  totals: { totalMatches: number; totalPitchesSent: number };
-  successRate: number; // 0..1
-};
-
-type LegalBlock = {
-  accepted: Record<string, { version: string; acceptedAt: string }>;
-  required: Record<string, string>;
-  missing?: string[];
-  allAccepted?: boolean;
-};
-
-function daysLeft(untilIso?: string | null) {
-  if (!untilIso) return null;
-  const until = new Date(untilIso).getTime();
-  const now = Date.now();
-  const ms = until - now;
-  const d = Math.ceil(ms / (1000 * 60 * 60 * 24));
-  return d;
-}
-
-export default function DashboardPage() {
-  const [usage, setUsage] = useState<Usage | null>(null);
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [overview, setOverview] = useState<any | null>(null);
-  const [legal, setLegal] = useState<LegalBlock | null>(null);
-
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
-
-  async function loadAll() {
-    setLoading(true);
-    setErr(null);
-
-    try {
-      if (!ARTIST_ID) {
-        throw new Error("Missing NEXT_PUBLIC_ARTIST_ID in your frontend env (.env.local).");
-      }
-
-      const [uRes, sRes, oRes] = await Promise.all([
-        fetch(`${API}/artists/${ARTIST_ID}/usage`, { cache: "no-store" }),
-        fetch(`${API}/dashboard/stats?artistId=${ARTIST_ID}`, { cache: "no-store" }),
-        fetch(`${API}/dashboard/artist/${ARTIST_ID}/overview`, { cache: "no-store" }),
-      ]);
-
-      const uText = await uRes.text();
-      const sText = await sRes.text();
-      const oText = await oRes.text();
-
-      if (!uRes.ok) throw new Error(uText || `Usage HTTP ${uRes.status}`);
-      if (!sRes.ok) throw new Error(sText || `Stats HTTP ${sRes.status}`);
-      if (!oRes.ok) throw new Error(oText || `Overview HTTP ${oRes.status}`);
-
-      setUsage(JSON.parse(uText));
-      setStats(JSON.parse(sText));
-
-      const overview = JSON.parse(oText);
-      setLegal((overview?.legal ?? null) as LegalBlock | null);
-      setOverview(overview);
-    } catch (e: any) {
-      setErr(e?.message ?? "Failed to load dashboard");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const trialDaysLeft = useMemo(() => daysLeft(usage?.trial?.until ?? null), [usage?.trial?.until]);
-  const showTrialBanner = usage?.plan === "TRIAL" && trialDaysLeft !== null;
-  const showTrialWarning = usage?.plan === "TRIAL" && (trialDaysLeft ?? 999) <= 2;
-  const showFreeLimitBanner = usage?.plan === "FREE" && (usage?.month?.remaining ?? 999) <= 1;
-
+export default function HomePage() {
   return (
-    <div className="max-w-5xl mx-auto p-8 space-y-6">
-      {/* ✅ Legal gate (blokkeert de UI tot geaccepteerd) */}
-      {!loading && !err && ARTIST_ID && (
-        <LegalGate subjectType="ARTIST" subjectId={ARTIST_ID} legal={legal} onAccepted={loadAll} />
-      )}
+    <main className="min-h-screen bg-black text-white">
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.35),transparent_35%),linear-gradient(to_bottom,rgba(0,0,0,0.35),#000)]" />
 
-      <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-bold">Dashboard</h1>
-        <div className="flex gap-3">
-          <Link
-            href="/pricing"
-            className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
-          >
-            Pricing
-          </Link>
-          <Link href="/upgrade" className="px-4 py-2 rounded bg-black text-white hover:opacity-90 transition">
-            Upgrade →
-          </Link>
-        </div>
-      </div>
+        <div className="relative mx-auto max-w-6xl px-6 py-24">
+          <nav className="mb-20 flex items-center justify-between">
+            <div className="text-2xl font-black tracking-tight">
+              TuneReach
+            </div>
 
-      <div className="text-sm text-gray-600">
-        API: {API} • Artist: {ARTIST_ID || "(missing NEXT_PUBLIC_ARTIST_ID)"}
-      </div>
+            <div className="flex gap-3">
+              <Link
+                href={`/dashboard?artistId=${artistId}`}
+                className="rounded-full border border-white/30 px-5 py-2 text-sm hover:bg-white hover:text-black transition"
+              >
+                Login
+              </Link>
 
-      {loading && <p>Loading…</p>}
-      {err && <p className="text-red-600 whitespace-pre-wrap">Error: {err}</p>}
+              <Link
+                href={`/upgrade?artistId=${artistId}`}
+                className="rounded-full bg-green-500 px-5 py-2 text-sm font-bold text-black hover:bg-green-400 transition"
+              >
+                Start Free Trial
+              </Link>
+            </div>
+          </nav>
 
-      {/* BANNERS */}
-      {!loading && !err && (
-        <div className="space-y-3">
-          {showTrialBanner && (
-            <div className={`border rounded-xl p-4 ${showTrialWarning ? "bg-yellow-50" : ""}`}>
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <div className="font-semibold">
-                    TRIAL actief — nog {trialDaysLeft} dag{trialDaysLeft === 1 ? "" : "en"}.
-                  </div>
-                  <div className="text-sm text-gray-700">
-                    {showTrialWarning
-                      ? "Let op: je trial loopt bijna af. Als je wil doorgaan, zorg dat billing klaarstaat."
-                      : "Je hebt nu unlimited pitches tijdens je trial."}
-                  </div>
-                </div>
-                <Link href="/upgrade" className="px-4 py-2 rounded bg-black text-white hover:opacity-90 transition">
-                  Manage trial →
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div>
+              <div className="mb-5 inline-flex rounded-full border border-green-400/40 bg-green-400/10 px-4 py-2 text-sm text-green-300">
+                AI playlist pitching for independent artists
+              </div>
+
+              <h1 className="max-w-3xl text-5xl font-black leading-tight md:text-7xl">
+                Get your music in front of real playlist curators.
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-xl leading-8 text-white/70">
+                TuneReach helps artists find matching Spotify playlists,
+                generate personalized AI pitches, launch outreach campaigns,
+                and track results from one dashboard.
+              </p>
+
+              <div className="mt-10 flex flex-wrap gap-4">
+                <Link
+                  href={`/dashboard?artistId=${artistId}`}
+                  className="rounded-full bg-green-500 px-8 py-4 font-bold text-black hover:bg-green-400 transition"
+                >
+                  Open Dashboard
+                </Link>
+
+                <Link
+                  href="#how-it-works"
+                  className="rounded-full border border-white/30 px-8 py-4 font-bold hover:bg-white hover:text-black transition"
+                >
+                  See How It Works
                 </Link>
               </div>
-            </div>
-          )}
 
-          {showFreeLimitBanner && (
-            <div className="border rounded-xl p-4 bg-yellow-50">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <div className="font-semibold">Je FREE limiet is bijna op.</div>
-                  <div className="text-sm text-gray-700">
-                    Remaining deze maand: <b>{usage?.month?.remaining}</b> / <b>{usage?.month?.limit}</b>
+              <div className="mt-10 grid max-w-xl grid-cols-3 gap-4 text-center">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="text-3xl font-black">1.5k+</div>
+                  <div className="mt-1 text-xs text-white/60">Playlists</div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="text-3xl font-black">500+</div>
+                  <div className="mt-1 text-xs text-white/60">Matches</div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="text-3xl font-black">300+</div>
+                  <div className="mt-1 text-xs text-white/60">Pitches</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/10 p-6 shadow-2xl backdrop-blur">
+              <div className="rounded-2xl bg-black/70 p-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <div className="text-sm text-white/50">Campaign</div>
+                    <div className="text-xl font-bold">Cocoa Tea</div>
+                  </div>
+                  <div className="rounded-full bg-green-500 px-3 py-1 text-xs font-bold text-black">
+                    PRO
                   </div>
                 </div>
-                <Link href="/upgrade" className="px-4 py-2 rounded bg-black text-white hover:opacity-90 transition">
-                  Upgrade →
-                </Link>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    ["Matches", "28"],
+                    ["Sent", "315"],
+                    ["Drafts", "53"],
+                    ["Open Rate", "0%"],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="rounded-xl border border-white/10 bg-white/5 p-4"
+                    >
+                      <div className="text-xs uppercase text-white/50">
+                        {label}
+                      </div>
+                      <div className="mt-2 text-3xl font-black">{value}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-5 rounded-xl border border-green-400/30 bg-green-400/10 p-4">
+                  <div className="text-sm text-green-300">
+                    AI Pitch Preview
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-white/75">
+                    Hi, I came across your playlist and thought this track could
+                    fit naturally with the sound you are curating...
+                  </p>
+                </div>
+
+                <button className="mt-5 w-full rounded-xl bg-green-500 py-4 font-bold text-black">
+                  Launch Campaign
+                </button>
               </div>
             </div>
-          )}
+          </div>
         </div>
-      )}
+      </section>
 
-      {/* CARDS */}
-      {!loading && !err && usage && stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="border rounded-xl p-6">
-            <div className="text-sm text-gray-600">Plan</div>
-            <div className="text-3xl font-bold">{usage.plan}</div>
-            {usage.plan === "FREE" && (
-              <div className="mt-2 text-gray-700">
-                Remaining: <b>{usage.month.remaining}</b> / <b>{usage.month.limit}</b>
-              </div>
-            )}
-            {usage.plan === "TRIAL" && (
-              <div className="mt-2 text-gray-700">
-                Unlimited • ends: <b>{new Date(usage.trial!.until).toLocaleString()}</b>
-              </div>
-            )}
-            {usage.plan === "PRO" && <div className="mt-2 text-gray-700">Unlimited</div>}
-          </div>
+      <section id="how-it-works" className="mx-auto max-w-6xl px-6 py-24">
+        <div className="mb-12 max-w-2xl">
+          <h2 className="text-4xl font-black">How TuneReach works</h2>
+          <p className="mt-4 text-white/60">
+            From track upload to curator outreach in minutes.
+          </p>
+        </div>
 
-          <div className="border rounded-xl p-6">
-            <div className="text-sm text-gray-600">Pitches sent this month</div>
-            <div className="text-3xl font-bold">{stats.month.sentThisMonth}</div>
-            {usage.plan === "FREE" && (
-              <div className="mt-2 text-gray-700">
-                Limit: <b>{usage.month.limit}</b>
+        <div className="grid gap-5 md:grid-cols-4">
+          {[
+            ["1", "Import your track", "Add your Spotify track URL."],
+            ["2", "Find playlists", "Match against relevant playlists."],
+            ["3", "Generate pitches", "Create personalized AI outreach."],
+            ["4", "Launch campaign", "Send, track and optimize results."],
+          ].map(([num, title, text]) => (
+            <div
+              key={num}
+              className="rounded-3xl border border-white/10 bg-white/5 p-6"
+            >
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-green-500 font-black text-black">
+                {num}
               </div>
-            )}
-          </div>
-
-          <div className="border rounded-xl p-6">
-            <div className="text-sm text-gray-600">Success rate</div>
-            <div className="text-3xl font-bold">{Math.round(stats.successRate * 100)}%</div>
-            <div className="mt-2 text-gray-700">
-              Matches: <b>{stats.month.matchesThisMonth}</b> • Sent: <b>{stats.month.sentThisMonth}</b>
+              <h3 className="text-xl font-bold">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-white/60">{text}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-white/5">
+        <div className="mx-auto grid max-w-6xl gap-6 px-6 py-24 md:grid-cols-3">
+          {[
+            [
+              "Playlist Matching",
+              "Find playlists that fit your track based on genre, mood, energy and audience.",
+            ],
+            [
+              "AI Pitch Generator",
+              "Write personal curator pitches faster without sounding generic.",
+            ],
+            [
+              "Campaign Analytics",
+              "Track sent pitches, clicks, opens, replies and campaign history.",
+            ],
+          ].map(([title, text]) => (
+            <div key={title} className="rounded-3xl bg-black p-8">
+              <h3 className="text-2xl font-black">{title}</h3>
+              <p className="mt-4 leading-7 text-white/60">{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-24">
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+            <h3 className="text-3xl font-black">Free</h3>
+            <p className="mt-3 text-white/60">For testing the platform.</p>
+            <div className="mt-8 text-5xl font-black">€0</div>
+            <ul className="mt-8 space-y-3 text-white/70">
+              <li>3 pitches per month</li>
+              <li>Track matching</li>
+              <li>Basic dashboard</li>
+            </ul>
+          </div>
+
+          <div className="rounded-3xl border border-green-400 bg-green-500 p-8 text-black">
+            <h3 className="text-3xl font-black">PRO</h3>
+            <p className="mt-3 text-black/70">
+              For artists ready to pitch seriously.
+            </p>
+            <div className="mt-8 text-5xl font-black">€19/mo</div>
+            <ul className="mt-8 space-y-3 text-black/80">
+              <li>Unlimited pitches</li>
+              <li>Campaign launch</li>
+              <li>Email intelligence</li>
+              <li>Advanced analytics</li>
+            </ul>
+
+            <Link
+              href={`/upgrade?artistId=${artistId}`}
+              className="mt-8 inline-block rounded-full bg-black px-8 py-4 font-bold text-white"
+            >
+              Upgrade to PRO
+            </Link>
           </div>
         </div>
-      )}
+      </section>
 
-      {/* RECENT TRACKS */}
-{!loading && !err && overview?.tracks && (
-  <div className="border rounded-xl p-6">
-    <div className="flex items-center justify-between">
-      <div className="text-xl font-bold">Recent Tracks</div>
-      <Link href="/tracks" className="text-sm underline">
-        All tracks
-      </Link>
-    </div>
+      <section className="mx-auto max-w-4xl px-6 pb-24 text-center">
+        <h2 className="text-5xl font-black">
+          Ready to reach more playlist curators?
+        </h2>
+        <p className="mt-5 text-xl text-white/60">
+          Start with TuneReach and turn playlist pitching into a repeatable
+          campaign system.
+        </p>
 
-    <div className="mt-4 space-y-3">
-      {(overview.tracks ?? []).slice(0, 5).map((t: any) => (
-        <div key={t.id} className="flex items-center justify-between border rounded p-3">
-          <div>
-            <div className="font-semibold">{t.title}</div>
-            <div className="text-sm text-gray-600">{(t.artists ?? []).join(", ")}</div>
-            <div className="text-xs text-gray-500">matches: {t.matchCount ?? 0}</div>
-          </div>
-
-          <Link className="px-3 py-2 rounded bg-black text-white" href={`/tracks/${t.id}`}>
-            View →
-          </Link>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
-      {/* NAV */}
-      <div className="flex gap-3 pt-2">
-        <Link href="/tracks" className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition">
-          Tracks
-        </Link>
-        <Link href="/pitches" className="px-4 py-2 rounded bg-black text-white hover:opacity-90 transition">
-          Pitches →
-        </Link>
-        <button
-          onClick={loadAll}
-          className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
+        <Link
+          href={`/dashboard?artistId=${artistId}`}
+          className="mt-10 inline-block rounded-full bg-green-500 px-10 py-5 font-black text-black hover:bg-green-400 transition"
         >
-          Refresh
-        </button>
-      </div>
-    </div>
+          Start Now
+        </Link>
+      </section>
+
+      <footer className="border-t border-white/10 px-6 py-8 text-center text-sm text-white/40">
+        © {new Date().getFullYear()} TuneReach. Built for independent artists.
+      </footer>
+    </main>
   );
 }
