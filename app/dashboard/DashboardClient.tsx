@@ -293,12 +293,21 @@ const placementRate = analytics?.placementRate ?? 0;
             Pricing
           </Link>
 
-          <Link
-            href={linkWithArtistId("/upgrade", artistId)}
-            className="px-4 py-2 rounded bg-black text-white hover:opacity-90 transition"
-          >
-            Upgrade →
-          </Link>
+          {usage?.plan === "PRO" ? (
+  <Link
+    href={linkWithArtistId("/upgrade", artistId)}
+    className="px-4 py-2 rounded bg-green-600 text-white"
+  >
+    PRO Active ✓
+  </Link>
+) : (
+  <Link
+    href={linkWithArtistId("/upgrade", artistId)}
+    className="px-4 py-2 rounded bg-black text-white hover:opacity-90 transition"
+  >
+    Upgrade →
+  </Link>
+)}
         </div>
       </div>
 
