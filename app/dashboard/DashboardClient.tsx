@@ -674,12 +674,19 @@ const placementRate = analytics?.placementRate ?? 0;
   Curators
 </Link>
 
-        <button
-          onClick={() => loadAll(artistId)}
-          className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
-        >
-          Refresh
-        </button>
+        <Link
+  href="/followups"
+  className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
+>
+  Follow-ups
+</Link>
+
+<button
+  onClick={() => loadAll(artistId)}
+  className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
+>
+  Refresh
+</button>
       </div>
     </div>
   );
