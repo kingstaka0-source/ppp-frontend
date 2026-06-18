@@ -21,6 +21,10 @@ export default function CuratorsPage() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [q, setQ] = useState("");
+  const [showOpened, setShowOpened] = useState(false);
+const [showClicked, setShowClicked] = useState(false);
+const [showHasEmail, setShowHasEmail] = useState(false);
+const [showInterested, setShowInterested] = useState(false);
 
   async function loadCurators() {
     setLoading(true);
@@ -50,18 +54,45 @@ export default function CuratorsPage() {
   }, []);
 
   const filtered = useMemo(() => {
-    const query = q.trim().toLowerCase();
+  const query = q.trim().toLowerCase();
 
-    if (!query) return curators;
+  return curators.filter((c) => {
+    if (
+      query &&
+      !c.name?.toLowerCase().includes(query) &&
+      !c.email?.toLowerCase().includes(query)
+    ) {
+      return false;
+    }
 
-    return curators.filter((c) => {
-      return (
-        c.name?.toLowerCase().includes(query) ||
-        c.email?.toLowerCase().includes(query)
-      );
-    });
-  }, [curators, q]);
+    if (showOpened && c.opens <= 0) {
+      return false;
+    }
 
+    if (showClicked && c.clicks <= 0) {
+      return false;
+    }
+
+    if (showHasEmail && !c.email) {
+      return false;
+    }
+
+    if (showInterested && !c.interested) {
+      return false;
+    }
+
+    return true;
+  });
+}, [
+  curators,
+  q,
+  showOpened,
+  showClicked,
+  showHasEmail,
+  showInterested,
+]);
+
+    
   const totals = useMemo(() => {
     return filtered.reduce(
       (acc, c) => {

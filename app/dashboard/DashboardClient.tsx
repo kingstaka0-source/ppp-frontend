@@ -667,6 +667,13 @@ const placementRate = analytics?.placementRate ?? 0;
           Pitches →
         </Link>
 
+        <Link
+  href="/curators"
+  className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
+>
+  Curators
+</Link>
+
         <button
           onClick={() => loadAll(artistId)}
           className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
