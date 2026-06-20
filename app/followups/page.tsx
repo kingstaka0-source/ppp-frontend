@@ -205,14 +205,36 @@ export default function FollowupsPage() {
                     </td>
 
                     <td className="p-3">
-                      <button
-                        onClick={() => markSent(item.id)}
-                        disabled={workingId === item.id}
-                        className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
-                      >
-                        {workingId === item.id ? "Saving..." : "Mark Sent"}
-                      </button>
-                    </td>
+  <div className="flex gap-2">
+    <button
+      onClick={async () => {
+        const res = await fetch(
+          `${API}/followups/${item.id}/generate`,
+          {
+            method: "POST",
+          }
+        );
+
+        const data = await res.json();
+
+        alert(
+          `SUBJECT:\n\n${data.subject}\n\nBODY:\n\n${data.body}`
+        );
+      }}
+      className="rounded border border-black px-3 py-2"
+    >
+      Generate
+    </button>
+
+    <button
+      onClick={() => markSent(item.id)}
+      disabled={workingId === item.id}
+      className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
+    >
+      {workingId === item.id ? "Saving..." : "Mark Sent"}
+    </button>
+  </div>
+</td>
                   </tr>
                 ))}
               </tbody>
