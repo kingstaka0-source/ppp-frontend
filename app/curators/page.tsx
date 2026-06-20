@@ -14,6 +14,8 @@ type CuratorAnalytics = {
   clicks: number;
   replies: number;
   interested: boolean;
+  score: number;
+  status: string;
 };
 
 export default function CuratorsPage() {
@@ -185,6 +187,44 @@ const [showInterested, setShowInterested] = useState(false);
           />
         </div>
 
+        <div className="mb-4 flex flex-wrap gap-2">
+  <button
+    onClick={() => setShowOpened(!showOpened)}
+    className={`rounded border px-3 py-1 text-sm ${
+      showOpened ? "bg-black text-white" : "bg-white"
+    }`}
+  >
+    Opened
+  </button>
+
+  <button
+    onClick={() => setShowClicked(!showClicked)}
+    className={`rounded border px-3 py-1 text-sm ${
+      showClicked ? "bg-black text-white" : "bg-white"
+    }`}
+  >
+    Clicked
+  </button>
+
+  <button
+    onClick={() => setShowHasEmail(!showHasEmail)}
+    className={`rounded border px-3 py-1 text-sm ${
+      showHasEmail ? "bg-black text-white" : "bg-white"
+    }`}
+  >
+    Has Email
+  </button>
+
+  <button
+    onClick={() => setShowInterested(!showInterested)}
+    className={`rounded border px-3 py-1 text-sm ${
+      showInterested ? "bg-black text-white" : "bg-white"
+    }`}
+  >
+    Interested
+  </button>
+</div>
+
         {loading ? (
           <p>Loading…</p>
         ) : filtered.length === 0 ? (
@@ -200,6 +240,8 @@ const [showInterested, setShowInterested] = useState(false);
                   <th className="p-3">Opens</th>
                   <th className="p-3">Clicks</th>
                   <th className="p-3">Replies</th>
+                  <th className="p-3">Score</th>
+                  <th className="p-3">Status</th>
                   <th className="p-3">Interested</th>
                 </tr>
               </thead>
@@ -213,7 +255,26 @@ const [showInterested, setShowInterested] = useState(false);
                     <td className="p-3">{c.opens}</td>
                     <td className="p-3">{c.clicks}</td>
                     <td className="p-3">{c.replies}</td>
-                    <td className="p-3">
+
+<td className="p-3 font-bold">
+  {c.score}
+</td>
+
+<td className="p-3">
+  <span
+    className={`rounded-full px-3 py-1 text-xs font-medium ${
+      c.status === "HOT"
+        ? "bg-red-100 text-red-700"
+        : c.status === "WARM"
+        ? "bg-yellow-100 text-yellow-700"
+        : "bg-gray-100 text-gray-600"
+    }`}
+  >
+    {c.status}
+  </span>
+</td>
+
+<td className="p-3">
                       {c.interested ? (
                         <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">
                           Yes
