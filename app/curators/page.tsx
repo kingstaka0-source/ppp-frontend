@@ -243,6 +243,7 @@ const [showInterested, setShowInterested] = useState(false);
                   <th className="p-3">Score</th>
                   <th className="p-3">Status</th>
                   <th className="p-3">Interested</th>
+                  <th className="p-3">Reply</th>
                 </tr>
               </thead>
 
@@ -285,6 +286,26 @@ const [showInterested, setShowInterested] = useState(false);
                         </span>
                       )}
                     </td>
+
+                    <td className="p-3">
+  <div className="flex gap-2">
+    <button
+      onClick={async () => {
+        await fetch(
+          `${API}/curators/${c.id}/positive-reply`,
+          {
+            method: "POST",
+          }
+        );
+
+        loadCurators();
+      }}
+      className="rounded bg-green-600 px-3 py-1 text-white text-xs"
+    >
+      👍 Positive
+    </button>
+  </div>
+</td>
                   </tr>
                 ))}
               </tbody>
