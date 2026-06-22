@@ -40,13 +40,12 @@ export default function HomePage() {
               </div>
 
               <h1 className="max-w-3xl text-5xl font-black leading-tight md:text-7xl">
-                Get your music in front of real playlist curators.
+                Get your music heard by the right Spotify playlist curators.
               </h1>
 
               <p className="mt-6 max-w-2xl text-xl leading-8 text-white/70">
-                TuneReach helps artists find matching Spotify playlists,
-                generate personalized AI pitches, launch outreach campaigns,
-                and track results from one dashboard.
+                Find playlist opportunities, generate AI-powered curator pitches,
+launch campaigns, and track opens, clicks and placements from one dashboard.
               </p>
 
               <div className="mt-10 flex flex-wrap gap-4">
@@ -65,8 +64,13 @@ export default function HomePage() {
                 </Link>
               </div>
 
+              <div className="mt-8 text-sm text-white/50">
+  Trusted by independent artists, reggae musicians,
+  producers and playlist marketers.
+</div>
+
               <div className="mt-10 grid max-w-xl grid-cols-3 gap-4 text-center">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                   <div className="text-3xl font-black">1.5k+</div>
                   <div className="mt-1 text-xs text-white/60">Playlists</div>
                 </div>
@@ -177,6 +181,10 @@ export default function HomePage() {
               "Campaign Analytics",
               "Track sent pitches, clicks, opens, replies and campaign history.",
             ],
+            [
+  "Follow-up Automation",
+  "Automatically identify engaged curators and send strategic follow-ups.",
+]
           ].map(([title, text]) => (
             <div key={title} className="rounded-3xl bg-black p-8">
               <h3 className="text-2xl font-black">{title}</h3>
@@ -210,6 +218,10 @@ export default function HomePage() {
               <li>Campaign launch</li>
               <li>Email intelligence</li>
               <li>Advanced analytics</li>
+              <li>Follow-up automation</li>
+              <li>Curator CRM</li>
+              <li>Open & click tracking</li>
+              <li>Placement detection</li>
             </ul>
 
             <Link
