@@ -1,5 +1,6 @@
 import Link from "next/link";
 import HeroDashboard from "./components/landing/HeroDashboard";
+import DemoVideoButton from "./components/landing/DemoVideoButton";
 
 export const dynamic = "force-dynamic";
 
@@ -148,14 +149,7 @@ export default function HomePage() {
                   Start Free Trial →
                 </Link>
 
-                <a
-  href="/tunereach-demo.mp4"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="rounded-full border border-white/25 px-8 py-4 font-black hover:bg-white hover:text-black transition"
->
-  ▶ Watch Demo
-</a>
+                <DemoVideoButton />
               </div>
 
               <div className="mt-7 flex flex-wrap gap-5 text-sm text-white/60">

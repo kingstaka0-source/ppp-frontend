@@ -24,3 +24,52 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes drawLine {
+  from {
+    stroke-dashoffset: 720;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-draw-line {
+  animation: drawLine 2.2s ease-out forwards;
+}
+
+@keyframes floatDashboard {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float-dashboard {
+  animation: floatDashboard 6s ease-in-out infinite;
+}
+
+@keyframes glowMove {
+  0% {
+    transform: scale(1) translate(0px, 0px);
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: scale(1.25) translate(-22px, 18px);
+    opacity: 0.95;
+  }
+
+  100% {
+    transform: scale(1) translate(0px, 0px);
+    opacity: 0.55;
+  }
+}
