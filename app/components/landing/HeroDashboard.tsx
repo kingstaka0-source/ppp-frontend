@@ -82,7 +82,7 @@ useEffect(() => {
 }, []);
   return (
     <div className="relative animate-[floatDashboard_4s_ease-in-out_infinite]">
-      <div className="absolute -inset-12 rounded-full bg-green-500/30 blur-3xl animate-[glowMove_5s_ease-in-out_infinite]" />
+              <div className="absolute -inset-12 rounded-full bg-green-500/30 blur-3xl animate-[glowMove_5s_ease-in-out_infinite]" />
 
       <div className="relative rounded-[2rem] border border-green-400/40 bg-black/70 p-5 shadow-[0_0_80px_rgba(34,197,94,0.25)] backdrop-blur">
         <div className="mb-5 flex items-center justify-between">
@@ -181,18 +181,49 @@ useEffect(() => {
 
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
           <div className="rounded-2xl border border-green-400/30 bg-green-400/10 p-5">
-            <div className="text-sm font-bold text-green-300">
-              AI Pitch Preview
-            </div>
+            <div className="flex items-center justify-between">
+  <div className="text-sm font-bold text-green-300">
+    🤖 AI Workflow
+  </div>
 
-            <p className="mt-3 min-h-[96px] text-sm leading-6 text-white/75">
-              {typedPitch}
-              <span className="ml-1 inline-block h-4 w-1 animate-pulse bg-green-400 align-middle" />
-            </p>
+  <div className="flex items-center gap-2 text-xs font-bold text-green-300">
+    <span className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
+    Live
+  </div>
+</div>
 
-            <div className="mt-4 border-t border-white/10 pt-3 text-xs text-green-300">
-              ✨ AI is generating a personalized pitch...
-            </div>
+<div className="mt-4 rounded-xl border border-green-400/20 bg-black/30 p-3">
+  <div className="mb-2 flex items-center justify-between text-xs text-white/50">
+    <span>Campaign automation</span>
+    <span>84%</span>
+  </div>
+
+  <div className="h-2 overflow-hidden rounded-full bg-white/10">
+    <div className="h-full w-[84%] rounded-full bg-green-400 animate-pulse" />
+  </div>
+</div>
+
+<div className="mt-4 space-y-2 text-sm text-white/75">
+  {[
+    "Analyzing Spotify track",
+    "Matching playlists",
+    "Finding curator emails",
+    "Writing personalized pitch",
+    "Ready to send",
+  ].map((step, index) => (
+    <div key={step} className="flex items-center gap-2">
+      <span className="text-green-400">✓</span>
+      <span>{step}</span>
+      {index === 3 && (
+        <span className="ml-1 inline-block h-4 w-1 animate-pulse bg-green-400 align-middle" />
+      )}
+    </div>
+  ))}
+</div>
+
+<div className="mt-4 border-t border-white/10 pt-3 text-xs text-green-300">
+  Estimated completion: 00:08 sec
+</div>
           </div>
 
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
