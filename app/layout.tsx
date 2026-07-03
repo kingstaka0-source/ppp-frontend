@@ -14,9 +14,54 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://tunereach.app"),
+
   title: "TuneReach | AI-Powered Playlist Promotion",
+
   description:
-    "Find playlist opportunities, generate personalized AI pitches, automate curator outreach and track campaign results.",
+    "Find playlist opportunities, generate personalized AI pitches, automate curator outreach and grow your Spotify career with AI.",
+
+  keywords: [
+    "Spotify",
+    "Playlist Promotion",
+    "AI",
+    "Music Marketing",
+    "Curators",
+    "Playlist Pitching",
+    "TuneReach",
+  ],
+
+  authors: [{ name: "TuneReach" }],
+
+  openGraph: {
+    title: "TuneReach | AI-Powered Playlist Promotion",
+    description:
+      "Grow your Spotify career using AI-powered playlist pitching.",
+    url: "https://tunereach.app",
+    siteName: "TuneReach",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "TuneReach AI Playlist Promotion",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "TuneReach | AI-Powered Playlist Promotion",
+    description:
+      "Grow your Spotify career using AI-powered playlist pitching.",
+    images: ["/og-image.png"],
+  },
+
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
