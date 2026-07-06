@@ -1,8 +1,38 @@
 import Link from "next/link";
 import HeroDashboard from "./components/landing/HeroDashboard";
 import DemoVideoButton from "./components/landing/DemoVideoButton";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "TuneReach | AI-Powered Playlist Promotion",
+  description:
+    "TuneReach helps independent artists find playlist opportunities, generate personalized AI pitches, automate curator outreach and track campaign results.",
+  openGraph: {
+    title: "TuneReach | AI-Powered Playlist Promotion",
+    description:
+      "Find playlists, generate AI pitches, launch campaigns and track results from one dashboard.",
+    url: "https://tunereach.app",
+    siteName: "TuneReach",
+    images: [
+      {
+        url: "/hero-artist.png",
+        width: 1200,
+        height: 630,
+        alt: "TuneReach AI-powered playlist promotion dashboard",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TuneReach | AI-Powered Playlist Promotion",
+    description:
+      "AI playlist matching, curator outreach automation and campaign analytics for independent artists.",
+    images: ["/hero-artist.png"],
+  },
+};
 
 const artistId = "cmmnjti0n0004112o3orl713x";
 
@@ -85,11 +115,19 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-7xl px-6 py-8">
           <nav className="flex items-center justify-between">
             <div className="flex items-center gap-3 text-2xl font-black tracking-tight">
-              <span className="text-green-400">▮▮▮</span>
-              <span>
-                Tune<span className="text-green-400">Reach</span>
-              </span>
-            </div>
+              <div className="flex items-center gap-3 text-2xl font-black tracking-tight">
+  <div className="flex h-8 items-center gap-1">
+    <span className="h-4 w-2 rounded-full bg-green-400" />
+    <span className="h-7 w-2 rounded-full bg-green-400" />
+    <span className="h-9 w-2 rounded-full bg-green-400" />
+    <span className="h-7 w-2 rounded-full bg-green-400" />
+    <span className="h-4 w-2 rounded-full bg-green-400" />
+  </div>
+
+  <span>
+    Tune<span className="text-green-400">Reach</span>
+  </span>
+</div>
 
             <div className="hidden items-center gap-8 text-sm font-semibold text-white/80 md:flex">
               <a href="#features" className="hover:text-green-300">
