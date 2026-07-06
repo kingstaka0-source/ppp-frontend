@@ -162,21 +162,22 @@ export default function HomePage() {
 
           <div className="grid min-h-[720px] gap-12 py-20 lg:grid-cols-2 lg:items-center">
             
-              <div className="relative rounded-[2rem] min-h-[620px]">
+              <div className="relative rounded-[2rem] min-h-[760px] overflow-hidden">
   <div
   className="absolute -right-40 inset-y-20 left-0 opacity-95"
   style={{
-    backgroundImage: "url('/hero-artist.png')",
-    backgroundSize: "cover",
-    backgroundPosition: "62% center",
-  }}
+  backgroundImage: "url('/hero-artist.png')",
+  backgroundSize: "cover",
+  backgroundPosition: "78% center",
+  transform: "scale(1.08)",
+}}
 />
 
 <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/10 to-transparent" />
 <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/20" />
 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-  <div className="relative z-10 p-8 lg:p-10">
+  <div className="relative z-10 max-w-xl px-8 py-16 lg:px-12 lg:py-24">
 
               <h1 className="max-w-3xl text-6xl font-black leading-[0.95] tracking-tight md:text-7xl">
   Grow Your
@@ -215,8 +216,9 @@ export default function HomePage() {
   </div>
 </div>
 
-<HeroDashboard />
-          </div>
+<div className="relative z-20">
+  <HeroDashboard />
+</div>
 
           {/* TRUST / STATS */}
 <div className="grid gap-6 pb-20 xl:grid-cols-[0.8fr_1.6fr]">
@@ -253,6 +255,7 @@ export default function HomePage() {
   </div>
 </div>
 
+</div>
 </div>
 </section>
 
