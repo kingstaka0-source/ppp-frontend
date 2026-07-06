@@ -114,52 +114,51 @@ export default function HomePage() {
 
         <div className="relative mx-auto max-w-7xl px-6 py-8">
           <nav className="flex items-center justify-between">
-            <div className="flex items-center gap-3 text-2xl font-black tracking-tight">
-              <div className="flex items-center gap-3 text-2xl font-black tracking-tight">
-  <div className="flex h-8 items-center gap-1">
-    <span className="h-4 w-2 rounded-full bg-green-400" />
-    <span className="h-7 w-2 rounded-full bg-green-400" />
-    <span className="h-9 w-2 rounded-full bg-green-400" />
-    <span className="h-7 w-2 rounded-full bg-green-400" />
-    <span className="h-4 w-2 rounded-full bg-green-400" />
+  <div className="flex items-center gap-3 text-2xl font-black tracking-tight">
+    <div className="flex h-8 items-center gap-1">
+      <span className="h-4 w-2 rounded-full bg-green-400" />
+      <span className="h-7 w-2 rounded-full bg-green-400" />
+      <span className="h-9 w-2 rounded-full bg-green-400" />
+      <span className="h-7 w-2 rounded-full bg-green-400" />
+      <span className="h-4 w-2 rounded-full bg-green-400" />
+    </div>
+
+    <span>
+      Tune<span className="text-green-400">Reach</span>
+    </span>
   </div>
 
-  <span>
-    Tune<span className="text-green-400">Reach</span>
-  </span>
-</div>
+  <div className="hidden items-center gap-8 text-sm font-semibold text-white/80 md:flex">
+    <a href="#features" className="hover:text-green-300">
+      Features
+    </a>
+    <a href="#how-it-works" className="hover:text-green-300">
+      How It Works
+    </a>
+    <a href="#pricing" className="hover:text-green-300">
+      Pricing
+    </a>
+    <a href="#faq" className="hover:text-green-300">
+      FAQ
+    </a>
+  </div>
 
-            <div className="hidden items-center gap-8 text-sm font-semibold text-white/80 md:flex">
-              <a href="#features" className="hover:text-green-300">
-                Features
-              </a>
-              <a href="#how-it-works" className="hover:text-green-300">
-                How It Works
-              </a>
-              <a href="#pricing" className="hover:text-green-300">
-                Pricing
-              </a>
-              <a href="#faq" className="hover:text-green-300">
-                FAQ
-              </a>
-            </div>
+  <div className="flex gap-3">
+    <Link
+      href={`/dashboard?artistId=${artistId}`}
+      className="rounded-full border border-white/20 px-5 py-2 text-sm font-bold transition hover:bg-white hover:text-black"
+    >
+      Login
+    </Link>
 
-            <div className="flex gap-3">
-              <Link
-                href={`/dashboard?artistId=${artistId}`}
-                className="rounded-full border border-white/20 px-5 py-2 text-sm font-bold hover:bg-white hover:text-black transition"
-              >
-                Login
-              </Link>
-
-              <Link
-                href={`/upgrade?artistId=${artistId}`}
-                className="rounded-full bg-green-500 px-5 py-2 text-sm font-black text-black hover:bg-green-400 transition"
-              >
-                Start Free Trial
-              </Link>
-            </div>
-          </nav>
+    <Link
+      href={`/upgrade?artistId=${artistId}`}
+      className="rounded-full bg-green-500 px-5 py-2 text-sm font-black text-black transition hover:bg-green-400"
+    >
+      Start Free Trial
+    </Link>
+  </div>
+</nav>
 
           <div className="grid min-h-[720px] gap-12 py-20 lg:grid-cols-2 lg:items-center">
             
