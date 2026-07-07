@@ -17,7 +17,6 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://tunereach.app"),
 
   title: "TuneReach | AI-Powered Playlist Promotion",
-
   description:
     "Find playlist opportunities, generate personalized AI pitches, automate curator outreach and grow your Spotify career with AI.",
 
@@ -33,15 +32,22 @@ export const metadata: Metadata = {
 
   authors: [{ name: "TuneReach" }],
 
+  icons: {
+    icon: "/brand/favicon.ico",
+    shortcut: "/brand/favicon.ico",
+    apple: "/brand/apple-touch-icon.png",
+  },
+
+  manifest: "/manifest.webmanifest",
+
   openGraph: {
     title: "TuneReach | AI-Powered Playlist Promotion",
-    description:
-      "Grow your Spotify career using AI-powered playlist pitching.",
+    description: "Grow your Spotify career using AI-powered playlist pitching.",
     url: "https://tunereach.app",
     siteName: "TuneReach",
     images: [
       {
-        url: "/og-image.png",
+        url: "/brand/og-image.png",
         width: 1200,
         height: 630,
         alt: "TuneReach AI Playlist Promotion",
@@ -54,13 +60,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "TuneReach | AI-Powered Playlist Promotion",
-    description:
-      "Grow your Spotify career using AI-powered playlist pitching.",
-    images: ["/og-image.png"],
-  },
-
-  icons: {
-    icon: "/favicon.ico",
+    description: "Grow your Spotify career using AI-powered playlist pitching.",
+    images: ["/brand/og-image.png"],
   },
 };
 
