@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import LegalGate from "@/app/components/LegalGate";
 import IntakeTrackCard from "@/app/components/IntakeTrackCard";
-import AccountSwitcher from "@/app/components/AccountSwitcher";
+
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
 const DEFAULT_ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
@@ -311,12 +311,7 @@ const placementRate = analytics?.placementRate ?? 0;
         </div>
       </div>
 
-      <AccountSwitcher />
-
-      <div className="text-sm text-gray-600">
-        API: {API} • Artist: {artistId || "(missing artistId)"}
-      </div>
-
+      
       {!loading && !err && overview && (
   <section className="rounded-2xl border bg-white p-6 shadow-sm">
     <div className="flex flex-col gap-1">

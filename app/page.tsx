@@ -155,7 +155,7 @@ export default function HomePage() {
       href={`/upgrade?artistId=${artistId}`}
       className="rounded-full bg-green-500 px-5 py-2 text-sm font-black text-black transition hover:bg-green-400"
     >
-      Start Free Trial
+      Get Started Free
     </Link>
   </div>
 </nav>
@@ -201,7 +201,7 @@ export default function HomePage() {
                   href={`/upgrade?artistId=${artistId}`}
                   className="rounded-full bg-green-500 px-8 py-4 font-black text-black hover:bg-green-400 transition"
                 >
-                  Start Free Trial →
+                  Get Started Free →
                 </Link>
 
                 <DemoVideoButton />
@@ -555,7 +555,7 @@ export default function HomePage() {
   </div>
 
   <Link
-    href={`/dashboard?artistId=${artistId}`}
+    href="/sign-in"
     className="mt-10 block rounded-full border border-white/20 py-4 text-center font-black transition hover:bg-white hover:text-black"
   >
     Start Free
@@ -593,7 +593,7 @@ export default function HomePage() {
   </div>
 
   <Link
-    href={`/upgrade?artistId=${artistId}`}
+    href="/sign-up"
     className="mt-10 block rounded-full bg-green-500 py-4 text-center font-black text-black transition hover:scale-105 hover:bg-green-400"
   >
     Start 7-Day Trial
@@ -690,7 +690,7 @@ export default function HomePage() {
           </p>
 
           <Link
-            href={`/upgrade?artistId=${artistId}`}
+            href="/sign-up"
             className="mt-10 inline-block rounded-full bg-green-500 px-10 py-5 font-black text-black hover:bg-green-400 transition"
           >
             Start Your 7-Day Pro Trial →
