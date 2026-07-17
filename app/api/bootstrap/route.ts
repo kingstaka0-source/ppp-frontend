@@ -54,6 +54,11 @@ export async function POST(request: NextRequest) {
 
     const bootstrapText = await bootstrapResponse.text();
 
+    console.log("BOOTSTRAP BACKEND RESPONSE", {
+  status: bootstrapResponse.status,
+  body: bootstrapText,
+});
+
     let bootstrapData: {
       artist?: { id: string };
       error?: string;
@@ -100,6 +105,12 @@ export async function POST(request: NextRequest) {
       });
 
       const legalText = await legalResponse.text();
+
+      console.log("LEGAL ACCEPT RESPONSE", {
+  docType,
+  status: legalResponse.status,
+  body: legalText,
+});
 
       let legalData: {
         error?: string;
