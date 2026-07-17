@@ -4,6 +4,7 @@ import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

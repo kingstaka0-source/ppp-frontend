@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import LegalGate from "@/app/components/LegalGate";
 import IntakeTrackCard from "@/app/components/IntakeTrackCard";
+
 
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
@@ -275,6 +277,16 @@ const placementRate = analytics?.placementRate ?? 0;
 
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-green-950 p-8 text-white shadow-2xl">
 
+<div className="absolute right-5 top-5 z-20">
+    <UserButton
+      appearance={{
+        elements: {
+          avatarBox: "h-10 w-10",
+        },
+      }}
+    />
+  </div>
+  
   <div className="absolute right-0 top-0 h-56 w-56 rounded-full bg-green-500/10 blur-3xl" />
   <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
 
