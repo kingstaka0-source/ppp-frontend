@@ -254,13 +254,16 @@ export default function DashboardClient() {
 
   const analytics = overview?.analytics;
 
+const artistName = overview?.artist?.name?.trim() || "Artist";
+const hasTracks = totalTracks > 0;
+
 const totalCampaigns = analytics?.totalCampaigns ?? 0;
 const totalSentPitches = analytics?.totalSentPitches ?? 0;
 const totalPlacements = analytics?.totalPlacements ?? 0;
 const placementRate = analytics?.placementRate ?? 0;
 
   return (
-    <div className="max-w-5xl mx-auto p-8 space-y-6">
+    <div className="mx-auto max-w-7xl space-y-7 px-5 py-8 md:px-8 md:py-10">
       {!loading && !err && artistId && (
         <LegalGate
           subjectType="ARTIST"
@@ -270,48 +273,81 @@ const placementRate = analytics?.placementRate ?? 0;
         />
       )}
 
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold">Dashboard</h1>
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-green-950 p-8 text-white shadow-2xl">
 
-          <div className="flex flex-wrap items-center gap-2">
-            {usage?.plan ? <PlanBadge plan={usage.plan} /> : null}
+  <div className="absolute right-0 top-0 h-56 w-56 rounded-full bg-green-500/10 blur-3xl" />
+  <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
 
-            {access?.subscriptionStatus ? (
-              <span className="inline-flex rounded-full border px-3 py-1 text-sm text-gray-700">
-                Status: {access.subscriptionStatus}
-              </span>
-            ) : null}
-          </div>
-        </div>
+  <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
 
-        <div className="flex gap-3">
-          <Link
-            href={linkWithArtistId("/pricing", artistId)}
-            className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
-          >
-            Pricing
-          </Link>
+    <div className="max-w-2xl">
 
-          {usage?.plan === "PRO" ? (
-  <Link
-    href={linkWithArtistId("/upgrade", artistId)}
-    className="px-4 py-2 rounded bg-green-600 text-white"
-  >
-    PRO Active ✓
-  </Link>
-) : (
-  <Link
-    href={linkWithArtistId("/upgrade", artistId)}
-    className="px-4 py-2 rounded bg-black text-white hover:opacity-90 transition"
-  >
-    Upgrade →
-  </Link>
-)}
-        </div>
+      <div className="mb-4 flex flex-wrap gap-2">
+        {usage?.plan && <PlanBadge plan={usage.plan} />}
+
+        {access?.subscriptionStatus && (
+          <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm">
+            {access.subscriptionStatus}
+          </span>
+        )}
       </div>
 
-      
+      <h1 className="text-4xl font-bold tracking-tight">
+        Welcome back, {artistName} 👋
+      </h1>
+
+      <p className="mt-4 max-w-xl text-lg text-zinc-300">
+        Grow your Spotify career with AI-powered playlist pitching,
+        campaign automation and real-time performance analytics.
+      </p>
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Link
+          href={linkWithArtistId("/pricing", artistId)}
+          className="rounded-xl border border-white/20 px-5 py-3 hover:bg-white hover:text-black transition"
+        >
+          Pricing
+        </Link>
+
+        <Link
+          href={linkWithArtistId("/upgrade", artistId)}
+          className="rounded-xl bg-green-500 px-5 py-3 font-semibold text-black hover:bg-green-400 transition"
+        >
+          Upgrade →
+        </Link>
+      </div>
+
+    </div>
+
+    <div className="grid grid-cols-2 gap-4">
+
+      <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
+        <div className="text-sm text-zinc-300">Tracks</div>
+        <div className="mt-2 text-4xl font-bold">{totalTracks}</div>
+      </div>
+
+      <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
+        <div className="text-sm text-zinc-300">Matches</div>
+        <div className="mt-2 text-4xl font-bold">{totalMatches}</div>
+      </div>
+
+      <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
+        <div className="text-sm text-zinc-300">Campaigns</div>
+        <div className="mt-2 text-4xl font-bold">{totalCampaigns}</div>
+      </div>
+
+      <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
+        <div className="text-sm text-zinc-300">Placements</div>
+        <div className="mt-2 text-4xl font-bold">{totalPlacements}</div>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+              
       {!loading && !err && overview && (
   <section className="rounded-2xl border bg-white p-6 shadow-sm">
     <div className="flex flex-col gap-1">
@@ -569,39 +605,7 @@ const placementRate = analytics?.placementRate ?? 0;
         </div>
       )}
 
-      {!loading && !err && access && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="border rounded-xl p-4">
-            <div className="text-sm text-gray-600">Create pitch</div>
-            <div className="mt-2 font-semibold">
-              {access.features.canCreatePitch ? "Enabled" : "Locked"}
-            </div>
-          </div>
-
-          <div className="border rounded-xl p-4">
-            <div className="text-sm text-gray-600">Launch campaign</div>
-            <div className="mt-2 font-semibold">
-              {access.features.canLaunchCampaign ? "Enabled" : "PRO / TRIAL only"}
-            </div>
-          </div>
-
-          <div className="border rounded-xl p-4">
-            <div className="text-sm text-gray-600">Bulk queue</div>
-            <div className="mt-2 font-semibold">
-              {access.features.canBulkQueue ? "Enabled" : "PRO / TRIAL only"}
-            </div>
-          </div>
-
-          <div className="border rounded-xl p-4">
-            <div className="text-sm text-gray-600">Auto send</div>
-            <div className="mt-2 font-semibold">
-              {access.features.canAutoSend ? "Enabled" : "PRO / TRIAL only"}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!loading && !err && overview && (
+            {!loading && !err && overview && (
         <div className="border rounded-xl p-6">
           <div className="flex items-center justify-between">
             <div className="text-xl font-bold">Recent Tracks</div>
@@ -676,12 +680,6 @@ const placementRate = analytics?.placementRate ?? 0;
   Follow-ups
 </Link>
 
-<button
-  onClick={() => loadAll(artistId)}
-  className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
->
-  Refresh
-</button>
       </div>
     </div>
   );
