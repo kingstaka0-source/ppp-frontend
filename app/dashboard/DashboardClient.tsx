@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import LegalGate from "@/app/components/LegalGate";
 import IntakeTrackCard from "@/app/components/IntakeTrackCard";
@@ -166,6 +166,8 @@ function linkWithArtistId(path: string, artistId: string) {
 }
 
 export default function DashboardClient() {
+  const { isLoaded, isSignedIn, user } = useUser();
+
   const searchParams = useSearchParams();
   const resolvedArtistId =
     searchParams.get("artistId")?.trim() || DEFAULT_ARTIST_ID;
@@ -277,16 +279,33 @@ const placementRate = analytics?.placementRate ?? 0;
 
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-green-950 p-8 text-white shadow-2xl">
 
-<div className="absolute right-5 top-5 z-20">
-    <UserButton
-      appearance={{
-        elements: {
-          avatarBox: "h-10 w-10",
-        },
-      }}
-    />
-  </div>
-  
+<div className="absolute right-5 top-5 z-50">
+  {!isLoaded ? (
+    <div className="h-10 w-10 animate-pulse rounded-full bg-white/20" />
+  ) : isSignedIn ? (
+    <div className="flex items-center gap-3 rounded-full border border-white/20 bg-black/30 p-1 pr-4 backdrop-blur">
+      <UserButton
+        appearance={{
+          elements: {
+            avatarBox: "h-10 w-10",
+          },
+        }}
+      />
+
+      <span className="hidden text-sm font-medium text-white sm:block">
+        {user?.firstName || user?.username || "Account"}
+      </span>
+    </div>
+  ) : (
+    <Link
+      href="/sign-in"
+      className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur hover:bg-white hover:text-black"
+    >
+      Sign in
+    </Link>
+  )}
+</div>
+
   <div className="absolute right-0 top-0 h-56 w-56 rounded-full bg-green-500/10 blur-3xl" />
   <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
 
