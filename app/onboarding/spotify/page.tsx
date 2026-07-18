@@ -1,42 +1,44 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import { Suspense } from "react";
+import SpotifyOnboardingClient from "./SpotifyOnboardingClient";
 
 export default function SpotifyOnboardingPage() {
-  const router = useRouter();
-
   return (
-    <main className="flex min-h-screen items-center justify-center bg-black px-5 text-white">
-      <section className="w-full max-w-2xl rounded-[32px] border border-white/10 bg-zinc-950 p-8 text-center shadow-2xl sm:p-12">
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-[#1ed760] text-4xl">
-          🎧
+    <Suspense fallback={<SpotifyPageLoading />}>
+      <SpotifyOnboardingClient />
+    </Suspense>
+  );
+}
+
+function SpotifyPageLoading() {
+  return (
+    <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-8">
+      <div className="mx-auto max-w-6xl">
+        <header className="flex items-center justify-between">
+          <div className="text-xl font-black tracking-tight">
+            Tune<span className="text-emerald-400">Reach</span>
+          </div>
+
+          <div className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/65">
+            Step 2 of 3
+          </div>
+        </header>
+
+        <div className="mt-6 h-2 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full w-2/3 rounded-full bg-emerald-400" />
         </div>
 
-        <p className="mt-8 text-sm font-bold uppercase tracking-[0.22em] text-emerald-400">
-          Step 2 of 3
-        </p>
+        <section className="mt-10 flex min-h-[680px] flex-col items-center justify-center rounded-[32px] border border-white/10 bg-zinc-950 px-8 text-center shadow-2xl">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-emerald-400" />
 
-        <h1 className="mt-4 text-4xl font-black sm:text-5xl">
-          Connect your Spotify artist profile
-        </h1>
+          <h1 className="mt-6 text-2xl font-black">
+            Loading Spotify connection
+          </h1>
 
-        <p className="mx-auto mt-5 max-w-xl text-lg leading-8 text-white/55">
-          Import your releases and prepare your first TuneReach playlist
-          campaign.
-        </p>
-
-        <button
-          type="button"
-          onClick={() => router.push("/onboarding/import-track")}
-          className="mt-9 rounded-2xl bg-[#1ed760] px-8 py-4 font-black text-black transition hover:brightness-110"
-        >
-          Connect Spotify
-        </button>
-
-        <p className="mt-5 text-sm text-white/35">
-          We never publish or modify anything on your Spotify account.
-        </p>
-      </section>
+          <p className="mt-3 text-white/45">
+            Preparing your secure connection.
+          </p>
+        </section>
+      </div>
     </main>
   );
 }
