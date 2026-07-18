@@ -60,6 +60,9 @@ export default function ContinueButton() {
         throw new Error("No artist ID returned by the backend.");
       }
 
+      console.log("BOOTSTRAP RESPONSE:", data);
+console.log("ARTIST ID:", data?.artist?.id);
+
       router.replace(
         `/dashboard?artistId=${encodeURIComponent(data.artist.id)}`,
       );
