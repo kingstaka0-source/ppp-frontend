@@ -1,7 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
-import ContinueButton from "./ContinueButton";
 import { redirect } from "next/navigation";
-
+import ContinueButton from "./ContinueButton";
 
 export default async function OnboardingPage() {
   const { userId } = await auth();
@@ -11,7 +10,6 @@ export default async function OnboardingPage() {
   }
 
   const user = await currentUser();
-
   const firstName = user?.firstName?.trim() || "Artist";
 
   return (
@@ -33,7 +31,11 @@ export default async function OnboardingPage() {
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           <div className="rounded-3xl border border-green-500/40 bg-green-500/10 p-7">
             <div className="text-sm font-black text-green-400">STEP 1</div>
-            <h2 className="mt-3 text-xl font-black">Create artist profile</h2>
+
+            <h2 className="mt-3 text-xl font-black">
+              Create artist profile
+            </h2>
+
             <p className="mt-3 text-sm leading-6 text-white/60">
               Connect this account to your private TuneReach artist profile.
             </p>
@@ -41,7 +43,9 @@ export default async function OnboardingPage() {
 
           <div className="rounded-3xl border border-white/10 bg-white/5 p-7">
             <div className="text-sm font-black text-white/40">STEP 2</div>
+
             <h2 className="mt-3 text-xl font-black">Import your track</h2>
+
             <p className="mt-3 text-sm leading-6 text-white/60">
               Add your Spotify release and start playlist matching.
             </p>
@@ -49,7 +53,11 @@ export default async function OnboardingPage() {
 
           <div className="rounded-3xl border border-white/10 bg-white/5 p-7">
             <div className="text-sm font-black text-white/40">STEP 3</div>
-            <h2 className="mt-3 text-xl font-black">Generate your pitch</h2>
+
+            <h2 className="mt-3 text-xl font-black">
+              Generate your pitch
+            </h2>
+
             <p className="mt-3 text-sm leading-6 text-white/60">
               Create your first personalized AI curator pitch.
             </p>
@@ -57,8 +65,8 @@ export default async function OnboardingPage() {
         </div>
 
         <div className="mt-10">
-  <ContinueButton />
-</div>
+          <ContinueButton />
+        </div>
       </div>
     </main>
   );

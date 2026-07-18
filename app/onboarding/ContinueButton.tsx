@@ -63,9 +63,9 @@ export default function ContinueButton() {
       console.log("BOOTSTRAP RESPONSE:", data);
 console.log("ARTIST ID:", data?.artist?.id);
 
-      router.replace(
-        `/dashboard?artistId=${encodeURIComponent(data.artist.id)}`,
-      );
+      localStorage.setItem("tunereachArtistId", data.artist.id);
+
+router.replace("/onboarding/wizard");
     } catch (err) {
       setError(
         err instanceof Error
