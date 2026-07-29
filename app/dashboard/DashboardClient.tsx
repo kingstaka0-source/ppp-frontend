@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { UserButton, useUser } from "@clerk/nextjs";
-import { useSearchParams } from "next/navigation";
+import { SignInButton, UserButton, useAuth, useUser } from "@clerk/nextjs";
 import LegalGate from "@/app/components/LegalGate";
 import IntakeTrackCard from "@/app/components/IntakeTrackCard";
 
@@ -167,12 +166,9 @@ function linkWithArtistId(path: string, artistId: string) {
 
 export default function DashboardClient() {
   const { isLoaded, isSignedIn, user } = useUser();
+  const { getToken } = useAuth();
 
-  const searchParams = useSearchParams();
-  const resolvedArtistId =
-    searchParams.get("artistId")?.trim() || DEFAULT_ARTIST_ID;
-
-  const [artistId, setArtistId] = useState<string>(resolvedArtistId);
+  const [artistId, setArtistId] = useState<string>("");
   const [usage, setUsage] = useState<Usage | null>(null);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [legal, setLegal] = useState<LegalBlock | null>(null);
@@ -181,63 +177,74 @@ export default function DashboardClient() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
 
-  async function loadAll(currentArtistId: string) {
-    setArtistId(currentArtistId);
-    setLoading(true);
-    setErr(null);
+  async function loadAll() {
+  setLoading(true);
+  setErr(null);
 
-    try {
-      if (!currentArtistId) {
-        throw new Error(
-          "Missing artistId. Add ?artistId=... in the URL or set NEXT_PUBLIC_ARTIST_ID."
-        );
-      }
-
-      const [uRes, oRes, aRes] = await Promise.all([
-        fetch(`${API}/artists/${currentArtistId}/usage`, {
-          cache: "no-store",
-          headers: { "x-artist-id": currentArtistId },
-        }),
-        fetch(`${API}/dashboard/artist/${currentArtistId}/overview`, {
-          cache: "no-store",
-          headers: { "x-artist-id": currentArtistId },
-        }),
-        fetch(
-          `${API}/billing/access?artistId=${encodeURIComponent(currentArtistId)}`,
-          {
-            cache: "no-store",
-            headers: { "x-artist-id": currentArtistId },
-          }
-        ),
-      ]);
-
-      const uText = await uRes.text();
-      const oText = await oRes.text();
-      const aText = await aRes.text();
-
-      if (!uRes.ok) throw new Error(uText || `Usage HTTP ${uRes.status}`);
-      if (!oRes.ok) throw new Error(oText || `Overview HTTP ${oRes.status}`);
-      if (!aRes.ok) throw new Error(aText || `Access HTTP ${aRes.status}`);
-
-      const u = JSON.parse(uText) as Usage;
-      const o = JSON.parse(oText) as Overview;
-      const a = JSON.parse(aText) as BillingAccessResponse;
-
-      setUsage(u);
-      setOverview(o);
-      setLegal((o?.legal ?? null) as LegalBlock | null);
-      setAccess(a?.access ?? null);
-    } catch (e: any) {
-      setErr(e?.message ?? "Failed to load dashboard");
-    } finally {
-      setLoading(false);
+  try {
+    if (!isSignedIn) {
+      throw new Error("You must be signed in.");
     }
+
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error("Could not get authentication token.");
+    }
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const [uRes, oRes, aRes] = await Promise.all([
+      fetch(`${API}/artists/me/usage`, {
+        cache: "no-store",
+        headers,
+      }),
+      fetch(`${API}/dashboard/overview`, {
+        cache: "no-store",
+        headers,
+      }),
+      fetch(`${API}/billing/access`, {
+        cache: "no-store",
+        headers,
+      }),
+    ]);
+
+    const uText = await uRes.text();
+    const oText = await oRes.text();
+    const aText = await aRes.text();
+
+    if (!uRes.ok) throw new Error(uText || `Usage HTTP ${uRes.status}`);
+    if (!oRes.ok) throw new Error(oText || `Overview HTTP ${oRes.status}`);
+    if (!aRes.ok) throw new Error(aText || `Access HTTP ${aRes.status}`);
+
+    const u = JSON.parse(uText) as Usage;
+    const o = JSON.parse(oText) as Overview;
+    const a = JSON.parse(aText) as BillingAccessResponse;
+
+    setArtistId(o.artist.id);
+    setUsage(u);
+    setOverview(o);
+    setLegal((o?.legal ?? null) as LegalBlock | null);
+    setAccess(a?.access ?? null);
+  } catch (e: any) {
+    setErr(e?.message ?? "Failed to load dashboard");
+  } finally {
+    setLoading(false);
   }
+}
 
   useEffect(() => {
-    setArtistId(resolvedArtistId);
-    loadAll(resolvedArtistId);
-  }, [resolvedArtistId]);
+  if (!isLoaded) return;
+
+  if (!isSignedIn) {
+    setLoading(false);
+    return;
+  }
+
+  loadAll();
+}, [isLoaded, isSignedIn]);
 
   const trialDaysLeft = useMemo(
     () => daysLeft(usage?.trial?.until ?? access?.trialUntil ?? null),
@@ -273,56 +280,59 @@ const placementRate = analytics?.placementRate ?? 0;
           subjectType="ARTIST"
           subjectId={artistId}
           legal={legal}
-          onAccepted={() => loadAll(artistId)}
+          onAccepted={() => loadAll()}
         />
       )}
 
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-green-950 p-8 text-white shadow-2xl">
 
-<div className="absolute right-5 top-5 z-50">
-  {!isLoaded ? (
-    <div className="h-10 w-10 animate-pulse rounded-full bg-white/20" />
-  ) : isSignedIn ? (
-    <div className="flex items-center gap-3 rounded-full border border-white/20 bg-black/30 p-1 pr-4 backdrop-blur">
-      <UserButton
-        appearance={{
-          elements: {
-            avatarBox: "h-10 w-10",
-          },
-        }}
-      />
+<div className="relative z-20 mb-4 flex flex-wrap items-center gap-2">
+  {usage?.plan && <PlanBadge plan={usage.plan} />}
 
-      <span className="hidden text-sm font-medium text-white sm:block">
-        {user?.firstName || user?.username || "Account"}
-      </span>
-    </div>
-  ) : (
-    <Link
-      href="/sign-in"
-      className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur hover:bg-white hover:text-black"
+  {access?.subscriptionStatus && (
+    <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm">
+      {access.subscriptionStatus}
+    </span>
+  )}
+
+  <div className="ml-auto">
+    {!isLoaded ? (
+      <div className="h-10 w-24 animate-pulse rounded-full bg-white/20" />
+    ) : isSignedIn ? (
+      <div className="flex items-center gap-3 rounded-full border border-white/20 bg-black/30 p-1 pr-4 backdrop-blur">
+        <UserButton
+          appearance={{
+            elements: {
+              avatarBox: "h-10 w-10",
+            },
+          }}
+        />
+
+        <span className="hidden text-sm font-medium text-white sm:block">
+          {user?.firstName || user?.username || "Account"}
+        </span>
+      </div>
+    ) : (
+  <SignInButton mode="modal">
+    <button
+      type="button"
+      className="relative z-20 cursor-pointer rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white hover:text-black"
     >
       Sign in
-    </Link>
-  )}
+    </button>
+  </SignInButton>
+)}
+  </div>
 </div>
 
-  <div className="absolute right-0 top-0 h-56 w-56 rounded-full bg-green-500/10 blur-3xl" />
-  <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
+  <div className="pointer-events-none absolute right-0 top-0 h-56 w-56 rounded-full bg-green-500/10 blur-3xl" />
+<div className="pointer-events-none absolute bottom-0 left-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
 
   <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
 
     <div className="max-w-2xl">
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        {usage?.plan && <PlanBadge plan={usage.plan} />}
-
-        {access?.subscriptionStatus && (
-          <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm">
-            {access.subscriptionStatus}
-          </span>
-        )}
-      </div>
-
+      
       <h1 className="text-4xl font-bold tracking-tight">
         Welcome back, {artistName} 👋
       </h1>
@@ -516,7 +526,12 @@ const placementRate = analytics?.placementRate ?? 0;
       {loading && <p>Loading…</p>}
       {err && <p className="text-red-600 whitespace-pre-wrap">Error: {err}</p>}
 
-      {!loading && !err && <IntakeTrackCard artistId={artistId} onDone={() => loadAll(artistId)} />}
+      {!loading && !err && (
+  <IntakeTrackCard
+    artistId={artistId}
+    onDone={loadAll}
+  />
+)}
 
       {!loading && !err && usage && access && (
         <div className="space-y-3">
