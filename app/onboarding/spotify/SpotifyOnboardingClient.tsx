@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -24,78 +25,128 @@ type SpotifyStatus = {
   message?: string;
 };
 
+type SpotifyStartResponse = {
+  url?: string;
+  error?: string;
+  message?: string;
+};
+
 export default function SpotifyOnboardingClient() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const [artistId, setArtistId] = useState("");
+  const { isLoaded, isSignedIn } = useUser();
+  const { getToken } = useAuth();
+
   const [status, setStatus] = useState<SpotifyStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState("");
 
-  const returnedArtistId = searchParams.get("artistId");
-  const spotifyResult = searchParams.get("spotify");
-
   useEffect(() => {
-    const storedArtistId = localStorage.getItem("tunereachArtistId");
-    const resolvedArtistId = returnedArtistId || storedArtistId || "";
-
-    if (returnedArtistId) {
-      localStorage.setItem("tunereachArtistId", returnedArtistId);
+    if (!isLoaded) {
+      return;
     }
 
-    setArtistId(resolvedArtistId);
-
-    if (!resolvedArtistId) {
-      setError("Your TuneReach artist profile could not be found.");
+    if (!isSignedIn) {
+      setError("You must be signed in to connect Spotify.");
       setLoading(false);
       return;
     }
 
-    void loadSpotifyStatus(resolvedArtistId);
-  }, [returnedArtistId]);
+    void loadSpotifyStatus();
+  }, [isLoaded, isSignedIn]);
 
-  async function loadSpotifyStatus(id: string) {
+  async function getAuthHeaders(): Promise<Record<string, string>> {
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error("Could not get authentication token.");
+    }
+
+    return {
+      Authorization: `Bearer ${token}`,
+    };
+  }
+
+  async function loadSpotifyStatus() {
     setLoading(true);
     setError("");
 
     try {
-      const response = await fetch(
-        `${API_URL}/auth/spotify/status?artistId=${encodeURIComponent(id)}`,
-        {
-          cache: "no-store",
-        }
-      );
+      const headers = await getAuthHeaders();
+
+      const response = await fetch(`${API_URL}/auth/spotify/status`, {
+        method: "GET",
+        cache: "no-store",
+        headers,
+      });
 
       const data = (await response.json()) as SpotifyStatus;
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || "Unable to check Spotify");
+        throw new Error(
+          data.message ||
+            data.error ||
+            "Unable to check your Spotify connection.",
+        );
       }
 
       setStatus(data);
     } catch (err) {
+      setStatus(null);
+
       setError(
         err instanceof Error
           ? err.message
-          : "Unable to check your Spotify connection."
+          : "Unable to check your Spotify connection.",
       );
     } finally {
       setLoading(false);
     }
   }
 
-  function connectSpotify() {
-    if (!artistId) {
-      setError("Your artist profile is missing. Please restart onboarding.");
-      return;
-    }
+  async function connectSpotify() {
+  console.log("CONNECT SPOTIFY CLICKED");
+
+  if (connecting) {
+    return;
+  }
 
     setConnecting(true);
+    setError("");
 
-    window.location.href =
-      `${API_URL}/auth/spotify?artistId=${encodeURIComponent(artistId)}`;
+    try {
+      const headers = await getAuthHeaders();
+
+      const response = await fetch(`${API_URL}/auth/spotify/start`, {
+        method: "POST",
+        headers,
+      });
+
+      const data = (await response.json()) as SpotifyStartResponse;
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            data.error ||
+            "Unable to start the Spotify connection.",
+        );
+      }
+
+      if (!data.url) {
+        throw new Error("Spotify authorization URL was not returned.");
+      }
+
+      window.location.assign(data.url);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to connect Spotify.",
+      );
+
+      setConnecting(false);
+    }
   }
 
   function continueToImport() {
@@ -145,7 +196,7 @@ export default function SpotifyOnboardingClient() {
             <ConnectState
               connecting={connecting}
               error={error}
-              spotifyResult={spotifyResult}
+              spotifyResult={null}
               onConnect={connectSpotify}
             />
           )}
@@ -224,6 +275,7 @@ function ConnectState({
         <div className="relative flex h-full items-center">
           <div className="w-full rounded-[28px] border border-white/10 bg-black/35 p-7 backdrop-blur">
             <p className="text-sm text-white/40">What you unlock</p>
+
             <h2 className="mt-2 text-3xl font-black">
               From release to campaign.
             </h2>
@@ -240,6 +292,7 @@ function ConnectState({
               <p className="font-bold text-emerald-300">
                 Your first campaign is close
               </p>
+
               <p className="mt-2 text-sm leading-6 text-white/50">
                 Connect Spotify now. In the next step you will select the
                 release you want to promote.

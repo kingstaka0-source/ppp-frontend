@@ -372,10 +372,20 @@ const placementRate = analytics?.placementRate ?? 0;
         <div className="mt-2 text-4xl font-bold">{totalMatches}</div>
       </div>
 
-      <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
-        <div className="text-sm text-zinc-300">Campaigns</div>
-        <div className="mt-2 text-4xl font-bold">{totalCampaigns}</div>
-      </div>
+      <Link
+  href="/campaigns"
+  className="rounded-2xl bg-white/10 p-5 backdrop-blur transition hover:bg-white/15 hover:-translate-y-0.5"
+>
+  <div className="text-sm text-zinc-300">Campaigns</div>
+
+  <div className="mt-2 text-4xl font-bold">
+    {totalCampaigns}
+  </div>
+
+  <div className="mt-2 text-xs font-semibold text-emerald-300">
+    View history →
+  </div>
+</Link>
 
       <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
         <div className="text-sm text-zinc-300">Placements</div>

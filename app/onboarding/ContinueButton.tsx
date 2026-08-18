@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 type BootstrapResponse = {
   artist?: {
@@ -12,6 +13,7 @@ type BootstrapResponse = {
 
 export default function ContinueButton() {
   const router = useRouter();
+  const { getToken } = useAuth();
 
   const [acceptedLegal, setAcceptedLegal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,16 +29,25 @@ export default function ContinueButton() {
     setError("");
 
     try {
-      const response = await fetch("/api/bootstrap", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          acceptedLegal: true,
-        }),
-        cache: "no-store",
-      });
+      const token = await getToken();
+
+if (!token) {
+  throw new Error("Could not get authentication token.");
+}
+
+const response = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/auth/bootstrap`,
+  {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    acceptedLegal: true,
+  }),
+  cache: "no-store",
+});
 
       const responseText = await response.text();
 
