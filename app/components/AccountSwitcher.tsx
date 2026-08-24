@@ -24,7 +24,7 @@ function normalize(value: string) {
 
 export default function AccountSwitcher() {
   console.log("ACCOUNT SWITCHER LOADED");
-  
+    
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

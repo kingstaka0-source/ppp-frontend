@@ -116,18 +116,141 @@ export default function CampaignDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { getToken, isLoaded } = useAuth();
+  const { getToken, isLoaded, isSignedIn } = useAuth();
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!isLoaded) {
-      return;
+  const [replySaving, setReplySaving] = useState<string | null>(null);
+
+  const [playlistSaving, setPlaylistSaving] =
+  useState<string | null>(null);
+
+async function markPlaylisted(
+  campaignItemId: string,
+) {
+  try {
+    setPlaylistSaving(campaignItemId);
+
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error(
+        "Could not get authentication token.",
+      );
     }
 
-    async function loadCampaign() {
+    const apiUrl =
+      process.env.NEXT_PUBLIC_API_URL ||
+      "http://127.0.0.1:3100";
+
+    const response = await fetch(
+      `${apiUrl}/campaigns/${encodeURIComponent(
+        id,
+      )}/items/${encodeURIComponent(
+        campaignItemId,
+      )}/playlist`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data?.message ||
+          data?.error ||
+          `Could not mark playlist placement (${response.status}).`,
+      );
+    }
+
+    window.location.reload();
+  } catch (err) {
+    alert(
+      err instanceof Error
+        ? err.message
+        : "Could not mark playlist placement.",
+    );
+  } finally {
+    setPlaylistSaving(null);
+  }
+}
+
+async function markReply(
+  campaignItemId: string,
+  status: "INTERESTED" | "DECLINED",
+) {
+  try {
+    setReplySaving(campaignItemId);
+
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error("Could not get authentication token.");
+    }
+
+    const apiUrl =
+      process.env.NEXT_PUBLIC_API_URL ||
+      "http://127.0.0.1:3100";
+
+    const response = await fetch(
+      `${apiUrl}/campaigns/${encodeURIComponent(
+        id,
+      )}/items/${encodeURIComponent(
+        campaignItemId,
+      )}/reply`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status,
+        }),
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data?.message ||
+          data?.error ||
+          `Could not save reply (${response.status}).`,
+      );
+    }
+
+    window.location.reload();
+  } catch (err) {
+    alert(
+      err instanceof Error
+        ? err.message
+        : "Could not save curator reply.",
+    );
+  } finally {
+    setReplySaving(null);
+  }
+}
+
+  useEffect(() => {
+  if (!isLoaded) {
+    return;
+  }
+
+  if (!isSignedIn) {
+    setLoading(false);
+    setError("You must be signed in.");
+    return;
+  }
+
+  async function loadCampaign() {
       try {
         setLoading(true);
         setError("");
@@ -177,7 +300,7 @@ export default function CampaignDetailPage({
     }
 
     void loadCampaign();
-  }, [getToken, id, isLoaded]);
+  }, [getToken, id, isLoaded, isSignedIn]);
 
   if (loading) {
     return (
@@ -410,6 +533,73 @@ export default function CampaignDetailPage({
                     />
                   </div>
                 </div>
+
+                <div className="mt-5 flex flex-wrap gap-3">
+  {item.pitch?.positiveReply === true ? (
+    <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-black text-emerald-300">
+      ✓ Interested
+    </div>
+  ) : item.pitch?.negativeReply === true ? (
+    <div className="rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-2 text-sm font-black text-red-300">
+      Declined
+    </div>
+  ) : (
+    <>
+      <button
+        type="button"
+        disabled={replySaving === item.id}
+        onClick={() =>
+          void markReply(
+            item.id,
+            "INTERESTED",
+          )
+        }
+        className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-black text-emerald-300 transition hover:bg-emerald-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {replySaving === item.id
+          ? "Saving..."
+          : "Mark Interested"}
+      </button>
+
+      <button
+        type="button"
+        disabled={replySaving === item.id}
+        onClick={() =>
+          void markReply(
+            item.id,
+            "DECLINED",
+          )
+        }
+        className="rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-2 text-sm font-black text-red-300 transition hover:bg-red-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {replySaving === item.id
+          ? "Saving..."
+          : "Mark Declined"}
+      </button>
+    </>
+  )}
+</div>
+
+<div className="mt-3">
+  {item.pitch?.playlistDetected === true ? (
+    <div className="inline-flex rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-black text-emerald-300">
+      ✓ Playlisted
+    </div>
+  ) : (
+    <button
+      type="button"
+      disabled={playlistSaving === item.id}
+      onClick={() =>
+        void markPlaylisted(item.id)
+      }
+      className="rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-black text-cyan-300 transition hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {playlistSaving === item.id
+        ? "Saving..."
+        : "Mark Playlisted"}
+    </button>
+  )}
+</div>
 
                 {item.playlist?.spotifyPlaylistId && (
                   <a

@@ -66,7 +66,7 @@ export default function FollowupsPage() {
     try {
       setWorkingId(id);
 
-      const res = await fetch(`${API}/followups/${id}/mark-sent`, {
+      const res = await fetch(`${API}/followups/${id}/send`, {
         method: "POST",
       });
 

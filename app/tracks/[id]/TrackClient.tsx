@@ -22,6 +22,13 @@ type TrackResponse = {
   spotifyUrl?: string | null;
   matchCount?: number;
   matchesCount?: number;
+
+  audioFeatures?: {
+    energy?: number;
+    danceability?: number;
+    tempo?: number;
+    valence?: number;
+  } | null;
 };
 
 type MatchResponse = {
@@ -223,7 +230,8 @@ if (matchesResponse.ok) {
     }
   }, [getToken, trackId]);
 
-  async function startMatching() {
+       
+async function startMatching() {
   try {
     setMatching(true);
     setMatchMessage("");
@@ -274,6 +282,9 @@ if (matchesResponse.ok) {
     setMatching(false);
   }
 }
+
+
+/* EN DAARNA KOMT JOUW BESTAANDE FUNCTIE */
 
 async function generatePitchForMatch(matchId: string) {
   try {
@@ -571,7 +582,39 @@ async function launchCampaign() {
   const duration = track.durationMs ?? track.duration;
   const matchCount = track.matchCount ?? track.matchesCount ?? 0;
 
-  const spotifyUrl =
+  const audio = track.audioFeatures;
+
+const energy =
+  typeof audio?.energy === "number"
+    ? `${Math.round(audio.energy * 100)}%`
+    : "Unavailable";
+
+const danceability =
+  typeof audio?.danceability === "number"
+    ? `${Math.round(audio.danceability * 100)}%`
+    : "Unavailable";
+
+const tempo =
+  typeof audio?.tempo === "number"
+    ? `${Math.round(audio.tempo)} BPM`
+    : "Unavailable";
+
+const mood =
+  typeof audio?.valence === "number"
+    ? audio.valence >= 0.65
+      ? "Positive"
+      : audio.valence >= 0.4
+        ? "Balanced"
+        : "Dark"
+    : "Unavailable";
+
+const hasAudioFeatures =
+  typeof audio?.energy === "number" ||
+  typeof audio?.danceability === "number" ||
+  typeof audio?.tempo === "number" ||
+  typeof audio?.valence === "number";
+
+    const spotifyUrl =
     track.spotifyUrl ||
     (track.spotifyTrackId
       ? `https://open.spotify.com/track/${track.spotifyTrackId}`
@@ -682,16 +725,25 @@ async function launchCampaign() {
             </div>
 
             <div className="mt-7 space-y-5">
-              <FeatureRow label="Energy" value="Analysis pending" />
-              <FeatureRow label="Danceability" value="Analysis pending" />
-              <FeatureRow label="Tempo" value="Analysis pending" />
-              <FeatureRow label="Mood" value="Analysis pending" />
-            </div>
+  <FeatureRow label="Energy" value={energy} />
+  <FeatureRow label="Danceability" value={danceability} />
+  <FeatureRow label="Tempo" value={tempo} />
+  <FeatureRow label="Mood" value={mood} />
+</div>
 
-            <p className="mt-6 text-sm leading-6 text-white/40">
-              Audio analysis will be connected to the matching engine in the
-              next step.
-            </p>
+
+{!hasAudioFeatures && (
+  <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <p className="text-sm font-bold text-white/70">
+      Audio features unavailable
+    </p>
+
+    <p className="mt-2 text-sm leading-6 text-white/40">
+      Spotify audio analysis is currently unavailable for this track.
+      TuneReach uses genre, metadata and playlist signals for matching.
+    </p>
+  </div>
+)}
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-zinc-950 p-7">
@@ -814,13 +866,19 @@ async function launchCampaign() {
 
           <div className="text-right">
             <p className="text-xl font-black text-emerald-300">
-              {Math.round(
-                match.fitScore <= 1
-                  ? match.fitScore * 100
-                  : match.fitScore,
-              )}
-              %
-            </p>
+  {Math.round(
+    Math.min(
+      100,
+      Math.max(
+        0,
+        match.fitScore <= 1
+          ? match.fitScore * 100
+          : match.fitScore,
+      ),
+    ),
+  )}
+  %
+</p> 
 
             <p className="mt-1 text-xs text-white/35">
               match score
