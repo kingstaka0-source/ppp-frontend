@@ -66,6 +66,20 @@ type PitchResponse = {
   status: string;
   channel: string;
   sentTo?: string | null;
+
+  openCount?: number;
+  clickCount?: number;
+  lastOpenedAt?: string | null;
+  lastClickedAt?: string | null;
+
+    match?: {
+    id?: string;
+    playlistId?: string;
+    playlist?: {
+      id: string;
+      name?: string;
+    } | null;
+  } | null;
 };
 
 type GeneratePitchResponse = {
@@ -135,100 +149,194 @@ const [sentPitchIds, setSentPitchIds] = useState<Record<string, boolean>>({});
 const [sendErrors, setSendErrors] = useState<Record<string, string>>({});
 
   const loadTrack = useCallback(async () => {
-    setLoading(true);
-    setError("");
+  setLoading(true);
+  setError("");
+
+  try {
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error("Could not get authentication token.");
+    }
+
+    // =====================================
+    // LOAD TRACK
+    // =====================================
+
+    const response = await fetch(
+      `${API_URL}/tracks/${encodeURIComponent(trackId)}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      },
+    );
+
+    const responseText = await response.text();
+
+    let data: TrackResponse | ApiErrorResponse;
 
     try {
-      const token = await getToken();
-
-      if (!token) {
-        throw new Error("Could not get authentication token.");
-      }
-
-      const response = await fetch(
-        `${API_URL}/tracks/${encodeURIComponent(trackId)}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          cache: "no-store",
-        },
+      data = JSON.parse(responseText);
+    } catch {
+      throw new Error(
+        `Server returned a non-JSON response (${response.status}).`,
       );
+    }
 
-      const responseText = await response.text();
+    if (!response.ok) {
+      const apiError = data as ApiErrorResponse;
 
-      let data: TrackResponse | ApiErrorResponse;
+      throw new Error(
+        apiError.message ||
+          apiError.error ||
+          `Could not load track (${response.status}).`,
+      );
+    }
 
-      try {
-        data = JSON.parse(responseText);
-      } catch {
-        throw new Error(
-          `Server returned a non-JSON response (${response.status}).`,
-        );
+    setTrack(data as TrackResponse);
+
+    // =====================================
+    // LOAD MATCHES
+    // =====================================
+
+    let loadedMatches: MatchResponse[] = [];
+
+    const matchesResponse = await fetch(
+      `${API_URL}/matches?trackId=${encodeURIComponent(trackId)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      },
+    );
+
+    console.log("MATCHES STATUS:", matchesResponse.status);
+
+    if (matchesResponse.ok) {
+      const contentType =
+        matchesResponse.headers.get("content-type") || "";
+
+      if (contentType.includes("application/json")) {
+        const matchesData = await matchesResponse.json();
+
+        console.log("MATCHES RESPONSE:", matchesData);
+
+        const list: MatchResponse[] = Array.isArray(matchesData)
+  ? matchesData
+  : Array.isArray(matchesData.matches)
+    ? matchesData.matches
+    : [];
+
+loadedMatches = list;
+setMatches(list);
+      } else {
+        console.warn("Matches endpoint returned non-JSON.");
+        setMatches([]);
       }
+    } else {
+      console.warn(
+        `Matches endpoint failed with status ${matchesResponse.status}`,
+      );
+      setMatches([]);
+    }
 
-      if (!response.ok) {
-        const apiError = data as ApiErrorResponse;
+    // =====================================
+    // LOAD EXISTING PITCHES + TRACKING
+    // =====================================
 
-        throw new Error(
-          apiError.message ||
-            apiError.error ||
-            `Could not load track (${response.status}).`,
-        );
-      }
+    const pitchesResponse = await fetch(
+      `${API_URL}/pitches?trackId=${encodeURIComponent(trackId)}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      },
+    );
 
-      setTrack(data as TrackResponse);
+    console.log("PITCHES STATUS:", pitchesResponse.status);
 
-      const matchesResponse = await fetch(
-  `${API_URL}/matches?trackId=${encodeURIComponent(trackId)}`,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    cache: "no-store",
-  },
-);
+    if (pitchesResponse.ok) {
+      const pitchesData = await pitchesResponse.json();
 
-console.log("MATCHES STATUS:", matchesResponse.status);
+      console.log("PITCHES RESPONSE:", pitchesData);
 
-if (matchesResponse.ok) {
-  const contentType = matchesResponse.headers.get("content-type") || "";
-
-  if (contentType.includes("application/json")) {
-    const matchesData = await matchesResponse.json();
-
-    console.log("MATCHES RESPONSE:", matchesData);
-
-    const list = Array.isArray(matchesData)
-      ? matchesData
-      : Array.isArray(matchesData.matches)
-        ? matchesData.matches
+      const pitchList: PitchResponse[] = Array.isArray(pitchesData)
+        ? pitchesData
         : [];
 
-    setMatches(list);
-  } else {
-    console.warn("Matches endpoint returned non-JSON.");
-    setMatches([]);
+      const pitchesByMatch: Record<string, PitchResponse> = {};
+const sentByPitchId: Record<string, boolean> = {};
+
+// Link every current Match to its playlist.
+const currentMatchIdByPlaylistId = new Map<string, string>();
+
+for (const match of loadedMatches) {
+  if (match.playlistId) {
+    currentMatchIdByPlaylistId.set(
+      match.playlistId,
+      match.id,
+    );
   }
-} else {
-  console.warn(
-    `Matches endpoint failed with status ${matchesResponse.status}`,
-  );
-  setMatches([]);
 }
 
-    } catch (err) {
-      setTrack(null);
+for (const pitch of pitchList) {
+  if (!pitch?.id || !pitch?.matchId) {
+    continue;
+  }
 
-      setError(
-        err instanceof Error ? err.message : "Could not load this track.",
+  const pitchPlaylistId =
+    pitch.match?.playlistId ||
+    pitch.match?.playlist?.id ||
+    null;
+
+  // When an old Match belongs to the same playlist,
+  // show its pitch on the current Match card.
+  const displayMatchId =
+    pitchPlaylistId &&
+    currentMatchIdByPlaylistId.get(pitchPlaylistId)
+      ? currentMatchIdByPlaylistId.get(pitchPlaylistId)!
+      : pitch.matchId;
+
+  const existingPitch = pitchesByMatch[displayMatchId];
+
+  if (
+    !existingPitch ||
+    (existingPitch.status !== "SENT" &&
+      pitch.status === "SENT")
+  ) {
+    pitchesByMatch[displayMatchId] = pitch;
+  }
+
+  if (pitch.status === "SENT") {
+    sentByPitchId[pitch.id] = true;
+  }
+}
+
+      setGeneratedPitches(pitchesByMatch);
+      setSentPitchIds(sentByPitchId);
+    } else {
+      console.warn(
+        `Pitches endpoint failed with status ${pitchesResponse.status}`,
       );
-    } finally {
-      setLoading(false);
     }
-  }, [getToken, trackId]);
+  } catch (err) {
+    setTrack(null);
+
+    setError(
+      err instanceof Error ? err.message : "Could not load this track.",
+    );
+  } finally {
+    setLoading(false);
+  }
+}, [getToken, trackId]);
 
        
 async function startMatching() {
@@ -922,8 +1030,10 @@ const hasAudioFeatures =
           {generatedPitches[match.id] && (
             <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
-                Saved draft
-              </p>
+  {generatedPitches[match.id].status === "SENT"
+    ? "Sent pitch"
+    : "Saved draft"}
+</p>
 
               <p className="mt-4 text-sm text-white/45">
                 Subject
@@ -950,6 +1060,40 @@ const hasAudioFeatures =
                   {generatedPitches[match.id].channel}
                 </span>
               </div>
+
+              {generatedPitches[match.id].status === "SENT" && (
+  <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+    <div className="flex flex-wrap gap-3">
+      <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-bold text-emerald-300">
+        👁 {generatedPitches[match.id].openCount ?? 0} Opens
+      </span>
+
+      <span className="rounded-full border border-sky-400/20 bg-sky-400/10 px-3 py-2 text-xs font-bold text-sky-300">
+        🔗 {generatedPitches[match.id].clickCount ?? 0} Clicks
+      </span>
+    </div>
+
+    <div className="mt-3 space-y-1 text-xs text-white/40">
+      <p>
+        Last opened:{" "}
+        {generatedPitches[match.id].lastOpenedAt
+          ? new Date(
+              generatedPitches[match.id].lastOpenedAt!,
+            ).toLocaleString()
+          : "—"}
+      </p>
+
+      <p>
+        Last clicked:{" "}
+        {generatedPitches[match.id].lastClickedAt
+          ? new Date(
+              generatedPitches[match.id].lastClickedAt!,
+            ).toLocaleString()
+          : "—"}
+      </p>
+    </div>
+  </div>
+)}
 
               {/* SEND SINGLE PITCH */}
               <div className="mt-5 border-t border-emerald-400/15 pt-5">
