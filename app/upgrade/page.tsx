@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
-import UpgradeButton from "@/app/components/UpgradeButton";
+
 
 type Usage = {
   artistId: string;
@@ -227,10 +227,6 @@ export default function UpgradePage() {
         </Link>
       </div>
 
-      <div className="text-sm text-gray-600">
-        API: {API}
-      </div>
-
       {loading && <p>Loading…</p>}
       {err && <p className="text-red-600 whitespace-pre-wrap">Error: {err}</p>}
       {msg && <p className="text-green-700 whitespace-pre-wrap">{msg}</p>}
@@ -291,7 +287,7 @@ export default function UpgradePage() {
               Unlimited pitches, campaign launch, auto pitch + send, billing portal access.
             </div>
             <div className="text-sm text-gray-700">
-              Price: <b>$19/month</b>
+              Price: <b>€19/month</b>
             </div>
           </div>
 
@@ -306,8 +302,6 @@ export default function UpgradePage() {
           </div>
 
           <div className="pt-2 flex flex-wrap gap-3">
-            {effectivePlan !== "PRO" && <UpgradeButton />}
-
             <button
               onClick={startTrial}
               disabled={
