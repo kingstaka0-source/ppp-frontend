@@ -241,6 +241,23 @@ export default function UpgradePage() {
             </div>
           </div>
 
+          {billing.cancelAtPeriodEnd && (
+  <div className="mt-4 border border-yellow-300 bg-yellow-50 rounded-lg p-4">
+    <div className="font-semibold text-yellow-800">
+      Subscription canceled
+    </div>
+    <div className="text-sm text-yellow-800 mt-1">
+      Your TuneReach access remains active until{" "}
+      <b>
+        {currentPeriodEnd
+          ? currentPeriodEnd.toLocaleString()
+          : "the end of your current billing period"}
+      </b>
+      . You will not be charged after this date.
+    </div>
+  </div>
+)}
+
           {effectivePlan === "FREE" && (
             <div className="text-gray-700 space-y-1">
               <div>
@@ -273,11 +290,7 @@ export default function UpgradePage() {
                   Current period ends: <b>{currentPeriodEnd.toLocaleString()}</b>
                 </div>
               )}
-              {billing.cancelAtPeriodEnd && (
-                <div className="text-yellow-700">
-                  Your subscription is set to cancel at the end of the current period.
-                </div>
-              )}
+              
             </div>
           )}
 
