@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
 
@@ -33,6 +34,8 @@ type FollowUp = {
 };
 
 export default function FollowupsPage() {
+  const { getToken } = useAuth();
+
   const [items, setItems] = useState<FollowUp[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -43,9 +46,18 @@ export default function FollowupsPage() {
     setErr(null);
 
     try {
-      const res = await fetch(`${API}/followups`, {
-        cache: "no-store",
-      });
+      const token = await getToken();
+
+if (!token) {
+  throw new Error("You must be signed in.");
+}
+
+const res = await fetch(`${API}/followups`, {
+  cache: "no-store",
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       const text = await res.text();
 
@@ -66,9 +78,18 @@ export default function FollowupsPage() {
     try {
       setWorkingId(id);
 
-      const res = await fetch(`${API}/followups/${id}/send`, {
-        method: "POST",
-      });
+      const token = await getToken();
+
+if (!token) {
+  throw new Error("You must be signed in.");
+}
+
+const res = await fetch(`${API}/followups/${id}/send`, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       const text = await res.text();
 
@@ -208,19 +229,38 @@ export default function FollowupsPage() {
   <div className="flex gap-2">
     <button
       onClick={async () => {
-        const res = await fetch(
-          `${API}/followups/${item.id}/generate`,
-          {
-            method: "POST",
-          }
-        );
+  try {
+    const token = await getToken();
 
-        const data = await res.json();
+    if (!token) {
+      throw new Error("You must be signed in.");
+    }
 
-        alert(
-          `SUBJECT:\n\n${data.subject}\n\nBODY:\n\n${data.body}`
-        );
-      }}
+    const res = await fetch(
+      `${API}/followups/${item.id}/generate`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const text = await res.text();
+
+    if (!res.ok) {
+      throw new Error(text || `HTTP ${res.status}`);
+    }
+
+    const data = JSON.parse(text);
+
+    alert(
+      `SUBJECT:\n\n${data.subject}\n\nBODY:\n\n${data.body}`
+    );
+  } catch (e: any) {
+    setErr(e?.message ?? "Failed to generate follow-up");
+  }
+}}
       className="rounded border border-black px-3 py-2"
     >
       Generate
