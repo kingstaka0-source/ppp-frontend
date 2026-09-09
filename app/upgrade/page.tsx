@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 import UpgradeButton from "@/app/components/UpgradeButton";
 
 type Usage = {
@@ -25,20 +26,21 @@ type BillingStatus = {
   stripeCustomerId: string | null;
   stripeSubscriptionId: string | null;
   subscriptionStatus:
-    | "NONE"
-    | "TRIALING"
-    | "ACTIVE"
-    | "PAST_DUE"
-    | "CANCELED"
-    | "INCOMPLETE";
+  | "NONE"
+  | "TRIALING"
+  | "ACTIVE"
+  | "PAST_DUE"
+  | "CANCELED"
+  | "INCOMPLETE";
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
 };
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
 export default function UpgradePage() {
+  const { getToken } = useAuth();
+
   const [usage, setUsage] = useState<Usage | null>(null);
   const [billing, setBilling] = useState<BillingStatus | null>(null);
 
@@ -69,16 +71,19 @@ export default function UpgradePage() {
     setErr(null);
 
     try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
+      const token = await getToken();
 
-      if (ARTIST_ID) {
-        headers["x-artist-id"] = ARTIST_ID;
+      if (!token) {
+        throw new Error("You must be signed in.");
       }
 
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
       const [usageRes, billingRes] = await Promise.all([
-        fetch(`${API}/artists/${ARTIST_ID}/usage`, {
+        fetch(`${API}/artists/me/usage`, {
           cache: "no-store",
           headers,
         }),
@@ -118,11 +123,17 @@ export default function UpgradePage() {
     setMsg(null);
 
     try {
-      const res = await fetch(`${API}/artists/${ARTIST_ID}/start-trial`, {
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("You must be signed in.");
+      }
+
+      const res = await fetch(`${API}/billing/create-checkout-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(ARTIST_ID ? { "x-artist-id": ARTIST_ID } : {}),
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -135,7 +146,7 @@ export default function UpgradePage() {
       const data = JSON.parse(text);
 
       if (!data?.url) {
-        throw new Error("No Stripe checkout URL returned for trial");
+        throw new Error("No Stripe checkout URL returned");
       }
 
       window.location.href = data.url;
@@ -146,42 +157,22 @@ export default function UpgradePage() {
     }
   }
 
-  async function cancelTrial() {
-    setBusy(true);
-    setErr(null);
-    setMsg(null);
-
-    try {
-      const res = await fetch(`${API}/artists/${ARTIST_ID}/cancel-trial`, {
-        method: "POST",
-      });
-
-      const text = await res.text();
-
-      if (!res.ok) {
-        throw new Error(text || `HTTP ${res.status}`);
-      }
-
-      const data = JSON.parse(text);
-      setMsg(data.message || "Trial canceled");
-      await loadAll();
-    } catch (e: any) {
-      setErr(e?.message ?? "Cancel trial failed");
-    } finally {
-      setBusy(false);
-    }
-  }
-
   async function openPortal() {
     setPortalLoading(true);
     setErr(null);
 
     try {
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("You must be signed in.");
+      }
+
       const res = await fetch(`${API}/billing/create-portal-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(ARTIST_ID ? { "x-artist-id": ARTIST_ID } : {}),
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -208,8 +199,8 @@ export default function UpgradePage() {
   const trialUntil = usage?.trial?.until
     ? new Date(usage.trial.until)
     : billing?.trialUntil
-    ? new Date(billing.trialUntil)
-    : null;
+      ? new Date(billing.trialUntil)
+      : null;
 
   const currentPeriodEnd = billing?.currentPeriodEnd
     ? new Date(billing.currentPeriodEnd)
@@ -237,7 +228,7 @@ export default function UpgradePage() {
       </div>
 
       <div className="text-sm text-gray-600">
-        API: {API} • Artist: {ARTIST_ID}
+        API: {API}
       </div>
 
       {loading && <p>Loading…</p>}
@@ -330,15 +321,7 @@ export default function UpgradePage() {
               {trialCheckoutLoading ? "Opening Stripe…" : "Start 7-day trial"}
             </button>
 
-            <button
-              onClick={cancelTrial}
-              disabled={busy || effectivePlan !== "TRIAL"}
-              className="px-4 py-2 rounded border border-black disabled:opacity-50"
-            >
-              {busy ? "Working…" : "Cancel trial → FREE"}
-            </button>
-
-            {effectivePlan === "PRO" && (
+            {(effectivePlan === "TRIAL" || effectivePlan === "PRO") && (
               <button
                 onClick={openPortal}
                 disabled={portalLoading}
