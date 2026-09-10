@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
 
@@ -19,6 +20,8 @@ type CuratorAnalytics = {
 };
 
 export default function CuratorsPage() {
+  const { getToken } = useAuth();
+
   const [curators, setCurators] = useState<CuratorAnalytics[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -33,9 +36,18 @@ const [showInterested, setShowInterested] = useState(false);
     setErr(null);
 
     try {
-      const res = await fetch(`${API}/curators/analytics`, {
-        cache: "no-store",
-      });
+      const token = await getToken();
+
+if (!token) {
+  throw new Error("You must be signed in.");
+}
+
+const res = await fetch(`${API}/curators/analytics`, {
+  cache: "no-store",
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       const text = await res.text();
 
@@ -291,15 +303,34 @@ const [showInterested, setShowInterested] = useState(false);
   <div className="flex gap-2">
     <button
       onClick={async () => {
-        await fetch(
-          `${API}/curators/${c.id}/positive-reply`,
-          {
-            method: "POST",
-          }
-        );
+  try {
+    const token = await getToken();
 
-        loadCurators();
-      }}
+    if (!token) {
+      throw new Error("You must be signed in.");
+    }
+
+    const res = await fetch(
+      `${API}/curators/${c.id}/positive-reply`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const text = await res.text();
+
+    if (!res.ok) {
+      throw new Error(text || `HTTP ${res.status}`);
+    }
+
+    await loadCurators();
+  } catch (e: any) {
+    setErr(e?.message ?? "Failed to mark curator interested");
+  }
+}}
       className="rounded bg-green-600 px-3 py-1 text-white text-xs"
     >
       👍 Positive
