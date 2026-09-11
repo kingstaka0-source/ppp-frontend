@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server";
+
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
 
 type Curator = {
@@ -19,7 +21,18 @@ type Curator = {
 };
 
 async function getCurators(): Promise<Curator[]> {
+  const { getToken } = await auth();
+
+  const token = await getToken();
+
+  if (!token) {
+    throw new Error("Could not get authentication token.");
+  }
+
   const res = await fetch(`${API}/curators`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
     cache: "no-store",
   });
 
