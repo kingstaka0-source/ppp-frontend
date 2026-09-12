@@ -1,3 +1,4 @@
+import { auth } from "@clerk/nextjs/server";
 import PlaylistMatchPitchButton from "./PlaylistMatchPitchButton";
 import AutoPitchAllButton from "./AutoPitchAllButton";
 
@@ -76,7 +77,18 @@ function safeNumber(value: unknown) {
 }
 
 async function getPlaylist(id: string): Promise<PlaylistDetail | null> {
+  const { getToken } = await auth();
+
+  const token = await getToken();
+
+  if (!token) {
+    throw new Error("Could not get authentication token.");
+  }
+
   const res = await fetch(`${API}/playlists/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
     cache: "no-store",
   });
 

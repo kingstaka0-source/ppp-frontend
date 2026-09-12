@@ -1,3 +1,4 @@
+import { auth } from "@clerk/nextjs/server";
 import ImportPlaylistForm from "./ImportPlaylistForm";
 import BulkImportPlaylistsForm from "./BulkImportPlaylistsForm";
 import SpotifyPlaylistSearchForm from "./SpotifyPlaylistSearchForm";
@@ -52,7 +53,18 @@ function safeNumber(value: unknown) {
 }
 
 async function getPlaylists(): Promise<Playlist[]> {
+  const { getToken } = await auth();
+
+  const token = await getToken();
+
+  if (!token) {
+    throw new Error("Could not get authentication token.");
+  }
+
   const res = await fetch(`${API}/playlists`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
     cache: "no-store",
   });
 
