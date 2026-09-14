@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
+
 
 type AutoPitchResultItem = {
   matchId?: string;
@@ -45,23 +46,19 @@ export default function AutoPitchAllButton({
   playlistId: string;
 }) {
   const router = useRouter();
+  const { getToken } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AutoPitchResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const missingArtistId = !ARTIST_ID;
+
   const missingPlaylistId = !playlistId;
-  const cannotRun = loading || missingArtistId || missingPlaylistId;
+  const cannotRun = loading || missingPlaylistId;
 
   async function handleAutoPitchAll() {
     setResult(null);
     setError(null);
-
-    if (!ARTIST_ID) {
-      setError("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
-      return;
-    }
 
     if (!playlistId) {
       setError("Missing playlist id.");
@@ -71,11 +68,17 @@ export default function AutoPitchAllButton({
     setLoading(true);
 
     try {
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("Could not get authentication token.");
+      }
+
       const res = await fetch(`${API}/playlists/${playlistId}/auto-pitch-all`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-artist-id": ARTIST_ID,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -128,12 +131,7 @@ export default function AutoPitchAllButton({
         </p>
       </div>
 
-      {missingArtistId ? (
-        <div className="text-sm border rounded px-3 py-2 bg-yellow-50 text-yellow-900">
-          Missing <strong>NEXT_PUBLIC_ARTIST_ID</strong> in <strong>.env.local</strong>.
-        </div>
-      ) : null}
-
+      
       {missingPlaylistId ? (
         <div className="text-sm border rounded px-3 py-2 bg-yellow-50 text-yellow-900">
           Missing playlist id for this page.

@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
+
 
 type SearchResult = {
   id?: string | null;
@@ -49,6 +50,7 @@ function safeText(value: unknown, fallback = "—") {
 
 export default function SpotifyPlaylistSearchForm() {
   const router = useRouter();
+  const { getToken } = useAuth();
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -78,8 +80,19 @@ export default function SpotifyPlaylistSearchForm() {
     setAutomationResults([]);
 
     try {
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("Could not get authentication token.");
+      }
+
       const res = await fetch(
-        `${API}/playlists/search-spotify?q=${encodeURIComponent(trimmedQuery)}`
+        `${API}/playlists/search-spotify?q=${encodeURIComponent(trimmedQuery)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const data: SearchResponse = await res.json().catch(() => ({}));
@@ -102,11 +115,6 @@ export default function SpotifyPlaylistSearchForm() {
   }
 
   async function importPlaylist(id: string) {
-    if (!ARTIST_ID) {
-      setError("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
-      setMessage("");
-      return;
-    }
 
     if (!id) {
       setError("Missing Spotify playlist id.");
@@ -119,11 +127,17 @@ export default function SpotifyPlaylistSearchForm() {
     setError("");
 
     try {
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("Could not get authentication token.");
+      }
+
       const res = await fetch(`${API}/playlists/import-from-spotify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-artist-id": ARTIST_ID,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           playlistId: id,
@@ -153,11 +167,6 @@ export default function SpotifyPlaylistSearchForm() {
   }
 
   async function importAndAutoPitchTop(n: number) {
-    if (!ARTIST_ID) {
-      setError("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
-      setMessage("");
-      return;
-    }
 
     if (results.length === 0) {
       setError("Search for playlists first.");
@@ -189,11 +198,17 @@ export default function SpotifyPlaylistSearchForm() {
       }
 
       try {
+        const token = await getToken();
+
+        if (!token) {
+          throw new Error("Could not get authentication token.");
+        }
+
         const importRes = await fetch(`${API}/playlists/import-from-spotify`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-artist-id": ARTIST_ID,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             playlistId: itemId,
@@ -234,7 +249,7 @@ export default function SpotifyPlaylistSearchForm() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-artist-id": ARTIST_ID,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -292,7 +307,7 @@ export default function SpotifyPlaylistSearchForm() {
 
   const hasResults = results.length > 0;
   const isBusy = searching || bulkRunning || importingId !== null;
-  const missingArtistId = !ARTIST_ID;
+
 
   return (
     <div className="border rounded p-4 space-y-4">
@@ -320,18 +335,12 @@ export default function SpotifyPlaylistSearchForm() {
         </button>
       </form>
 
-      {missingArtistId ? (
-        <div className="bg-yellow-50 border rounded p-3 text-sm text-yellow-900">
-          Missing <strong>NEXT_PUBLIC_ARTIST_ID</strong> in <strong>.env.local</strong>.
-          Import actions are disabled until this is set.
-        </div>
-      ) : null}
 
       {hasResults ? (
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => importAndAutoPitchTop(3)}
-            disabled={bulkRunning || searching || importingId !== null || !hasResults || missingArtistId}
+            disabled={bulkRunning || searching || importingId !== null || !hasResults}
             className="px-3 py-2 bg-green-600 text-white rounded disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {bulkRunning ? "Running..." : "Import + Auto Pitch Top 3"}
@@ -339,7 +348,7 @@ export default function SpotifyPlaylistSearchForm() {
 
           <button
             onClick={() => importAndAutoPitchTop(5)}
-            disabled={bulkRunning || searching || importingId !== null || !hasResults || missingArtistId}
+            disabled={bulkRunning || searching || importingId !== null || !hasResults}
             className="px-3 py-2 bg-green-600 text-white rounded disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {bulkRunning ? "Running..." : "Import + Auto Pitch Top 5"}
@@ -347,7 +356,7 @@ export default function SpotifyPlaylistSearchForm() {
 
           <button
             onClick={() => importAndAutoPitchTop(10)}
-            disabled={bulkRunning || searching || importingId !== null || !hasResults || missingArtistId}
+            disabled={bulkRunning || searching || importingId !== null || !hasResults}
             className="px-3 py-2 bg-green-600 text-white rounded disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {bulkRunning ? "Running..." : "Import + Auto Pitch Top 10"}
@@ -464,7 +473,7 @@ export default function SpotifyPlaylistSearchForm() {
 
                 <button
                   onClick={() => importPlaylist(playlistId)}
-                  disabled={!playlistId || importingId === playlistId || bulkRunning || searching || missingArtistId || isBusy && importingId !== playlistId}
+                  disabled={!playlistId || importingId === playlistId || bulkRunning || searching || isBusy && importingId !== playlistId}
                   className="px-3 py-2 bg-black text-white rounded disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {!playlistId

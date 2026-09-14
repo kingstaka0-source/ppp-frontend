@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
+
 
 function looksLikeSpotifyPlaylistUrl(value: string) {
   const trimmed = value.trim();
@@ -17,6 +18,7 @@ function looksLikeSpotifyPlaylistUrl(value: string) {
 
 export default function ImportPlaylistForm() {
   const router = useRouter();
+  const { getToken } = useAuth();
 
   const [playlistUrl, setPlaylistUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,19 +26,13 @@ export default function ImportPlaylistForm() {
   const [error, setError] = useState<string | null>(null);
 
   const trimmedUrl = playlistUrl.trim();
-  const missingArtistId = !ARTIST_ID;
-  const canSubmit = !loading && !missingArtistId && !!trimmedUrl;
+  const canSubmit = !loading && !!trimmedUrl;
 
   async function handleImport(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setMessage(null);
     setError(null);
-
-    if (!ARTIST_ID) {
-      setError("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
-      return;
-    }
 
     if (!trimmedUrl) {
       setError("Paste a Spotify playlist link first.");
@@ -51,11 +47,17 @@ export default function ImportPlaylistForm() {
     setLoading(true);
 
     try {
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("Could not get authentication token.");
+      }
+
       const res = await fetch(`${API}/playlists/import-from-spotify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-artist-id": ARTIST_ID,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           playlistUrl: trimmedUrl,
@@ -94,12 +96,6 @@ export default function ImportPlaylistForm() {
         </p>
       </div>
 
-      {missingArtistId ? (
-        <div className="text-sm border rounded px-3 py-2 bg-yellow-50 text-yellow-900">
-          Missing <strong>NEXT_PUBLIC_ARTIST_ID</strong> in <strong>.env.local</strong>.
-        </div>
-      ) : null}
-
       <form onSubmit={handleImport} className="space-y-3">
         <input
           type="text"
@@ -107,7 +103,7 @@ export default function ImportPlaylistForm() {
           onChange={(e) => setPlaylistUrl(e.target.value)}
           placeholder="https://open.spotify.com/playlist/..."
           className="w-full border rounded px-3 py-2 disabled:opacity-60"
-          disabled={loading || missingArtistId}
+          disabled={loading}
         />
 
         <button

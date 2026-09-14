@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
+
 
 type BulkResult = {
   input: string;
@@ -38,6 +39,7 @@ function looksLikeSpotifyPlaylistUrl(value: string) {
 
 export default function BulkImportPlaylistsForm() {
   const router = useRouter();
+  const { getToken } = useAuth();
 
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -46,8 +48,7 @@ export default function BulkImportPlaylistsForm() {
   const [results, setResults] = useState<BulkResult[]>([]);
 
   const lines = useMemo(() => normalizeLines(text), [text]);
-  const missingArtistId = !ARTIST_ID;
-  const canSubmit = !loading && !missingArtistId && lines.length > 0;
+  const canSubmit = !loading && lines.length > 0;
 
   async function handleBulkImport(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -55,11 +56,6 @@ export default function BulkImportPlaylistsForm() {
     setSummary(null);
     setError(null);
     setResults([]);
-
-    if (!ARTIST_ID) {
-      setError("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
-      return;
-    }
 
     if (lines.length === 0) {
       setError("Paste at least 1 Spotify playlist link.");
@@ -82,13 +78,19 @@ export default function BulkImportPlaylistsForm() {
     const output: BulkResult[] = [];
 
     try {
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("Could not get authentication token.");
+      }
+
       for (const line of lines) {
         try {
           const res = await fetch(`${API}/playlists/import-from-spotify`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "x-artist-id": ARTIST_ID,
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
               playlistUrl: line,
@@ -142,12 +144,6 @@ export default function BulkImportPlaylistsForm() {
         </p>
       </div>
 
-      {missingArtistId ? (
-        <div className="text-sm border rounded px-3 py-2 bg-yellow-50 text-yellow-900">
-          Missing <strong>NEXT_PUBLIC_ARTIST_ID</strong> in <strong>.env.local</strong>.
-        </div>
-      ) : null}
-
       <form onSubmit={handleBulkImport} className="space-y-3">
         <textarea
           value={text}
@@ -156,7 +152,7 @@ export default function BulkImportPlaylistsForm() {
 https://open.spotify.com/playlist/...
 https://open.spotify.com/playlist/...`}
           className="w-full min-h-[180px] border rounded px-3 py-2 disabled:opacity-60"
-          disabled={loading || missingArtistId}
+          disabled={loading}
         />
 
         <div className="flex items-center gap-3 flex-wrap">
