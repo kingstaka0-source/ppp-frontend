@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 type DocType = "TERMS" | "PRIVACY" | "BILLING_TERMS" | "PITCH_CONSENT";
 type SubjectType = "ARTIST" | "CURATOR";
@@ -39,6 +40,8 @@ function titleFor(doc: DocType) {
 }
 
 export default function LegalGate({ subjectType, subjectId, legal, onAccepted }: Props) {
+  const { getToken } = useAuth();
+
   const required = legal?.required ?? {};
   const accepted = legal?.accepted ?? {};
   const missing = useMemo(() => {
@@ -55,15 +58,24 @@ export default function LegalGate({ subjectType, subjectId, legal, onAccepted }:
 
   const [checks, setChecks] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+      const [err, setErr] = useState<string | null>(null);
 
   async function accept(docType: DocType) {
     const version = required[docType];
     if (!version) return;
 
+    const token = await getToken();
+
+    if (!token) {
+      throw new Error("Could not get authentication token.");
+    }
+
     const res = await fetch(`${API}/legal/accept`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         subjectType,
         subjectId,
