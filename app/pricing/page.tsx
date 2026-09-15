@@ -2,44 +2,52 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
 export default function PricingPage() {
+  const { getToken } = useAuth();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function upgradeToPro() {
-    try {
-      setLoading(true);
-      setError(null);
+  try {
+    setLoading(true);
+    setError(null);
 
-      const r = await fetch(`${API}/billing/create-checkout-session`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(ARTIST_ID ? { "x-artist-id": ARTIST_ID } : {}),
-        },
-      });
+    const token = await getToken();
 
-      const j = await r.json().catch(() => ({}));
-
-      if (!r.ok) {
-        throw new Error(j?.error || j?.message || `HTTP ${r.status}`);
-      }
-
-      if (!j?.url) {
-        throw new Error("No checkout URL returned");
-      }
-
-      window.location.href = j.url;
-    } catch (e: any) {
-      setError(e?.message ?? "Upgrade failed");
-    } finally {
-      setLoading(false);
+    if (!token) {
+      throw new Error("You must be signed in.");
     }
+
+    const r = await fetch(`${API}/billing/create-checkout-session`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const j = await r.json().catch(() => ({}));
+
+    if (!r.ok) {
+      throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
+    }
+
+    if (!j?.url) {
+      throw new Error("No checkout URL returned");
+    }
+
+    window.location.href = j.url;
+  } catch (e: any) {
+    setError(e?.message ?? "Upgrade failed");
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <div className="max-w-5xl mx-auto p-8 space-y-8">
