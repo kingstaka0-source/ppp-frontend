@@ -236,7 +236,7 @@ export default function HomePage() {
               </div>
 
               <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-                <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-8">
                   {stats.map(([value, label]) => (
                     <div
                       key={label}
