@@ -34,7 +34,6 @@ export const metadata: Metadata = {
   },
 };
 
-const artistId = "cmmnjti0n0004112o3orl713x";
 
 const stats = [
   ["25,000+", "Curator Contacts"],
@@ -145,14 +144,14 @@ export default function HomePage() {
 
             <div className="flex gap-3">
               <Link
-                href={`/dashboard?artistId=${artistId}`}
+                href="/sign-in"
                 className="rounded-full border border-white/20 px-5 py-2 text-sm font-bold transition hover:bg-white hover:text-black"
               >
                 Login
               </Link>
 
               <Link
-                href={`/upgrade?artistId=${artistId}`}
+                href="/sign-up"
                 className="rounded-full bg-green-500 px-5 py-2 text-sm font-black text-black transition hover:bg-green-400"
               >
                 Get Started Free
@@ -198,7 +197,7 @@ export default function HomePage() {
 
                 <div className="mt-10 flex flex-wrap gap-4">
                   <Link
-                    href={`/upgrade?artistId=${artistId}`}
+                    href="/sign-up"
                     className="rounded-full bg-green-500 px-8 py-4 font-black text-black hover:bg-green-400 transition"
                   >
                     Get Started Free →
