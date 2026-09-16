@@ -68,7 +68,7 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
 
       const newJobId = data?.matchJob?.jobId ?? null;
       if (!newJobId) {
-        setSubmitErr("Geen matchJob terug. Check intake response.");
+        setSubmitErr("No match job returned. Check the intake response.");
         return;
       }
 
@@ -175,7 +175,7 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
                 </div>
               ) : (
                 <div className="text-sm text-gray-700">
-                  Geen matches in result.top
+                  No matches in result.top
                 </div>
               )}
 

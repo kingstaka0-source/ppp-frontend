@@ -48,7 +48,7 @@ export function useMatchJob(jobId: string | null, opts?: { intervalMs?: number; 
       const elapsed = Date.now() - startedAtRef.current;
 
       if (elapsed > timeoutMs) {
-        setError("Timeout: match job duurde te lang. Probeer refresh.");
+        setError("Timeout: the match job took too long. Please refresh and try again.");
         setLoading(false);
         return;
       }

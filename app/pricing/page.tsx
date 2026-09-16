@@ -68,27 +68,27 @@ export default function PricingPage() {
         <div className="border rounded-2xl p-6 space-y-4">
           <div className="text-sm text-gray-500">FREE</div>
           <div className="text-3xl font-bold">€0</div>
-          <div className="text-gray-700">Voor testen en kleine artiesten.</div>
+          <div className="text-gray-700">For testing and emerging artists.</div>
 
           <ul className="space-y-2 text-sm text-gray-700">
-            <li>3 pitches per maand</li>
-            <li>Beperkte AI generatie</li>
-            <li>Geen bulk campaigns</li>
+            <li>3 pitches per month</li>
+            <li>Limited AI generation</li>
+            <li>No bulk campaigns</li>
           </ul>
         </div>
 
         <div className="border-2 border-black rounded-2xl p-6 space-y-4">
           <div className="text-sm text-gray-500">PRO</div>
-          <div className="text-3xl font-bold">€19 / maand</div>
+          <div className="text-3xl font-bold">€19 / month</div>
           <div className="text-gray-700">
-            Voor serieuze playlist outreach en automatisering.
+            For serious playlist outreach and automation.
           </div>
 
           <ul className="space-y-2 text-sm text-gray-700">
             <li>Unlimited AI pitch generation</li>
             <li>Campaign launch</li>
             <li>Email queue & send</li>
-            <li>Betere schaalbaarheid</li>
+            <li>Better scalability</li>
           </ul>
 
           <button

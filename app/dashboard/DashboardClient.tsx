@@ -554,13 +554,13 @@ const placementRate = analytics?.placementRate ?? 0;
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <div className="font-semibold">
-                    TRIAL actief — nog {trialDaysLeft} dag
-                    {trialDaysLeft === 1 ? "" : "en"}.
+                    TRIAL active — {trialDaysLeft} day
+                    {trialDaysLeft === 1 ? "" : "s"} remaining.
                   </div>
                   <div className="text-sm text-gray-700">
                     {showTrialWarning
-                      ? "Let op: je trial loopt bijna af. Regel je billing als je unlimited toegang wilt houden."
-                      : "Je hebt nu unlimited pitches en campaign launch tijdens je trial."}
+                      ? "Your trial is ending soon. Manage your billing to keep unlimited access."
+                      : "You have unlimited pitches and campaign launch access during your trial."}
                   </div>
                 </div>
 
@@ -578,9 +578,9 @@ const placementRate = analytics?.placementRate ?? 0;
             <div className="border rounded-xl p-4 bg-yellow-50">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <div className="font-semibold">Je FREE limiet is bijna op.</div>
+                  <div className="font-semibold">Your FREE limit is almost reached.</div>
                   <div className="text-sm text-gray-700">
-                    Remaining deze maand: <b>{usage.month.remaining}</b> /{" "}
+                    Remaining this month: <b>{usage.month.remaining}</b> /{" "}
                     <b>{usage.month.limit}</b>
                   </div>
                 </div>
@@ -650,13 +650,13 @@ const placementRate = analytics?.placementRate ?? 0;
           <div className="border rounded-xl p-6">
             <div className="text-sm text-gray-600">Tracks</div>
             <div className="mt-2 text-3xl font-bold">{totalTracks}</div>
-            <div className="mt-2 text-gray-700">Totaal ingelezen tracks</div>
+            <div className="mt-2 text-gray-700">Total imported tracks</div>
           </div>
 
           <div className="border rounded-xl p-6">
             <div className="text-sm text-gray-600">Matches</div>
             <div className="mt-2 text-3xl font-bold">{totalMatches}</div>
-            <div className="mt-2 text-gray-700">Totaal matches over je tracks</div>
+            <div className="mt-2 text-gray-700">Total matches across your tracks</div>
           </div>
         </div>
       )}
@@ -675,7 +675,7 @@ const placementRate = analytics?.placementRate ?? 0;
 
           {(overview.tracks ?? []).length === 0 ? (
             <div className="mt-4 text-sm text-gray-600">
-              Nog geen tracks. Voeg er één toe via <b>Intake Track</b> hierboven.
+              No tracks yet. Add one using <b>Intake Track</b> above.
             </div>
           ) : (
             <div className="mt-4 space-y-3">

@@ -110,16 +110,16 @@ export default async function TracksPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="mb-2 text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
-            Muziekcatalogus
+            Music catalog
           </p>
 
           <h1 className="text-3xl font-bold tracking-tight text-gray-950 md:text-4xl">
-            Mijn tracks
+            My Tracks
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-            Bekijk je Spotify-releases, metadata en het aantal gevonden
-            playlistmatches.
+            View your Spotify releases, metadata, and the number of
+            playlist matches found.
           </p>
         </div>
 
@@ -132,10 +132,10 @@ export default async function TracksPage() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Totaal tracks" value={tracks.length} />
+        <StatCard label="Total tracks" value={tracks.length} />
 
         <StatCard
-          label="Met artwork"
+          label="With artwork"
           value={tracks.filter((track) => track.albumImageUrl).length}
         />
 
@@ -161,11 +161,11 @@ export default async function TracksPage() {
       ) : tracks.length === 0 ? (
         <section className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
           <h2 className="text-lg font-semibold text-gray-950">
-            Nog geen tracks gevonden
+            No tracks found yet
           </h2>
 
           <p className="mt-2 text-sm text-gray-600">
-            Importeer eerst je Spotify-catalogus.
+            Import your Spotify catalog first.
           </p>
         </section>
       ) : (
@@ -178,9 +178,9 @@ export default async function TracksPage() {
                     <th className="px-5 py-4">Track</th>
                     <th className="px-5 py-4">Album</th>
                     <th className="px-5 py-4">Release</th>
-                    <th className="px-5 py-4 text-center">Duur</th>
+                    <th className="px-5 py-4 text-center">Duration</th>
                     <th className="px-5 py-4 text-center">Matches</th>
-                    <th className="px-5 py-4 text-right">Acties</th>
+                    <th className="px-5 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
 
@@ -261,7 +261,7 @@ export default async function TracksPage() {
                             href={`/tracks/${track.id}`}
                             className="inline-flex items-center rounded-lg bg-gray-950 px-3 py-2 text-xs font-semibold text-white transition hover:bg-gray-700"
                           >
-                            Bekijken →
+                            View →
                           </Link>
                         </div>
                       </td>
@@ -308,7 +308,7 @@ export default async function TracksPage() {
                   </div>
 
                   <div>
-                    <dt className="text-xs text-gray-500">Duur</dt>
+                    <dt className="text-xs text-gray-500">Duration</dt>
                     <dd className="mt-1 font-mono text-xs font-semibold text-gray-900">
                       {msToMinSec(track.durationMs)}
                     </dd>
@@ -338,7 +338,7 @@ export default async function TracksPage() {
                     href={`/tracks/${track.id}`}
                     className="flex-1 rounded-xl bg-gray-950 px-3 py-2.5 text-center text-sm font-semibold text-white"
                   >
-                    Bekijken
+                    View
                   </Link>
                 </div>
               </article>
@@ -360,7 +360,7 @@ function TrackArtwork({ track }: { track: Track }) {
     return (
       <img
         src={track.albumImageUrl}
-        alt={`Artwork van ${track.title}`}
+        alt={`Artwork for ${track.title}`}
         className="h-14 w-14 shrink-0 rounded-xl object-cover shadow-sm"
       />
     );
@@ -384,7 +384,7 @@ function StatCard({
     <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <p className="text-sm text-gray-500">{label}</p>
       <p className="mt-2 text-3xl font-bold tracking-tight text-gray-950">
-        {value.toLocaleString("nl-NL")}
+        {value.toLocaleString("en-US")}
       </p>
     </div>
   );

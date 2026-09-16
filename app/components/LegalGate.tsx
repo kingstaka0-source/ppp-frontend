@@ -142,10 +142,10 @@ export default function LegalGate({ subjectType, subjectId, legal, onAccepted }:
         }}
       >
         <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
-          Accepteer de voorwaarden om door te gaan
+          Accept the terms to continue
         </h2>
         <p style={{ fontSize: 14, opacity: 0.8, marginBottom: 16 }}>
-          We moeten je akkoord loggen (met versie + timestamp) voordat je de app kunt gebruiken.
+          We need to record your acceptance (including version and timestamp) before you can use the app.
         </p>
 
         <div style={{ display: "grid", gap: 10, marginBottom: 14 }}>
@@ -205,12 +205,10 @@ export default function LegalGate({ subjectType, subjectId, legal, onAccepted }:
             opacity: busy ? 0.7 : 1,
           }}
         >
-          {busy ? "Bezig..." : "Akkoord & doorgaan"}
+          {busy ? "Processing..." : "Accept & continue"}
         </button>
 
-        <div style={{ fontSize: 12, opacity: 0.65, marginTop: 10 }}>
-          Tip: later kun je hier links zetten naar je echte Terms/Privacy pagina’s.
-        </div>
+        
       </div>
     </div>
   );
