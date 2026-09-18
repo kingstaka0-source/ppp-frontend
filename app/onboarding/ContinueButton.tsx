@@ -36,7 +36,7 @@ if (!token) {
 }
 
 const response = await fetch(
-  `${process.env.NEXT_PUBLIC_API_URL}/auth/bootstrap`,
+  "/api/bootstrap",
   {
   method: "POST",
   headers: {
