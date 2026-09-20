@@ -1,12 +1,11 @@
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 
 export const dynamic = "force-dynamic";
 
 const API =
   process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
 
-const ARTIST_ID =
-  process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
 type Track = {
   id: string;
@@ -60,8 +59,18 @@ function formatReleaseDate(date: string | null) {
 }
 
 async function getTracks(): Promise<Track[]> {
+  const { getToken } = await auth();
+  const token = await getToken();
+
+  if (!token) {
+    throw new Error("Authentication required.");
+  }
+
   const response = await fetch(`${API}/tracks`, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
 
   if (!response.ok) {
@@ -76,23 +85,10 @@ async function getTracks(): Promise<Track[]> {
     return [];
   }
 
-  return data.filter((track: Track) => {
-    return !ARTIST_ID || track.artistId === ARTIST_ID;
-  });
+  return data;
 }
 
 export default async function TracksPage() {
-  if (!ARTIST_ID) {
-    return (
-      <main className="mx-auto max-w-7xl p-6 md:p-8">
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
-          Missing <strong>NEXT_PUBLIC_ARTIST_ID</strong> in{" "}
-          <code>.env.local</code>.
-        </div>
-      </main>
-    );
-  }
-
   let tracks: Track[] = [];
   let errorMessage = "";
 
@@ -347,10 +343,7 @@ export default async function TracksPage() {
         </>
       )}
 
-      <footer className="text-xs text-gray-500">
-        Showing {tracks.length} track{tracks.length === 1 ? "" : "s"} for
-        artist <span className="font-mono">{ARTIST_ID}</span>
-      </footer>
+      
     </main>
   );
 }
