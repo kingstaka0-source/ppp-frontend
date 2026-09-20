@@ -803,7 +803,7 @@ const hasAudioFeatures =
 
           <MetricCard
             label="Pitches"
-            value="0"
+            value={String(Object.keys(generatedPitches).length)}
             description="Pitch drafts"
           />
 
