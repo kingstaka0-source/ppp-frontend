@@ -191,7 +191,7 @@ export default function HomePage() {
 
                 <p className="mt-8 max-w-2xl text-xl leading-9 text-white/70">
                   TuneReach finds playlist opportunities, writes personalized AI pitches,
-                  contacts curators automatically and helps independent artists grow faster
+                  helps you reach curators and helps independent artists grow faster
                   with less work.
                 </p>
 
@@ -216,6 +216,11 @@ export default function HomePage() {
             </div>
 
             <div className="relative z-20">
+              <div className="mb-3 flex justify-end">
+                <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white/50">
+                  Demo data
+                </span>
+              </div>
               <HeroDashboard />
             </div>
 
