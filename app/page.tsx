@@ -145,14 +145,14 @@ export default function HomePage() {
             <div className="flex gap-3">
               <Link
                 href="/sign-in"
-                className="rounded-full border border-white/20 px-5 py-2 text-sm font-bold transition hover:bg-white hover:text-black"
+                className="whitespace-nowrap rounded-full border border-white/20 px-3 py-2 text-xs font-bold transition hover:bg-white hover:text-black sm:px-5 sm:text-sm"
               >
                 Login
               </Link>
 
               <Link
                 href="/sign-up"
-                className="rounded-full bg-green-500 px-5 py-2 text-sm font-black text-black transition hover:bg-green-400"
+                className="whitespace-nowrap rounded-full bg-green-500 px-3 py-2 text-xs font-black text-black transition hover:bg-green-400 sm:px-5 sm:text-sm"
               >
                 Get Started Free
               </Link>
