@@ -36,10 +36,10 @@ export const metadata: Metadata = {
 
 
 const stats = [
-  ["25,000+", "Curator Contacts"],
   ["1,500+", "Playlists Indexed"],
-  ["50,000+", "AI Pitches Generated"],
-  ["100+", "Artists Growing"],
+  ["AI", "Playlist Matching"],
+  ["AI", "Personalized Pitches"],
+  ["Live", "Open & Click Tracking"],
 ];
 
 const steps = [
@@ -280,7 +280,7 @@ export default function HomePage() {
             ["02", "Find matching playlists", "AI scans playlist opportunities based on sound, genre and audience fit."],
             ["03", "Generate outreach", "Create personalized curator pitches instead of generic copy-paste emails."],
             ["04", "Launch campaign", "Send outreach, track engagement and manage curator responses from one place."],
-            ["05", "Automate follow-ups", "Reach engaged curators again without manually chasing every reply."],
+            ["05", "Manage follow-ups", "Generate and send follow-ups to engaged curators from one organized queue."],
             ["06", "Track results", "Measure opens, clicks, replies, placements and campaign performance."],
           ].map(([number, title, text]) => (
             <div
@@ -303,38 +303,38 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="mb-12 text-center">
           <div className="text-sm font-black uppercase tracking-widest text-green-400">
-            Artist results
+            Built into TuneReach
           </div>
 
           <h2 className="mt-4 text-4xl font-black md:text-5xl">
-            Built for artists who pitch seriously
+            A complete playlist outreach workflow
           </h2>
 
           <p className="mx-auto mt-4 max-w-2xl text-lg text-white/60">
-            TuneReach helps artists turn playlist outreach into a repeatable,
-            trackable growth system.
+            TuneReach brings playlist discovery, personalized pitching and campaign
+            tracking together in one workflow.
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
           {[
             [
-              "King Staka",
-              "Reggae artist & drummer",
-              "TuneReach makes playlist pitching feel organized instead of random. I can see matches, campaigns, opens and results in one place.",
-              "315 pitches sent",
+              "Smart Matching",
+              "Find relevant playlists",
+              "Match your music with relevant playlists using track, genre and playlist signals.",
+              "Playlist matching",
             ],
             [
-              "Independent Artist",
-              "Afrobeats / Dancehall",
-              "The AI workflow helps me move faster without sending the same generic message to every curator.",
-              "28 playlist matches",
+              "Personalized Outreach",
+              "Create pitches faster",
+              "Generate personalized curator pitches instead of sending the same generic message every time.",
+              "AI-powered pitches",
             ],
             [
-              "Artist Manager",
-              "Campaign workflow",
-              "The dashboard gives me a clear view of outreach, follow-ups and curator engagement before I spend more time chasing replies.",
-              "24% open rate",
+              "Measurable Campaigns",
+              "See what happens after send",
+              "Track campaign activity, opens and clicks from one dashboard so your outreach stays organized.",
+              "Open & click tracking",
             ],
           ].map(([name, role, quote, metric]) => (
             <div
@@ -554,7 +554,7 @@ export default function HomePage() {
             </div>
 
             <Link
-              href="/sign-in"
+              href="/sign-up"
               className="mt-10 block rounded-full border border-white/20 py-4 text-center font-black transition hover:bg-white hover:text-black"
             >
               Start Free
@@ -611,22 +611,22 @@ export default function HomePage() {
             </div>
 
             <div className="mt-1 text-white/50">
-              For Labels & Teams
+              For Labels & Teams - Coming Soon
             </div>
 
             <div className="mt-8 space-y-4 text-white/80">
-              <div>✓ Unlimited Artists</div>
-              <div>✓ Team Members</div>
-              <div>✓ Shared Dashboard</div>
-              <div>✓ API Access</div>
-              <div>✓ Dedicated Support</div>
+              <div>✓ Multi-artist workflows</div>
+              <div>✓ Team collaboration</div>
+              <div>✓ Label & team tools</div>
+              <div>✓ More features planned</div>
+              <div>✓ Join the Enterprise waitlist</div>
             </div>
 
             <a
               href="mailto:support@tunereach.app"
               className="mt-10 block rounded-full border border-white/20 py-4 text-center font-black transition hover:bg-white hover:text-black"
             >
-              Contact Sales
+              Join Waitlist
             </a>
 
           </div>
