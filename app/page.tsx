@@ -159,7 +159,7 @@ export default function HomePage() {
             </div>
           </nav>
 
-          <div className="grid min-h-[720px] gap-12 py-20 lg:grid-cols-2 lg:items-center">
+          <div className="grid min-h-[720px] gap-12 py-10 lg:grid-cols-2 lg:items-center lg:py-20">
 
             <div className="relative rounded-[2rem] min-h-[760px] overflow-hidden">
               <div
