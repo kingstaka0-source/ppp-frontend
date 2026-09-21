@@ -111,8 +111,8 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.35),transparent_35%),radial-gradient(circle_at_top_right,rgba(34,197,94,0.18),transparent_30%),linear-gradient(to_bottom,rgba(0,0,0,0.15),#000)]" />
 
-        <div className="relative mx-auto max-w-7xl px-6 py-8">
-          <nav className="flex items-center justify-between">
+        <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+          <nav className="flex flex-col items-stretch gap-4 md:flex-row md:items-center md:justify-between md:gap-0">
             <div className="flex items-center gap-3 text-2xl font-black tracking-tight">
               <div className="flex h-8 items-center gap-1">
                 <span className="h-4 w-2 rounded-full bg-green-400" />
@@ -142,7 +142,7 @@ export default function HomePage() {
               </a>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex w-full gap-3 md:w-auto">
               <Link
                 href="/sign-in"
                 className="whitespace-nowrap rounded-full border border-white/20 px-3 py-2 text-xs font-bold transition hover:bg-white hover:text-black sm:px-5 sm:text-sm"
