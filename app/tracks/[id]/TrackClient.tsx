@@ -44,6 +44,7 @@ type MatchResponse = {
     name: string;
     spotifyPlaylistId?: string | null;
     genres?: string[];
+    followers?: number;
 
     curator?: {
       id: string;
@@ -956,6 +957,10 @@ const hasAudioFeatures =
 
             <p className="mt-1 text-sm text-white/45">
               Curator: {match.playlist?.curator?.name || "Unknown"}
+            </p>
+
+            <p className="mt-1 text-sm text-white/45">
+              {(match.playlist?.followers ?? 0).toLocaleString()} followers
             </p>
 
             {match.playlist?.curator?.canEmail && (
