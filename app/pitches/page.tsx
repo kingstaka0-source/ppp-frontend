@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 type PitchRow = {
   id: string;
@@ -97,7 +98,6 @@ type BillingAccessResponse = {
 };
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
-const ARTIST_ID = process.env.NEXT_PUBLIC_ARTIST_ID || "";
 
 function formatDate(value?: string | null) {
   if (!value) return "—";
@@ -150,6 +150,7 @@ function PaywallNotice({
 }
 
 export default function PitchesPage() {
+  const { getToken } = useAuth();
   const [loading, setLoading] = useState(true);
   const [pitches, setPitches] = useState<PitchRow[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -167,24 +168,26 @@ export default function PitchesPage() {
     setError(null);
 
     try {
-      if (!ARTIST_ID) {
-        throw new Error("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("You must be signed in.");
       }
 
       const res = await fetch(`${API}/pitches/all`, {
-  headers: {
-    "x-artist-id": ARTIST_ID,
-  },
-  cache: "no-store",
-});
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      });
 
       const json = await res.json().catch(() => []);
 
-if (!res.ok) {
-  throw new Error(`HTTP ${res.status}`);
-}
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
 
-setPitches(Array.isArray(json) ? json : []);
+      setPitches(Array.isArray(json) ? json : []);
     } catch (error) {
       setError(error instanceof Error ? error.message : "Failed to load pitches");
       setPitches([]);
@@ -192,19 +195,20 @@ setPitches(Array.isArray(json) ? json : []);
       setLoading(false);
     }
   }
-
   async function loadAccess() {
     setAccessLoading(true);
     setAccessError(null);
 
     try {
-      if (!ARTIST_ID) {
-        throw new Error("Missing NEXT_PUBLIC_ARTIST_ID in .env.local");
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("You must be signed in.");
       }
 
-      const res = await fetch(`${API}/billing/access?artistId=${encodeURIComponent(ARTIST_ID)}`, {
+      const res = await fetch(`${API}/billing/access`, {
         headers: {
-          "x-artist-id": ARTIST_ID,
+          Authorization: `Bearer ${token}`,
         },
         cache: "no-store",
       });
@@ -223,7 +227,6 @@ setPitches(Array.isArray(json) ? json : []);
       setAccessLoading(false);
     }
   }
-
   async function refreshAll() {
     await Promise.all([loadPitches(), loadAccess()]);
   }
