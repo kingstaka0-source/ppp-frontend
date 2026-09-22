@@ -54,6 +54,9 @@ type MatchResponse = {
       consent?: boolean;
       languages?: string[];
       contactConfidence?: number | null;
+      submissionUrl?: string | null;
+      websiteUrl?: string | null;
+      instagramUrl?: string | null;
       canEmail?: boolean;
     } | null;
   } | null;
@@ -923,31 +926,38 @@ const hasAudioFeatures =
         className="rounded-2xl border border-white/10 bg-white/[0.035] p-4"
       >
         {/* SELECT CHECKBOX */}
-        <div className="mb-4 flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={selectedMatches.includes(match.id)}
-            onChange={(event) => {
-              if (event.target.checked) {
-                setSelectedMatches((current) =>
-                  current.includes(match.id)
-                    ? current
-                    : [...current, match.id],
-                );
-              } else {
-                setSelectedMatches((current) =>
-                  current.filter((id) => id !== match.id),
-                );
-              }
-            }}
-            className="h-5 w-5 cursor-pointer accent-emerald-400"
-          />
+        {match.playlist?.curator?.canEmail ? (
+          <div className="mb-4 flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={selectedMatches.includes(match.id)}
+              onChange={(event) => {
+                if (event.target.checked) {
+                  setSelectedMatches((current) =>
+                    current.includes(match.id)
+                      ? current
+                      : [...current, match.id],
+                  );
+                } else {
+                  setSelectedMatches((current) =>
+                    current.filter((id) => id !== match.id),
+                  );
+                }
+              }}
+              className="h-5 w-5 cursor-pointer accent-emerald-400"
+            />
 
-          <span className="text-sm font-bold text-emerald-300">
-            Select for campaign
-          </span>
-        </div>
-
+            <span className="text-sm font-bold text-emerald-300">
+              Select for campaign
+            </span>
+          </div>
+        ) : (
+          <div className="mb-4">
+            <span className="text-sm font-bold text-white/40">
+              Manual contact only
+            </span>
+          </div>
+        )}
         {/* PLAYLIST INFO */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
@@ -963,12 +973,40 @@ const hasAudioFeatures =
               {(match.playlist?.followers ?? 0).toLocaleString()} followers
             </p>
 
-            {match.playlist?.curator?.canEmail && (
-              <p className="mt-2 text-xs font-bold text-emerald-300">
-                Email available
-              </p>
-            )}
+            <div className="mt-2 flex flex-wrap gap-2">
+              {match.playlist?.curator?.canEmail && (
+                <span className="text-xs font-bold text-emerald-300">
+                  Email available
+                </span>
+              )}
 
+              {match.playlist?.curator?.submissionUrl && (
+                <span className="text-xs font-bold text-sky-300">
+                  Submission link available
+                </span>
+              )}
+
+              {match.playlist?.curator?.instagramUrl && (
+                <span className="text-xs font-bold text-pink-300">
+                  Instagram available
+                </span>
+              )}
+
+              {match.playlist?.curator?.websiteUrl && (
+                <span className="text-xs font-bold text-amber-300">
+                  Curator website available
+                </span>
+              )}
+
+              {!match.playlist?.curator?.canEmail &&
+                !match.playlist?.curator?.submissionUrl &&
+                !match.playlist?.curator?.instagramUrl &&
+                !match.playlist?.curator?.websiteUrl && (
+                  <span className="text-xs font-bold text-white/35">
+                    No direct contact found
+                  </span>
+                )}
+            </div>
             {Array.isArray(match.playlist?.genres) &&
               match.playlist.genres.length > 0 && (
                 <p className="mt-2 text-xs text-white/35">
@@ -1011,7 +1049,43 @@ const hasAudioFeatures =
           </a>
         )}
 
+        <div className="mt-3 flex flex-wrap gap-3">
+          {match.playlist?.curator?.submissionUrl && (
+            <a
+              href={match.playlist.curator.submissionUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex text-sm font-bold text-sky-300 hover:text-sky-200"
+            >
+              Submit track ↗
+            </a>
+          )}
+
+          {match.playlist?.curator?.instagramUrl && (
+            <a
+              href={match.playlist.curator.instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex text-sm font-bold text-pink-300 hover:text-pink-200"
+            >
+              Instagram ↗
+            </a>
+          )}
+
+          {match.playlist?.curator?.websiteUrl && (
+            <a
+              href={match.playlist.curator.websiteUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex text-sm font-bold text-amber-300 hover:text-amber-200"
+            >
+              Visit website ↗
+            </a>
+          )}
+        </div>
+
         {/* AI PITCH */}
+        {match.playlist?.curator?.canEmail && (
         <div className="mt-5 border-t border-white/10 pt-5">
           <button
             type="button"
@@ -1129,6 +1203,7 @@ const hasAudioFeatures =
             </div>
           )}
         </div>
+        )}
       </div>
     ))}
 
