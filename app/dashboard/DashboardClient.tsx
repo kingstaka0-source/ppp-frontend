@@ -99,6 +99,7 @@ type Overview = {
   draftCount?: number;
   queuedCount?: number;
   sentCount?: number;
+  deliveredCount?: number;
 
   topPerformingTrack?: {
     title: string;
@@ -411,7 +412,8 @@ const placementRate = analytics?.placementRate ?? 0;
     <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
   {[
     ["Campaigns", overview.analytics?.totalCampaigns ?? 0, "Campaign runs created"],
-    ["Sent", overview.analytics?.sentCount ?? 0, "Emails sent to curators"],
+    ["Sent", overview.analytics?.sentCount ?? 0, "Accepted for sending"],
+    ["Delivered", overview.analytics?.deliveredCount ?? 0, "Confirmed delivered by email provider"],
     ["Drafts", overview.analytics?.draftCount ?? 0, "Ready to edit/send"],
     ["Queued", overview.analytics?.queuedCount ?? 0, "Waiting to send"],
     ["Placements", overview.analytics?.totalPlacements ?? 0, "Detected playlist adds"],
