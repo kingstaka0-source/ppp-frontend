@@ -71,6 +71,18 @@ type PitchResponse = {
   channel: string;
   sentTo?: string | null;
 
+  deliveryStatus?:
+    | "SENT"
+    | "DELIVERED"
+    | "DELIVERY_DELAYED"
+    | "BOUNCED"
+    | "COMPLAINED"
+    | "FAILED"
+    | "SUPPRESSED"
+    | null;
+  deliveredAt?: string | null;
+  deliveryError?: string | null;
+
   openCount?: number;
   clickCount?: number;
   lastOpenedAt?: string | null;
@@ -1140,6 +1152,51 @@ const hasAudioFeatures =
                 </span>
               </div>
 
+              {generatedPitches[match.id].deliveryStatus && (
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <span
+                    className={`rounded-full border px-3 py-2 text-xs font-bold ${
+                      generatedPitches[match.id].deliveryStatus === "DELIVERED"
+                        ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+                        : generatedPitches[match.id].deliveryStatus === "SENT"
+                          ? "border-sky-400/20 bg-sky-400/10 text-sky-300"
+                          : generatedPitches[match.id].deliveryStatus === "DELIVERY_DELAYED"
+                            ? "border-amber-400/20 bg-amber-400/10 text-amber-300"
+                            : "border-red-400/20 bg-red-400/10 text-red-300"
+                    }`}
+                  >
+                    {generatedPitches[match.id].deliveryStatus === "DELIVERED"
+                      ? "✓ Delivered"
+                      : generatedPitches[match.id].deliveryStatus === "SENT"
+                        ? "→ Sent"
+                        : generatedPitches[match.id].deliveryStatus === "DELIVERY_DELAYED"
+                          ? "⏳ Delayed"
+                          : generatedPitches[match.id].deliveryStatus === "SUPPRESSED"
+                            ? "⚠ Suppressed"
+                            : generatedPitches[match.id].deliveryStatus === "BOUNCED"
+                              ? "⚠ Bounced"
+                              : generatedPitches[match.id].deliveryStatus === "COMPLAINED"
+                                ? "⚠ Complained"
+                                : "⚠ Failed"}
+                  </span>
+
+                  {generatedPitches[match.id].deliveryStatus === "DELIVERED" &&
+                    generatedPitches[match.id].deliveredAt && (
+                      <span className="text-xs text-emerald-300/70">
+                        Delivered:{" "}
+                        {new Date(
+                          generatedPitches[match.id].deliveredAt!,
+                        ).toLocaleString()}
+                      </span>
+                    )}
+                </div>
+              )}
+
+              {generatedPitches[match.id].deliveryError && (
+                <p className="mt-3 text-xs text-red-300">
+                  Delivery error: {generatedPitches[match.id].deliveryError}
+                </p>
+              )}
               {generatedPitches[match.id].status === "SENT" && (
   <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
     <div className="flex flex-wrap gap-3">
