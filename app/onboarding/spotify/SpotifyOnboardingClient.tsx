@@ -22,7 +22,7 @@ type SpotifyArtistOption = {
   id: string;
   name: string;
   imageUrl?: string | null;
-  followers?: number;
+  followers?: number | null;
   spotifyUrl?: string | null;
   genres?: string[];
   popularity?: number;
@@ -102,8 +102,8 @@ export default function SpotifyOnboardingClient() {
       if (!response.ok) {
         throw new Error(
           data.message ||
-            data.error ||
-            "Unable to check your Spotify connection.",
+          data.error ||
+          "Unable to check your Spotify connection.",
         );
       }
 
@@ -122,11 +122,11 @@ export default function SpotifyOnboardingClient() {
   }
 
   async function connectSpotify() {
-  console.log("CONNECT SPOTIFY CLICKED");
+    console.log("CONNECT SPOTIFY CLICKED");
 
-  if (connecting) {
-    return;
-  }
+    if (connecting) {
+      return;
+    }
 
     setConnecting(true);
     setError("");
@@ -144,8 +144,8 @@ export default function SpotifyOnboardingClient() {
       if (!response.ok) {
         throw new Error(
           data.message ||
-            data.error ||
-            "Unable to start the Spotify connection.",
+          data.error ||
+          "Unable to start the Spotify connection.",
         );
       }
 
@@ -527,7 +527,9 @@ function ConnectedState({
                 </h2>
 
                 <p className="mt-1 text-sm text-white/50">
-                  {(selectedArtist.followers ?? 0).toLocaleString()} followers
+                  {selectedArtist.followers == null
+                    ? "Followers unavailable"
+                    : `${selectedArtist.followers.toLocaleString()} followers`}
                 </p>
               </div>
             </div>
