@@ -77,6 +77,9 @@ type Overview = {
     plan: "FREE" | "TRIAL" | "PRO";
     trialUntil: string | null;
     createdAt: string;
+    spotifyArtistName: string | null;
+    spotifyArtistUrl: string | null;
+    spotifyArtistImageUrl: string | null;
   };
   legal: LegalBlock;
   tracks: OverviewTrack[];
@@ -266,7 +269,16 @@ export default function DashboardClient() {
 
   const analytics = overview?.analytics;
 
-const artistName = overview?.artist?.name?.trim() || "Artist";
+const artistName =
+  overview?.artist?.spotifyArtistName?.trim() ||
+  overview?.artist?.name?.trim() ||
+  "Artist";
+
+const artistImageUrl =
+  overview?.artist?.spotifyArtistImageUrl?.trim() || null;
+
+const spotifyArtistUrl =
+  overview?.artist?.spotifyArtistUrl?.trim() || null;
 const hasTracks = totalTracks > 0;
 
 const totalCampaigns = analytics?.totalCampaigns ?? 0;
@@ -285,7 +297,21 @@ const placementRate = analytics?.placementRate ?? 0;
         />
       )}
 
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-green-950 p-8 text-white shadow-2xl">
+      <section
+        className="relative overflow-hidden rounded-3xl bg-zinc-950 p-8 text-white shadow-2xl"
+        style={
+          artistImageUrl
+            ? {
+                backgroundImage: `url("${artistImageUrl}")`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : undefined
+        }
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.96)_0%,rgba(0,0,0,0.82)_42%,rgba(0,0,0,0.50)_72%,rgba(0,0,0,0.72)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.32),transparent_38%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
 
 <div className="relative z-20 mb-4 flex flex-wrap items-center gap-2">
   {usage?.plan && <PlanBadge plan={usage.plan} />}
@@ -334,14 +360,29 @@ const placementRate = analytics?.placementRate ?? 0;
     <div className="max-w-2xl">
 
       
-      <h1 className="text-4xl font-bold tracking-tight">
-        Welcome back, {artistName} 👋
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-green-400">
+        Welcome back
+      </div>
+
+      <h1 className="mt-3 max-w-2xl text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+        {artistName}
       </h1>
 
-      <p className="mt-4 max-w-xl text-lg text-zinc-300">
-        Grow your Spotify career with AI-powered playlist pitching,
-        campaign automation and real-time performance analytics.
+      <p className="mt-4 max-w-xl text-base leading-7 text-zinc-300 sm:text-lg">
+        Your music promotion command center for playlist matching,
+        curator outreach and campaign performance.
       </p>
+
+      {spotifyArtistUrl && (
+        <a
+          href={spotifyArtistUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-5 inline-flex items-center rounded-full border border-green-400/30 bg-green-400/10 px-4 py-2 text-sm font-bold text-green-300 backdrop-blur transition hover:bg-green-400 hover:text-black"
+        >
+          View on Spotify ↗
+        </a>
+      )}
 
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
@@ -351,12 +392,14 @@ const placementRate = analytics?.placementRate ?? 0;
           Pricing
         </Link>
 
+        {usage?.plan !== "PRO" && (
         <Link
           href={linkWithArtistId("/upgrade", artistId)}
           className="rounded-xl bg-green-500 px-5 py-3 font-semibold text-black hover:bg-green-400 transition"
         >
           Upgrade →
         </Link>
+      )}
       </div>
 
     </div>
