@@ -80,6 +80,9 @@ type Overview = {
     spotifyArtistName: string | null;
     spotifyArtistUrl: string | null;
     spotifyArtistImageUrl: string | null;
+    dashboardCoverZoom: number;
+    dashboardCoverPositionX: number;
+    dashboardCoverPositionY: number;
   };
   legal: LegalBlock;
   tracks: OverviewTrack[];
@@ -181,6 +184,13 @@ export default function DashboardClient() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
 
+  const [isEditingCover, setIsEditingCover] = useState(false);
+  const [coverZoom, setCoverZoom] = useState(100);
+  const [coverPositionX, setCoverPositionX] = useState(50);
+  const [coverPositionY, setCoverPositionY] = useState(50);
+  const [savingCover, setSavingCover] = useState(false);
+  const [coverError, setCoverError] = useState<string | null>(null);
+
   async function loadAll() {
   setLoading(true);
   setErr(null);
@@ -230,6 +240,9 @@ export default function DashboardClient() {
     setArtistId(o.artist.id);
     setUsage(u);
     setOverview(o);
+    setCoverZoom(o.artist.dashboardCoverZoom ?? 100);
+    setCoverPositionX(o.artist.dashboardCoverPositionX ?? 50);
+    setCoverPositionY(o.artist.dashboardCoverPositionY ?? 50);
     setLegal((o?.legal ?? null) as LegalBlock | null);
     setAccess(a?.access ?? null);
   } catch (e: any) {
@@ -239,6 +252,74 @@ export default function DashboardClient() {
   }
 }
 
+  async function saveCover() {
+    setSavingCover(true);
+    setCoverError(null);
+
+    try {
+      if (!isSignedIn) {
+        throw new Error("You must be signed in.");
+      }
+
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("Could not get authentication token.");
+      }
+
+      const response = await fetch(`${API}/dashboard/cover`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          zoom: coverZoom,
+          positionX: coverPositionX,
+          positionY: coverPositionY,
+        }),
+      });
+
+      const text = await response.text();
+
+      if (!response.ok) {
+        throw new Error(text || `Cover update HTTP ${response.status}`);
+      }
+
+      const result = JSON.parse(text) as {
+        ok: boolean;
+        cover: {
+          zoom: number;
+          positionX: number;
+          positionY: number;
+        };
+      };
+
+      setCoverZoom(result.cover.zoom);
+      setCoverPositionX(result.cover.positionX);
+      setCoverPositionY(result.cover.positionY);
+
+      setOverview((current) =>
+        current
+          ? {
+              ...current,
+              artist: {
+                ...current.artist,
+                dashboardCoverZoom: result.cover.zoom,
+                dashboardCoverPositionX: result.cover.positionX,
+                dashboardCoverPositionY: result.cover.positionY,
+              },
+            }
+          : current
+      );
+
+      setIsEditingCover(false);
+    } catch (e: any) {
+      setCoverError(e?.message ?? "Failed to save cover settings.");
+    } finally {
+      setSavingCover(false);
+    }
+  }
   useEffect(() => {
   if (!isLoaded) return;
 
@@ -297,18 +378,28 @@ const placementRate = analytics?.placementRate ?? 0;
         />
       )}
 
-      <section
-        className="relative overflow-hidden rounded-3xl bg-zinc-950 p-8 text-white shadow-2xl"
-        style={
-          artistImageUrl
-            ? {
+      <section className="relative overflow-hidden rounded-3xl bg-zinc-950 p-8 text-white shadow-2xl">
+        {artistImageUrl && (
+          <>
+            <div
+              className="pointer-events-none absolute inset-0 scale-110 bg-cover bg-center opacity-45 blur-2xl"
+              style={{
                 backgroundImage: `url("${artistImageUrl}")`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }
-            : undefined
-        }
-      >
+              }}
+            />
+
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage: `url("${artistImageUrl}")`,
+                backgroundRepeat: "no-repeat",
+                backgroundSize: `${coverZoom}% auto`,
+                backgroundPosition: `${coverPositionX}% ${coverPositionY}%`,
+              }}
+            />
+          </>
+        )}
+
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.96)_0%,rgba(0,0,0,0.82)_42%,rgba(0,0,0,0.50)_72%,rgba(0,0,0,0.72)_100%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.32),transparent_38%)]" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
@@ -354,6 +445,140 @@ const placementRate = analytics?.placementRate ?? 0;
 
   <div className="pointer-events-none absolute right-0 top-0 h-56 w-56 rounded-full bg-green-500/10 blur-3xl" />
 <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
+
+{artistImageUrl && (
+  <div className="relative z-30 mb-6 flex justify-end">
+    {!isEditingCover ? (
+      <button
+        type="button"
+        onClick={() => {
+          setCoverError(null);
+          setIsEditingCover(true);
+        }}
+        className="rounded-full border border-white/20 bg-black/40 px-4 py-2 text-sm font-bold text-white backdrop-blur transition hover:border-green-400/50 hover:bg-black/60"
+      >
+        Edit cover
+      </button>
+    ) : (
+      <div className="w-full max-w-md rounded-2xl border border-white/15 bg-black/75 p-5 shadow-2xl backdrop-blur-xl">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div>
+            <div className="text-sm font-black text-white">
+              Adjust cover
+            </div>
+            <div className="mt-1 text-xs text-zinc-400">
+              Changes are previewed live.
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setCoverZoom(overview?.artist.dashboardCoverZoom ?? 100);
+              setCoverPositionX(
+                overview?.artist.dashboardCoverPositionX ?? 50
+              );
+              setCoverPositionY(
+                overview?.artist.dashboardCoverPositionY ?? 50
+              );
+              setCoverError(null);
+              setIsEditingCover(false);
+            }}
+            disabled={savingCover}
+            className="text-sm font-semibold text-zinc-400 transition hover:text-white disabled:opacity-50"
+          >
+            Cancel
+          </button>
+        </div>
+
+        <label className="block">
+          <div className="mb-2 flex items-center justify-between text-xs font-bold text-zinc-300">
+            <span>Zoom</span>
+            <span>{coverZoom}%</span>
+          </div>
+          <input
+            type="range"
+            min="50"
+            max="200"
+            step="1"
+            value={coverZoom}
+            onChange={(event) =>
+              setCoverZoom(Number(event.target.value))
+            }
+            className="w-full accent-green-500"
+          />
+        </label>
+
+        <label className="mt-4 block">
+          <div className="mb-2 flex items-center justify-between text-xs font-bold text-zinc-300">
+            <span>Horizontal</span>
+            <span>{coverPositionX}%</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value={coverPositionX}
+            onChange={(event) =>
+              setCoverPositionX(Number(event.target.value))
+            }
+            className="w-full accent-green-500"
+          />
+        </label>
+
+        <label className="mt-4 block">
+          <div className="mb-2 flex items-center justify-between text-xs font-bold text-zinc-300">
+            <span>Vertical</span>
+            <span>{coverPositionY}%</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value={coverPositionY}
+            onChange={(event) =>
+              setCoverPositionY(Number(event.target.value))
+            }
+            className="w-full accent-green-500"
+          />
+        </label>
+
+        {coverError && (
+          <div className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+            {coverError}
+          </div>
+        )}
+
+        <div className="mt-5 flex flex-wrap justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setCoverZoom(100);
+              setCoverPositionX(50);
+              setCoverPositionY(50);
+              setCoverError(null);
+            }}
+            disabled={savingCover}
+            className="rounded-full border border-white/15 px-4 py-2 text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white disabled:opacity-50"
+          >
+            Reset
+          </button>
+
+          <button
+            type="button"
+            onClick={saveCover}
+            disabled={savingCover}
+            className="rounded-full bg-green-500 px-5 py-2 text-sm font-black text-black transition hover:bg-green-400 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {savingCover ? "Saving..." : "Save cover"}
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+)}
 
   <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
 
