@@ -139,47 +139,69 @@ const res = await fetch(`${API}/curators/analytics`, {
   return (
     <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-8">
       <div className="mx-auto max-w-6xl space-y-7">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/10"
-          >
-            ← Dashboard
-          </Link>
+        <header className="overflow-hidden rounded-[24px] border border-white/10 bg-[#090b0b]">
+          <div className="flex flex-col gap-5 border-b border-white/10 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 items-center gap-6">
+              <Link
+                href="/dashboard"
+                className="shrink-0"
+                aria-label="TuneReach dashboard"
+              >
+                <img
+                  src="/brand/logo.svg"
+                  alt="TuneReach"
+                  className="h-auto w-[210px] sm:w-[235px]"
+                />
+              </Link>
 
-          <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-bold text-emerald-300">
-            Curator workspace
-          </div>
-        </div>
+              <div className="hidden h-10 w-px bg-white/10 lg:block" />
 
-        <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-zinc-950 via-zinc-950 to-emerald-950 p-7 shadow-2xl sm:p-10">
-          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
-
-          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-sm font-black uppercase tracking-[0.24em] text-emerald-400">
-                TuneReach outreach
-              </p>
-
-              <h1 className="mt-4 text-4xl font-black leading-tight sm:text-6xl">
-                Curator CRM
-              </h1>
-
-              <p className="mt-4 max-w-xl text-base leading-7 text-white/55">
-                Track curator outreach, engagement, replies and interest from one workspace.
-              </p>
+              <div className="min-w-0">
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
+                  Curator workspace
+                </p>
+                <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
+                  Curator CRM
+                </h1>
+              </div>
             </div>
 
-            <button
-              type="button"
-              onClick={loadCurators}
-              disabled={loading}
-              className="inline-flex items-center justify-center rounded-2xl bg-emerald-400 px-6 py-3 font-black text-black transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? "Refreshing..." : "Refresh data"}
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-bold text-white/70 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                ← Dashboard
+              </Link>
+
+              <Link
+                href="/followups"
+                className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-bold text-white/70 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Follow-ups
+              </Link>
+
+              <button
+                type="button"
+                onClick={loadCurators}
+                disabled={loading}
+                className="inline-flex items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-4 py-2.5 text-sm font-black text-emerald-300 transition hover:bg-emerald-400/20 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loading ? "Refreshing..." : "Refresh"}
+              </button>
+            </div>
           </div>
-        </section>
+
+          <div className="flex flex-col gap-2 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-white/45">
+              Manage curator outreach, playlist contacts and campaign engagement.
+            </p>
+
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/25">
+              {filtered.length} curator contacts
+            </span>
+          </div>
+        </header>
 
         {err && (
           <div className="rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm font-bold text-red-200">
