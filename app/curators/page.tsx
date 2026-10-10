@@ -17,6 +17,14 @@ type CuratorAnalytics = {
   interested: boolean;
   score: number;
   status: string;
+  playlist: {
+    id: string;
+    name: string;
+    genres: string[];
+    followers: number;
+    imageUrl: string | null;
+    spotifyUrl: string | null;
+  } | null;
 };
 
 export default function CuratorsPage() {
@@ -74,7 +82,8 @@ const res = await fetch(`${API}/curators/analytics`, {
     if (
       query &&
       !c.name?.toLowerCase().includes(query) &&
-      !c.email?.toLowerCase().includes(query)
+      !c.email?.toLowerCase().includes(query) &&
+      !c.playlist?.name?.toLowerCase().includes(query)
     ) {
       return false;
     }
@@ -313,19 +322,15 @@ const res = await fetch(`${API}/curators/analytics`, {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1050px] border-collapse text-left text-sm">
+              <table className="w-full border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-white/10 bg-white/[0.025]">
                     {[
-                      "Curator",
+                      "Curator / Playlist",
                       "Email",
-                      "Sent",
-                      "Opens",
-                      "Clicks",
-                      "Replies",
-                      "Score",
+                      "Followers",
+                      "Engagement",
                       "Status",
-                      "Interest",
                       "Action",
                     ].map((heading) => (
                       <th
@@ -344,10 +349,47 @@ const res = await fetch(`${API}/curators/analytics`, {
                       key={c.id}
                       className="border-b border-white/[0.07] transition last:border-b-0 hover:bg-white/[0.025]"
                     >
-                      <td className="px-4 py-4">
-                        <p className="font-black text-white">
-                          {c.name || "Unknown curator"}
-                        </p>
+                      <td className="min-w-[280px] px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          {c.playlist?.imageUrl ? (
+                            <img
+                              src={c.playlist.imageUrl}
+                              alt=""
+                              className="h-12 w-12 shrink-0 rounded-xl border border-white/10 object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-sm font-black text-emerald-300">
+                              {(c.name || "C").charAt(0).toUpperCase()}
+                            </div>
+                          )}
+
+                          <div className="min-w-0">
+                            <p className="truncate font-black text-white">
+                              {c.name || "Unknown curator"}
+                            </p>
+
+                            {c.playlist ? (
+                              c.playlist.spotifyUrl ? (
+                                <a
+                                  href={c.playlist.spotifyUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="mt-1 block max-w-[230px] truncate text-xs font-bold text-emerald-300 transition hover:text-emerald-200"
+                                >
+                                  {c.playlist.name}
+                                </a>
+                              ) : (
+                                <p className="mt-1 max-w-[230px] truncate text-xs text-white/40">
+                                  {c.playlist.name}
+                                </p>
+                              )
+                            ) : (
+                              <p className="mt-1 text-xs text-white/25">
+                                No playlist
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       </td>
 
                       <td className="px-4 py-4">
@@ -358,82 +400,84 @@ const res = await fetch(`${API}/curators/analytics`, {
                         )}
                       </td>
 
-                      <td className="px-4 py-4 font-bold text-white/70">
-                        {c.sent}
-                      </td>
-
-                      <td className="px-4 py-4">
-                        <span
-                          className={
-                            c.opens > 0
-                              ? "font-black text-emerald-300"
-                              : "text-white/35"
-                          }
-                        >
-                          {c.opens}
-                        </span>
-                      </td>
-
-                      <td className="px-4 py-4">
-                        <span
-                          className={
-                            c.clicks > 0
-                              ? "font-black text-emerald-300"
-                              : "text-white/35"
-                          }
-                        >
-                          {c.clicks}
-                        </span>
-                      </td>
-
-                      <td className="px-4 py-4">
-                        <span
-                          className={
-                            c.replies > 0
-                              ? "font-black text-emerald-300"
-                              : "text-white/35"
-                          }
-                        >
-                          {c.replies}
-                        </span>
-                      </td>
-
                       <td className="px-4 py-4">
                         <span className="font-black text-white">
-                          {c.score}
+                          {(c.playlist?.followers ?? 0).toLocaleString()}
                         </span>
                       </td>
 
                       <td className="px-4 py-4">
-                        <span
-                          className={`inline-flex rounded-full border px-3 py-1 text-xs font-black ${
-                            c.status === "HOT"
-                              ? "border-red-400/20 bg-red-400/10 text-red-300"
-                              : c.status === "WARM"
-                              ? "border-amber-400/20 bg-amber-400/10 text-amber-300"
-                              : "border-white/10 bg-white/[0.04] text-white/45"
-                          }`}
-                        >
-                          {c.status}
-                        </span>
+                        <div className="flex min-w-[170px] items-center gap-2">
+                          <span
+                            title="Sent"
+                            className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-xs font-bold text-white/55"
+                          >
+                            S {c.sent}
+                          </span>
+                          <span
+                            title="Opens"
+                            className={`rounded-lg border px-2 py-1 text-xs font-bold ${
+                              c.opens > 0
+                                ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+                                : "border-white/10 bg-white/[0.04] text-white/35"
+                            }`}
+                          >
+                            O {c.opens}
+                          </span>
+                          <span
+                            title="Clicks"
+                            className={`rounded-lg border px-2 py-1 text-xs font-bold ${
+                              c.clicks > 0
+                                ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+                                : "border-white/10 bg-white/[0.04] text-white/35"
+                            }`}
+                          >
+                            C {c.clicks}
+                          </span>
+                          <span
+                            title="Replies"
+                            className={`rounded-lg border px-2 py-1 text-xs font-bold ${
+                              c.replies > 0
+                                ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+                                : "border-white/10 bg-white/[0.04] text-white/35"
+                            }`}
+                          >
+                            R {c.replies}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`inline-flex rounded-full border px-3 py-1 text-xs font-black ${
+                              c.status === "HOT"
+                                ? "border-red-400/20 bg-red-400/10 text-red-300"
+                                : c.status === "WARM"
+                                  ? "border-amber-400/20 bg-amber-400/10 text-amber-300"
+                                  : "border-white/10 bg-white/[0.04] text-white/45"
+                            }`}
+                          >
+                            {c.status}
+                          </span>
+
+                          <span className="text-xs font-black text-white/55">
+                            {c.score}
+                          </span>
+
+                          {c.interested && (
+                            <span
+                              title="Positive reply"
+                              className="h-2 w-2 rounded-full bg-emerald-400"
+                            />
+                          )}
+                        </div>
                       </td>
 
                       <td className="px-4 py-4">
                         {c.interested ? (
-                          <span className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-black text-emerald-300">
-                            Interested
-                          </span>
-                        ) : (
-                          <span className="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-bold text-white/35">
-                            Not marked
-                          </span>
-                        )}
-                      </td>
-
-                      <td className="px-4 py-4">
-                        {c.interested ? (
-                          <span className="text-xs font-bold text-emerald-300/70">
-                            Marked positive
+                          <span className="whitespace-nowrap text-xs font-bold text-emerald-300">
+                            Positive reply
                           </span>
                         ) : (
                           <button
@@ -466,13 +510,13 @@ const res = await fetch(`${API}/curators/analytics`, {
                               } catch (e: any) {
                                 setErr(
                                   e?.message ??
-                                    "Failed to mark curator interested"
+                                    "Failed to mark positive reply"
                                 );
                               }
                             }}
                             className="whitespace-nowrap rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-3 py-2 text-xs font-black text-emerald-300 transition hover:bg-emerald-400/20"
                           >
-                            Mark interested
+                            Mark positive reply
                           </button>
                         )}
                       </td>
