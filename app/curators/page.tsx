@@ -128,222 +128,362 @@ const res = await fetch(`${API}/curators/analytics`, {
   }, [filtered]);
 
   return (
-    <main className="mx-auto max-w-6xl p-8 space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-4xl font-bold">Curator CRM</h1>
-          <p className="mt-2 text-gray-600">
-            Track curator outreach, opens, clicks, replies and interest.
-          </p>
-        </div>
-
-        <div className="flex gap-3">
+    <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-8">
+      <div className="mx-auto max-w-6xl space-y-7">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <Link
             href="/dashboard"
-            className="rounded border border-black px-4 py-2 hover:bg-black hover:text-white transition"
+            className="inline-flex items-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/10"
           >
             ← Dashboard
           </Link>
 
-          <button
-            onClick={loadCurators}
-            className="rounded bg-black px-4 py-2 text-white hover:opacity-90 transition"
-          >
-            Refresh
-          </button>
-        </div>
-      </div>
-
-      {err && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
-          {err}
-        </div>
-      )}
-
-      <section className="grid gap-4 md:grid-cols-5">
-        <div className="rounded-xl border bg-white p-4">
-          <p className="text-xs uppercase text-gray-500">Curators</p>
-          <p className="mt-2 text-3xl font-bold">{filtered.length}</p>
+          <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-bold text-emerald-300">
+            Curator workspace
+          </div>
         </div>
 
-        <div className="rounded-xl border bg-white p-4">
-          <p className="text-xs uppercase text-gray-500">Sent</p>
-          <p className="mt-2 text-3xl font-bold">{totals.sent}</p>
-        </div>
+        <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-zinc-950 via-zinc-950 to-emerald-950 p-7 shadow-2xl sm:p-10">
+          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
 
-        <div className="rounded-xl border bg-white p-4">
-          <p className="text-xs uppercase text-gray-500">Opens</p>
-          <p className="mt-2 text-3xl font-bold">{totals.opens}</p>
-        </div>
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-sm font-black uppercase tracking-[0.24em] text-emerald-400">
+                TuneReach outreach
+              </p>
 
-        <div className="rounded-xl border bg-white p-4">
-          <p className="text-xs uppercase text-gray-500">Clicks</p>
-          <p className="mt-2 text-3xl font-bold">{totals.clicks}</p>
-        </div>
+              <h1 className="mt-4 text-4xl font-black leading-tight sm:text-6xl">
+                Curator CRM
+              </h1>
 
-        <div className="rounded-xl border bg-white p-4">
-          <p className="text-xs uppercase text-gray-500">Interested</p>
-          <p className="mt-2 text-3xl font-bold">{totals.interested}</p>
-        </div>
-      </section>
+              <p className="mt-4 max-w-xl text-base leading-7 text-white/55">
+                Track curator outreach, engagement, replies and interest from one workspace.
+              </p>
+            </div>
 
-      <section className="rounded-2xl border bg-white p-6 shadow-sm">
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <h2 className="text-2xl font-semibold">Curators</h2>
+            <button
+              type="button"
+              onClick={loadCurators}
+              disabled={loading}
+              className="inline-flex items-center justify-center rounded-2xl bg-emerald-400 px-6 py-3 font-black text-black transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? "Refreshing..." : "Refresh data"}
+            </button>
+          </div>
+        </section>
 
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search curator or email..."
-            className="w-full rounded border px-4 py-2 md:max-w-sm"
-          />
-        </div>
-
-        <div className="mb-4 flex flex-wrap gap-2">
-  <button
-    onClick={() => setShowOpened(!showOpened)}
-    className={`rounded border px-3 py-1 text-sm ${
-      showOpened ? "bg-black text-white" : "bg-white"
-    }`}
-  >
-    Opened
-  </button>
-
-  <button
-    onClick={() => setShowClicked(!showClicked)}
-    className={`rounded border px-3 py-1 text-sm ${
-      showClicked ? "bg-black text-white" : "bg-white"
-    }`}
-  >
-    Clicked
-  </button>
-
-  <button
-    onClick={() => setShowHasEmail(!showHasEmail)}
-    className={`rounded border px-3 py-1 text-sm ${
-      showHasEmail ? "bg-black text-white" : "bg-white"
-    }`}
-  >
-    Has Email
-  </button>
-
-  <button
-    onClick={() => setShowInterested(!showInterested)}
-    className={`rounded border px-3 py-1 text-sm ${
-      showInterested ? "bg-black text-white" : "bg-white"
-    }`}
-  >
-    Interested
-  </button>
-</div>
-
-        {loading ? (
-          <p>Loading…</p>
-        ) : filtered.length === 0 ? (
-          <p className="text-gray-600">No curators found.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] border-collapse text-left text-sm">
-              <thead>
-                <tr className="border-b bg-gray-50">
-                  <th className="p-3">Curator</th>
-                  <th className="p-3">Email</th>
-                  <th className="p-3">Sent</th>
-                  <th className="p-3">Opens</th>
-                  <th className="p-3">Clicks</th>
-                  <th className="p-3">Replies</th>
-                  <th className="p-3">Score</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Interested</th>
-                  <th className="p-3">Reply</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {filtered.map((c) => (
-                  <tr key={c.id} className="border-b hover:bg-gray-50">
-                    <td className="p-3 font-medium">{c.name || "-"}</td>
-                    <td className="p-3 text-gray-600">{c.email || "-"}</td>
-                    <td className="p-3">{c.sent}</td>
-                    <td className="p-3">{c.opens}</td>
-                    <td className="p-3">{c.clicks}</td>
-                    <td className="p-3">{c.replies}</td>
-
-<td className="p-3 font-bold">
-  {c.score}
-</td>
-
-<td className="p-3">
-  <span
-    className={`rounded-full px-3 py-1 text-xs font-medium ${
-      c.status === "HOT"
-        ? "bg-red-100 text-red-700"
-        : c.status === "WARM"
-        ? "bg-yellow-100 text-yellow-700"
-        : "bg-gray-100 text-gray-600"
-    }`}
-  >
-    {c.status}
-  </span>
-</td>
-
-<td className="p-3">
-                      {c.interested ? (
-                        <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">
-                          Yes
-                        </span>
-                      ) : (
-                        <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
-                          No
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="p-3">
-  <div className="flex gap-2">
-    <button
-      onClick={async () => {
-  try {
-    const token = await getToken();
-
-    if (!token) {
-      throw new Error("You must be signed in.");
-    }
-
-    const res = await fetch(
-      `${API}/curators/${c.id}/positive-reply`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const text = await res.text();
-
-    if (!res.ok) {
-      throw new Error(text || `HTTP ${res.status}`);
-    }
-
-    await loadCurators();
-  } catch (e: any) {
-    setErr(e?.message ?? "Failed to mark curator interested");
-  }
-}}
-      className="rounded bg-green-600 px-3 py-1 text-white text-xs"
-    >
-      👍 Positive
-    </button>
-  </div>
-</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {err && (
+          <div className="rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm font-bold text-red-200">
+            {err}
           </div>
         )}
-      </section>
+
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {[
+            {
+              label: "Curators",
+              value: filtered.length,
+              description: "Visible contacts",
+            },
+            {
+              label: "Sent",
+              value: totals.sent,
+              description: "Pitches delivered",
+            },
+            {
+              label: "Opens",
+              value: totals.opens,
+              description: "Tracked opens",
+            },
+            {
+              label: "Clicks",
+              value: totals.clicks,
+              description: "Tracked clicks",
+            },
+            {
+              label: "Interested",
+              value: totals.interested,
+              description: "Positive replies",
+            },
+          ].map((metric) => (
+            <div
+              key={metric.label}
+              className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-white/40">
+                {metric.label}
+              </p>
+              <p className="mt-3 text-3xl font-black text-white">
+                {metric.value}
+              </p>
+              <p className="mt-2 text-sm text-white/40">
+                {metric.description}
+              </p>
+            </div>
+          ))}
+        </section>
+
+        <section className="overflow-hidden rounded-[28px] border border-white/10 bg-zinc-950">
+          <div className="border-b border-white/10 p-5 sm:p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-sm font-bold text-emerald-400">
+                  Outreach database
+                </p>
+                <h2 className="mt-1 text-2xl font-black">
+                  Curators
+                </h2>
+                <p className="mt-1 text-sm text-white/40">
+                  {filtered.length} of {curators.length} curators shown
+                </p>
+              </div>
+
+              <div className="w-full lg:max-w-md">
+                <label
+                  htmlFor="curator-search"
+                  className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-white/35"
+                >
+                  Search
+                </label>
+
+                <input
+                  id="curator-search"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder="Search curator or email..."
+                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/10"
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              {[
+                {
+                  label: "Opened",
+                  active: showOpened,
+                  toggle: () => setShowOpened(!showOpened),
+                },
+                {
+                  label: "Clicked",
+                  active: showClicked,
+                  toggle: () => setShowClicked(!showClicked),
+                },
+                {
+                  label: "Has Email",
+                  active: showHasEmail,
+                  toggle: () => setShowHasEmail(!showHasEmail),
+                },
+                {
+                  label: "Interested",
+                  active: showInterested,
+                  toggle: () => setShowInterested(!showInterested),
+                },
+              ].map((filter) => (
+                <button
+                  key={filter.label}
+                  type="button"
+                  onClick={filter.toggle}
+                  className={`rounded-full border px-4 py-2 text-xs font-bold transition ${
+                    filter.active
+                      ? "border-emerald-400/30 bg-emerald-400/15 text-emerald-300"
+                      : "border-white/10 bg-white/[0.035] text-white/55 hover:bg-white/[0.07] hover:text-white"
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="flex min-h-64 items-center justify-center p-8">
+              <div className="text-center">
+                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-400" />
+                <p className="mt-4 text-sm font-bold text-white/45">
+                  Loading curators...
+                </p>
+              </div>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="p-10 text-center">
+              <p className="font-black text-white">No curators found</p>
+              <p className="mt-2 text-sm text-white/40">
+                Try changing your search or filters.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[1050px] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 bg-white/[0.025]">
+                    {[
+                      "Curator",
+                      "Email",
+                      "Sent",
+                      "Opens",
+                      "Clicks",
+                      "Replies",
+                      "Score",
+                      "Status",
+                      "Interest",
+                      "Action",
+                    ].map((heading) => (
+                      <th
+                        key={heading}
+                        className="px-4 py-4 text-xs font-black uppercase tracking-[0.12em] text-white/35"
+                      >
+                        {heading}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filtered.map((c) => (
+                    <tr
+                      key={c.id}
+                      className="border-b border-white/[0.07] transition last:border-b-0 hover:bg-white/[0.025]"
+                    >
+                      <td className="px-4 py-4">
+                        <p className="font-black text-white">
+                          {c.name || "Unknown curator"}
+                        </p>
+                      </td>
+
+                      <td className="px-4 py-4">
+                        {c.email ? (
+                          <span className="text-white/60">{c.email}</span>
+                        ) : (
+                          <span className="text-white/25">No email</span>
+                        )}
+                      </td>
+
+                      <td className="px-4 py-4 font-bold text-white/70">
+                        {c.sent}
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <span
+                          className={
+                            c.opens > 0
+                              ? "font-black text-emerald-300"
+                              : "text-white/35"
+                          }
+                        >
+                          {c.opens}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <span
+                          className={
+                            c.clicks > 0
+                              ? "font-black text-emerald-300"
+                              : "text-white/35"
+                          }
+                        >
+                          {c.clicks}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <span
+                          className={
+                            c.replies > 0
+                              ? "font-black text-emerald-300"
+                              : "text-white/35"
+                          }
+                        >
+                          {c.replies}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <span className="font-black text-white">
+                          {c.score}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <span
+                          className={`inline-flex rounded-full border px-3 py-1 text-xs font-black ${
+                            c.status === "HOT"
+                              ? "border-red-400/20 bg-red-400/10 text-red-300"
+                              : c.status === "WARM"
+                              ? "border-amber-400/20 bg-amber-400/10 text-amber-300"
+                              : "border-white/10 bg-white/[0.04] text-white/45"
+                          }`}
+                        >
+                          {c.status}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-4">
+                        {c.interested ? (
+                          <span className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-black text-emerald-300">
+                            Interested
+                          </span>
+                        ) : (
+                          <span className="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-bold text-white/35">
+                            Not marked
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="px-4 py-4">
+                        {c.interested ? (
+                          <span className="text-xs font-bold text-emerald-300/70">
+                            Marked positive
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const token = await getToken();
+
+                                if (!token) {
+                                  throw new Error("You must be signed in.");
+                                }
+
+                                const res = await fetch(
+                                  `${API}/curators/${c.id}/positive-reply`,
+                                  {
+                                    method: "POST",
+                                    headers: {
+                                      Authorization: `Bearer ${token}`,
+                                    },
+                                  }
+                                );
+
+                                const text = await res.text();
+
+                                if (!res.ok) {
+                                  throw new Error(text || `HTTP ${res.status}`);
+                                }
+
+                                await loadCurators();
+                              } catch (e: any) {
+                                setErr(
+                                  e?.message ??
+                                    "Failed to mark curator interested"
+                                );
+                              }
+                            }}
+                            className="whitespace-nowrap rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-3 py-2 text-xs font-black text-emerald-300 transition hover:bg-emerald-400/20"
+                          >
+                            Mark interested
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </div>
     </main>
   );
 }
