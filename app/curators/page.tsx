@@ -339,7 +339,7 @@ const res = await fetch(`${API}/curators/analytics`, {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left text-sm">
+              <table className="w-full table-fixed border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-white/10 bg-white/[0.025]">
                     {[
@@ -352,7 +352,7 @@ const res = await fetch(`${API}/curators/analytics`, {
                     ].map((heading) => (
                       <th
                         key={heading}
-                        className="px-4 py-4 text-xs font-black uppercase tracking-[0.12em] text-white/35"
+                        className="px-3 py-4 text-xs font-black uppercase tracking-[0.1em] text-white/35"
                       >
                         {heading}
                       </th>
@@ -366,16 +366,16 @@ const res = await fetch(`${API}/curators/analytics`, {
                       key={c.id}
                       className="border-b border-white/[0.07] transition last:border-b-0 hover:bg-white/[0.025]"
                     >
-                      <td className="min-w-[280px] px-4 py-4">
+                      <td className="w-[28%] px-3 py-4">
                         <div className="flex items-center gap-3">
                           {c.playlist?.imageUrl ? (
                             <img
                               src={c.playlist.imageUrl}
                               alt=""
-                              className="h-12 w-12 shrink-0 rounded-xl border border-white/10 object-cover"
+                              className="h-10 w-10 shrink-0 rounded-lg border border-white/10 object-cover"
                             />
                           ) : (
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-sm font-black text-emerald-300">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-sm font-black text-emerald-300">
                               {(c.name || "C").charAt(0).toUpperCase()}
                             </div>
                           )}
@@ -391,12 +391,12 @@ const res = await fetch(`${API}/curators/analytics`, {
                                   href={c.playlist.spotifyUrl}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="mt-1 block max-w-[230px] truncate text-xs font-bold text-emerald-300 transition hover:text-emerald-200"
+                                  className="mt-1 block max-w-[190px] truncate text-xs font-bold text-emerald-300 transition hover:text-emerald-200"
                                 >
                                   {c.playlist.name}
                                 </a>
                               ) : (
-                                <p className="mt-1 max-w-[230px] truncate text-xs text-white/40">
+                                <p className="mt-1 max-w-[190px] truncate text-xs text-white/40">
                                   {c.playlist.name}
                                 </p>
                               )
@@ -409,7 +409,7 @@ const res = await fetch(`${API}/curators/analytics`, {
                         </div>
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-4">
                         {c.email ? (
                           <span className="text-white/60">{c.email}</span>
                         ) : (
@@ -417,23 +417,23 @@ const res = await fetch(`${API}/curators/analytics`, {
                         )}
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-4">
                         <span className="font-black text-white">
                           {(c.playlist?.followers ?? 0).toLocaleString()}
                         </span>
                       </td>
 
-                      <td className="px-4 py-4">
-                        <div className="flex min-w-[170px] items-center gap-2">
+                      <td className="px-3 py-4">
+                        <div className="flex items-center gap-1">
                           <span
                             title="Sent"
-                            className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-xs font-bold text-white/55"
+                            className="rounded-lg border border-white/10 bg-white/[0.04] px-1.5 py-1 text-[11px] font-bold text-white/55"
                           >
                             S {c.sent}
                           </span>
                           <span
                             title="Opens"
-                            className={`rounded-lg border px-2 py-1 text-xs font-bold ${
+                            className={`rounded-lg border px-1.5 py-1 text-[11px] font-bold ${
                               c.opens > 0
                                 ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
                                 : "border-white/10 bg-white/[0.04] text-white/35"
@@ -443,7 +443,7 @@ const res = await fetch(`${API}/curators/analytics`, {
                           </span>
                           <span
                             title="Clicks"
-                            className={`rounded-lg border px-2 py-1 text-xs font-bold ${
+                            className={`rounded-lg border px-1.5 py-1 text-[11px] font-bold ${
                               c.clicks > 0
                                 ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
                                 : "border-white/10 bg-white/[0.04] text-white/35"
@@ -453,7 +453,7 @@ const res = await fetch(`${API}/curators/analytics`, {
                           </span>
                           <span
                             title="Replies"
-                            className={`rounded-lg border px-2 py-1 text-xs font-bold ${
+                            className={`rounded-lg border px-1.5 py-1 text-[11px] font-bold ${
                               c.replies > 0
                                 ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
                                 : "border-white/10 bg-white/[0.04] text-white/35"
@@ -464,10 +464,10 @@ const res = await fetch(`${API}/curators/analytics`, {
                         </div>
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-4">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`inline-flex rounded-full border px-3 py-1 text-xs font-black ${
+                            className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-black ${
                               c.status === "HOT"
                                 ? "border-red-400/20 bg-red-400/10 text-red-300"
                                 : c.status === "WARM"
@@ -491,7 +491,7 @@ const res = await fetch(`${API}/curators/analytics`, {
                         </div>
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-4">
                         {c.interested ? (
                           <span className="whitespace-nowrap text-xs font-bold text-emerald-300">
                             Positive reply
@@ -531,9 +531,9 @@ const res = await fetch(`${API}/curators/analytics`, {
                                 );
                               }
                             }}
-                            className="whitespace-nowrap rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-3 py-2 text-xs font-black text-emerald-300 transition hover:bg-emerald-400/20"
+                            className="whitespace-nowrap rounded-lg border border-emerald-400/25 bg-emerald-400/10 px-2.5 py-2 text-[11px] font-black text-emerald-300 transition hover:bg-emerald-400/20"
                           >
-                            Mark positive reply
+                            Mark positive
                           </button>
                         )}
                       </td>
