@@ -97,26 +97,22 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
 
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-950 p-6 shadow-xl md:p-7">
-      <div className="flex flex-col gap-1">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
-          Track Intake
-        </p>
-        <h2 className="text-2xl font-black tracking-tight text-white">
-          Add a Track
-        </h2>
-        <p className="text-sm text-white/45">
-          Paste a Spotify track URL to import your music and start playlist matching.
-        </p>
-      </div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="min-w-0">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+            Track Intake
+          </p>
+          <h2 className="mt-1 text-2xl font-black tracking-tight text-white">
+            Add a Track
+          </h2>
+          <p className="mt-1 text-sm text-white/45">
+            Paste a Spotify track URL to import your music and start playlist matching.
+          </p>
+        </div>
 
-      <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.035] p-4 md:p-5">
-        <label className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">
-          Spotify Track URL
-        </label>
-
-        <div className="mt-3 flex flex-col gap-3 lg:flex-row">
+        <div className="flex w-full gap-2 lg:max-w-3xl">
           <input
-            className="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/10"
+            className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/10"
             value={spotifyUrl}
             onChange={(e) => setSpotifyUrl(e.target.value)}
             placeholder="https://open.spotify.com/track/..."
@@ -125,9 +121,9 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
           <button
             onClick={submit}
             disabled={submitting}
-            className="rounded-xl bg-emerald-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
+            className="shrink-0 rounded-xl bg-emerald-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? "Submitting..." : "Submit & start matching"}
+            {submitting ? "Submitting..." : "Submit & match"}
           </button>
         </div>
       </div>
@@ -139,10 +135,10 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
       )}
 
       {jobId && (
-        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] p-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-400">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-400">
                 Matching
               </p>
               <h3 className="mt-1 font-black text-white">Match Job</h3>
@@ -154,25 +150,25 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
             </span>
           </div>
 
-          <div className="mt-3 break-all font-mono text-[11px] text-white/25">
+          <div className="mt-2 break-all font-mono text-[10px] text-white/25">
             jobId: {jobId}
           </div>
 
           {pollErr && (
-            <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300 whitespace-pre-wrap">
+            <div className="mt-3 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300 whitespace-pre-wrap">
               {pollErr}
             </div>
           )}
 
           {job?.status === "FAILED" && (
-            <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300 whitespace-pre-wrap">
+            <div className="mt-3 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300 whitespace-pre-wrap">
               FAILED: {job?.lastError || "Unknown error"}
             </div>
           )}
 
           {job?.status === "SUCCEEDED" && (
-            <div className="mt-5 space-y-4">
-              <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/[0.08] px-4 py-3 text-sm font-bold text-emerald-300">
+            <div className="mt-4 space-y-3">
+              <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/[0.08] px-4 py-2.5 text-sm font-bold text-emerald-300">
                 Matching complete
               </div>
 
@@ -180,22 +176,22 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
                 <div>
                   <div className="text-sm font-black text-white">Top matches</div>
 
-                  <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  <div className="mt-2 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
                     {top.map((m: any) => (
                       <div
                         key={m.matchId}
-                        className="rounded-xl border border-white/10 bg-black/20 p-4"
+                        className="rounded-xl border border-white/10 bg-black/20 px-4 py-3"
                       >
-                        <div className="font-bold text-white">
+                        <div className="truncate font-bold text-white">
                           {m.playlistName ?? m.playlistId}
                         </div>
-                        <div className="mt-2 text-sm text-white/50">
+                        <div className="mt-1 text-sm text-white/50">
                           Match score{" "}
                           <span className="font-bold text-emerald-300">
                             {m.fitScore}
                           </span>
                         </div>
-                        <div className="mt-1 break-all font-mono text-[10px] text-white/25">
+                        <div className="mt-1 truncate font-mono text-[10px] text-white/25">
                           matchId: {m.matchId}
                         </div>
                       </div>
@@ -208,7 +204,7 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
                 </div>
               )}
 
-              <details className="rounded-xl border border-white/10 bg-black/20 p-4 text-xs text-white/50">
+              <details className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-xs text-white/50">
                 <summary className="cursor-pointer font-bold text-white/70">
                   Raw result
                 </summary>
