@@ -292,10 +292,10 @@ const res = await fetch(`${API}/curators/analytics`, {
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-400">
-                  Outreach database
+                  Curator Network
                 </p>
                 <h2 className="mt-1 text-2xl font-black text-white">
-                  Curators
+                  Playlist Curators
                 </h2>
               </div>
 
