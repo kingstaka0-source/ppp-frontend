@@ -598,7 +598,7 @@ const placementRate = analytics?.placementRate ?? 0;
 
       <p className="mt-4 max-w-xl text-base leading-7 text-zinc-300 sm:text-lg">
         Your music promotion command center for playlist matching,
-        curator outreach and campaign performance.
+        curator connections and campaign performance.
       </p>
 
       {spotifyArtistUrl && (
