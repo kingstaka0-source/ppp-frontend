@@ -289,73 +289,82 @@ const res = await fetch(`${API}/curators/analytics`, {
 
         <section className="overflow-hidden rounded-[28px] border border-white/10 bg-zinc-950">
           <div className="border-b border-white/10 p-5 sm:p-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <p className="text-sm font-bold text-emerald-400">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-400">
                   Outreach database
                 </p>
-                <h2 className="mt-1 text-2xl font-black">
+                <h2 className="mt-1 text-2xl font-black text-white">
                   Curators
                 </h2>
-                <p className="mt-1 text-sm text-white/40">
-                  {filtered.length} of {curators.length} curators shown
-                </p>
               </div>
 
-              <div className="w-full lg:max-w-md">
-                <label
-                  htmlFor="curator-search"
-                  className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-white/35"
+              <p className="text-sm font-medium text-white/35">
+                {filtered.length} of {curators.length} curators shown
+              </p>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-2 lg:flex-row lg:items-center">
+              <div className="relative min-w-0 flex-1">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
                 >
-                  Search
-                </label>
+                  <circle cx="11" cy="11" r="7" />
+                  <path strokeLinecap="round" d="m20 20-4-4" />
+                </svg>
 
                 <input
                   id="curator-search"
+                  aria-label="Search curators"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder="Search curator or email..."
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/10"
+                  placeholder="Search curator, playlist or email..."
+                  className="h-10 w-full rounded-xl border border-white/10 bg-black/40 pl-10 pr-4 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/10"
                 />
               </div>
-            </div>
 
-            <div className="mt-5 flex flex-wrap gap-2">
-              {[
-                {
-                  label: "Opened",
-                  active: showOpened,
-                  toggle: () => setShowOpened(!showOpened),
-                },
-                {
-                  label: "Clicked",
-                  active: showClicked,
-                  toggle: () => setShowClicked(!showClicked),
-                },
-                {
-                  label: "Has Email",
-                  active: showHasEmail,
-                  toggle: () => setShowHasEmail(!showHasEmail),
-                },
-                {
-                  label: "Interested",
-                  active: showInterested,
-                  toggle: () => setShowInterested(!showInterested),
-                },
-              ].map((filter) => (
-                <button
-                  key={filter.label}
-                  type="button"
-                  onClick={filter.toggle}
-                  className={`rounded-full border px-4 py-2 text-xs font-bold transition ${
-                    filter.active
-                      ? "border-emerald-400/30 bg-emerald-400/15 text-emerald-300"
-                      : "border-white/10 bg-white/[0.035] text-white/55 hover:bg-white/[0.07] hover:text-white"
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
+              <div className="flex flex-wrap gap-2">
+                {[
+                  {
+                    label: "Opened",
+                    active: showOpened,
+                    toggle: () => setShowOpened(!showOpened),
+                  },
+                  {
+                    label: "Clicked",
+                    active: showClicked,
+                    toggle: () => setShowClicked(!showClicked),
+                  },
+                  {
+                    label: "Has Email",
+                    active: showHasEmail,
+                    toggle: () => setShowHasEmail(!showHasEmail),
+                  },
+                  {
+                    label: "Interested",
+                    active: showInterested,
+                    toggle: () => setShowInterested(!showInterested),
+                  },
+                ].map((filter) => (
+                  <button
+                    key={filter.label}
+                    type="button"
+                    onClick={filter.toggle}
+                    aria-pressed={filter.active}
+                    className={`h-10 rounded-xl border px-3.5 text-xs font-bold transition ${
+                      filter.active
+                        ? "border-emerald-400/30 bg-emerald-400/15 text-emerald-300"
+                        : "border-white/10 bg-white/[0.035] text-white/55 hover:border-white/15 hover:bg-white/[0.07] hover:text-white"
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
