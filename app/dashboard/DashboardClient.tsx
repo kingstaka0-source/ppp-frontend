@@ -61,6 +61,9 @@ type LegalBlock = {
 type OverviewTrack = {
   id: string;
   spotifyTrackId: string;
+  spotifyUrl: string | null;
+  albumName: string | null;
+  albumImageUrl: string | null;
   title: string;
   artists: string[];
   durationMs: number;
@@ -714,6 +717,87 @@ const placementRate = analytics?.placementRate ?? 0;
           </Link>
         </div>
       </nav>
+
+      {!loading && !err && overview && (
+        <section className="rounded-3xl border border-white/10 bg-zinc-950 p-6 shadow-xl md:p-7">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+                Music Library
+              </p>
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-white">
+                Recent Tracks
+              </h2>
+              <p className="mt-1 text-sm text-white/45">
+                Your latest imported tracks and their current playlist matches.
+              </p>
+            </div>
+
+            <Link
+              href={linkWithArtistId("/tracks", artistId)}
+              className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-bold text-white transition hover:border-emerald-400/30 hover:bg-emerald-400/[0.08] hover:text-emerald-300"
+            >
+              All tracks
+            </Link>
+          </div>
+
+          {(overview.tracks ?? []).length === 0 ? (
+            <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-white/[0.025] p-6 text-sm text-white/45">
+              No tracks yet. Add one using{" "}
+              <span className="font-semibold text-white">Track Intake</span> above.
+            </div>
+          ) : (
+            <div className="mt-6 grid gap-3 lg:grid-cols-2">
+              {(overview.tracks ?? []).slice(0, 5).map((t) => (
+                <div
+                  key={t.id}
+                  className="group flex min-w-0 items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-3 transition hover:border-emerald-400/25 hover:bg-white/[0.06]"
+                >
+                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-zinc-900">
+                    {t.albumImageUrl ? (
+                      <img
+                        src={t.albumImageUrl}
+                        alt=""
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-2xl font-black text-emerald-400/60">
+                        ♪
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-base font-black text-white">
+                      {t.title}
+                    </div>
+                    <div className="mt-1 truncate text-sm text-white/55">
+                      {(t.artists ?? []).join(", ")}
+                    </div>
+                    {t.albumName && (
+                      <div className="mt-0.5 truncate text-xs text-white/35">
+                        {t.albumName}
+                      </div>
+                    )}
+                    <div className="mt-2 inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/[0.1] px-2.5 py-1 text-xs font-bold text-emerald-300">
+                      {t.matchCount} matches
+                    </div>
+                  </div>
+
+                  <Link
+                    href={linkWithArtistId(`/tracks/${t.id}`, artistId)}
+                    className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-400 px-3.5 py-2.5 text-xs font-black text-zinc-950 transition hover:bg-emerald-300"
+                  >
+                    Open track
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
       {!loading && !err && overview && (
         <section className="rounded-3xl border border-white/10 bg-zinc-950 p-6 shadow-xl md:p-7">
           <div className="flex flex-col gap-1">
@@ -1009,63 +1093,6 @@ const placementRate = analytics?.placementRate ?? 0;
         </section>
       )}
 
-      {!loading && !err && overview && (
-        <section className="rounded-3xl border border-white/10 bg-zinc-950 p-6 shadow-xl md:p-7">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
-                Music Library
-              </p>
-              <h2 className="mt-1 text-2xl font-black tracking-tight text-white">
-                Recent Tracks
-              </h2>
-              <p className="mt-1 text-sm text-white/45">
-                Your latest imported tracks and their current playlist matches.
-              </p>
-            </div>
-
-            <Link
-              href={linkWithArtistId("/tracks", artistId)}
-              className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-bold text-white transition hover:border-emerald-400/30 hover:bg-emerald-400/[0.08] hover:text-emerald-300"
-            >
-              All tracks
-            </Link>
-          </div>
-
-          {(overview.tracks ?? []).length === 0 ? (
-            <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-white/[0.025] p-6 text-sm text-white/45">
-              No tracks yet. Add one using{" "}
-              <span className="font-semibold text-white">Track Intake</span> above.
-            </div>
-          ) : (
-            <div className="mt-6 space-y-3">
-              {(overview.tracks ?? []).slice(0, 5).map((t) => (
-                <div
-                  key={t.id}
-                  className="group flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-emerald-400/20 hover:bg-white/[0.055] sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="min-w-0">
-                    <div className="truncate font-bold text-white">{t.title}</div>
-                    <div className="mt-1 truncate text-sm text-white/45">
-                      {(t.artists ?? []).join(", ")}
-                    </div>
-                    <div className="mt-2 inline-flex rounded-full border border-emerald-400/15 bg-emerald-400/[0.08] px-2.5 py-1 text-xs font-bold text-emerald-300">
-                      {t.matchCount} matches
-                    </div>
-                  </div>
-
-                  <Link
-                    href={linkWithArtistId(`/tracks/${t.id}`, artistId)}
-                    className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-emerald-300"
-                  >
-                    Open track
-                  </Link>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
 
 
     </div>
