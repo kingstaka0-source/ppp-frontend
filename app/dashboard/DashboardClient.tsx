@@ -935,44 +935,78 @@ const placementRate = analytics?.placementRate ?? 0;
       )}
 
       {!loading && !err && usage && overview && access && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="border rounded-xl p-6">
-            <div className="text-sm text-gray-600">Plan</div>
-            <div className="mt-2 text-3xl font-bold">{usage.plan}</div>
+        <section className="rounded-3xl border border-white/10 bg-zinc-950 p-6 shadow-xl md:p-7">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+              Account Overview
+            </p>
+            <h2 className="mt-1 text-2xl font-black tracking-tight text-white">
+              Your TuneReach Plan
+            </h2>
+            <p className="mt-1 text-sm text-white/45">
+              Your current access, imported music and playlist matching activity.
+            </p>
+          </div>
 
-            {usage.plan === "FREE" && (
-              <div className="mt-2 text-gray-700">
-                Remaining: <b>{access.limits.remaining}</b> /{" "}
-                <b>{access.limits.pitchesPerMonth}</b>
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">
+                Plan
               </div>
-            )}
 
-            {usage.plan === "TRIAL" && (
-              <div className="mt-2 text-gray-700">
-                Unlimited • ends:{" "}
-                <b>
-                  {access.trialUntil
-                    ? new Date(access.trialUntil).toLocaleString()
-                    : "—"}
-                </b>
+              <div className="mt-3 flex items-center gap-3">
+                <div className="text-3xl font-black text-white">{usage.plan}</div>
+                <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-300">
+                  Active
+                </span>
               </div>
-            )}
 
-            {usage.plan === "PRO" && <div className="mt-2 text-gray-700">Unlimited</div>}
-          </div>
+              {usage.plan === "FREE" && (
+                <div className="mt-3 text-sm text-white/45">
+                  Remaining:{" "}
+                  <span className="font-bold text-white">{access.limits.remaining}</span>{" "}
+                  /{" "}
+                  <span className="font-bold text-white">{access.limits.pitchesPerMonth}</span>
+                </div>
+              )}
 
-          <div className="border rounded-xl p-6">
-            <div className="text-sm text-gray-600">Tracks</div>
-            <div className="mt-2 text-3xl font-bold">{totalTracks}</div>
-            <div className="mt-2 text-gray-700">Total imported tracks</div>
-          </div>
+              {usage.plan === "TRIAL" && (
+                <div className="mt-3 text-sm text-white/45">
+                  Unlimited - ends:{" "}
+                  <span className="font-bold text-white">
+                    {access.trialUntil
+                      ? new Date(access.trialUntil).toLocaleString()
+                      : "-"}
+                  </span>
+                </div>
+              )}
 
-          <div className="border rounded-xl p-6">
-            <div className="text-sm text-gray-600">Matches</div>
-            <div className="mt-2 text-3xl font-bold">{totalMatches}</div>
-            <div className="mt-2 text-gray-700">Total matches across your tracks</div>
+              {usage.plan === "PRO" && (
+                <div className="mt-3 text-sm font-semibold text-emerald-300">
+                  Unlimited access
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">
+                Tracks
+              </div>
+              <div className="mt-3 text-3xl font-black text-white">{totalTracks}</div>
+              <div className="mt-2 text-sm text-white/45">Total imported tracks</div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">
+                Matches
+              </div>
+              <div className="mt-3 text-3xl font-black text-white">{totalMatches}</div>
+              <div className="mt-2 text-sm text-white/45">
+                Total matches across your tracks
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
       )}
 
             {!loading && !err && overview && (
