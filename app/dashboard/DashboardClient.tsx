@@ -762,103 +762,90 @@ const placementRate = analytics?.placementRate ?? 0;
           </div>
         </section>
       )}
-{!loading && !err && overview?.analytics && (
-  <section className="rounded-2xl border bg-white p-6 shadow-sm">
-    <h2 className="text-2xl font-semibold">Advanced Analytics</h2>
-
-    <div className="mt-5 grid gap-4 md:grid-cols-2">
-
-      <div className="rounded-xl border p-4">
-        <div className="text-sm text-gray-500">
-          Top Performing Track
-        </div>
-        <div className="mt-2 text-xl font-bold">
-          {overview.analytics.topPerformingTrack?.title ?? "-"}
-        </div>
-      </div>
-
-      <div className="rounded-xl border p-4">
-        <div className="text-sm text-gray-500">
-          Most Pitched Track
-        </div>
-        <div className="mt-2 text-xl font-bold">
-          {overview.analytics.mostPitchedTrack?.title ?? "-"}
-        </div>
-      </div>
-
-      <div className="rounded-xl border p-4">
-        <div className="text-sm text-gray-500">
-          Best Playlist Category
-        </div>
-        <div className="mt-2 text-xl font-bold">
-          {overview.analytics.bestPlaylistCategory?.category ?? "-"}
-        </div>
-      </div>
-
-      <div className="rounded-xl border p-4">
-        <div className="text-sm text-gray-500">
-          Top Curator Source
-        </div>
-        <div className="mt-2 text-xl font-bold">
-          {overview.analytics.topCuratorSources?.[0]?.source ?? "-"}
-        </div>
-      </div>
-
-    </div>
-
-    <div className="mt-6 rounded-xl border p-4">
-      <h3 className="font-semibold mb-3">
-        Conversion Funnel
-      </h3>
-
-      <div className="grid grid-cols-4 gap-4">
-
-        <div>
-          <div className="text-xs text-gray-500">Drafts</div>
-          <div className="text-2xl font-bold">
-            {overview.analytics.conversionFunnel?.drafts ?? 0}
+      {!loading && !err && overview?.analytics && (
+        <section className="rounded-3xl border border-white/10 bg-zinc-950 p-6 shadow-xl md:p-7">
+          <div className="flex flex-col gap-1">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+              Insights
+            </p>
+            <h2 className="text-2xl font-black tracking-tight text-white">
+              Advanced Analytics
+            </h2>
+            <p className="text-sm text-white/45">
+              See which tracks, playlists and campaign stages are performing best.
+            </p>
           </div>
-        </div>
 
-        <div>
-          <div className="text-xs text-gray-500">Queued</div>
-          <div className="text-2xl font-bold">
-            {overview.analytics.conversionFunnel?.queued ?? 0}
+          <div className="mt-6 grid gap-3 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">Top Performing Track</div>
+              <div className="mt-2 text-xl font-black text-white">
+                {overview.analytics.topPerformingTrack?.title ?? "-"}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">Most Pitched Track</div>
+              <div className="mt-2 text-xl font-black text-white">
+                {overview.analytics.mostPitchedTrack?.title ?? "-"}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">Best Playlist Category</div>
+              <div className="mt-2 text-xl font-black text-white">
+                {overview.analytics.bestPlaylistCategory?.category ?? "-"}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">Top Curator Source</div>
+              <div className="mt-2 break-words text-xl font-black text-white">
+                {overview.analytics.topCuratorSources?.[0]?.source ?? "-"}
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div>
-          <div className="text-xs text-gray-500">Sent</div>
-          <div className="text-2xl font-bold">
-            {overview.analytics.conversionFunnel?.sent ?? 0}
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-400">Campaign Flow</p>
+            <h3 className="mt-1 text-lg font-black text-white">Conversion Funnel</h3>
+
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <div className="text-xs text-white/40">Drafts</div>
+                <div className="mt-1 text-2xl font-black text-white">{overview.analytics.conversionFunnel?.drafts ?? 0}</div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <div className="text-xs text-white/40">Queued</div>
+                <div className="mt-1 text-2xl font-black text-white">{overview.analytics.conversionFunnel?.queued ?? 0}</div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <div className="text-xs text-white/40">Sent</div>
+                <div className="mt-1 text-2xl font-black text-white">{overview.analytics.conversionFunnel?.sent ?? 0}</div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <div className="text-xs text-white/40">Placements</div>
+                <div className="mt-1 text-2xl font-black text-white">{overview.analytics.conversionFunnel?.placements ?? 0}</div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-white/55">
+                Draft → Queue{" "}<strong className="text-white">{overview.analytics.conversionFunnel?.draftToQueuedRate ?? 0}%</strong>
+              </span>
+              <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-white/55">
+                Queue → Sent{" "}<strong className="text-white">{overview.analytics.conversionFunnel?.queuedToSentRate ?? 0}%</strong>
+              </span>
+              <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-white/55">
+                Sent → Placement{" "}<strong className="text-white">{overview.analytics.conversionFunnel?.sentToPlacementRate ?? 0}%</strong>
+              </span>
+            </div>
           </div>
-        </div>
-
-        <div>
-          <div className="text-xs text-gray-500">Placements</div>
-          <div className="text-2xl font-bold">
-            {overview.analytics.conversionFunnel?.placements ?? 0}
-          </div>
-        </div>
-
-      </div>
-
-      <div className="mt-4 text-sm text-gray-600">
-        Draft → Queue:
-        {" "}
-        {overview.analytics.conversionFunnel?.draftToQueuedRate ?? 0}%
-        {" • "}
-        Queue → Sent:
-        {" "}
-        {overview.analytics.conversionFunnel?.queuedToSentRate ?? 0}%
-        {" • "}
-        Sent → Placement:
-        {" "}
-        {overview.analytics.conversionFunnel?.sentToPlacementRate ?? 0}%
-      </div>
-    </div>
-  </section>
-)}
+        </section>
+      )}
 
       {loading && <p>Loading…</p>}
       {err && <p className="text-red-600 whitespace-pre-wrap">Error: {err}</p>}
