@@ -869,70 +869,59 @@ const placementRate = analytics?.placementRate ?? 0;
             </p>
           </div>
 
-          <div className="mt-6 grid gap-3 md:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">Top Performing Track</div>
-              <div className="mt-2 text-xl font-black text-white">
-                {overview.analytics.topPerformingTrack?.title ?? "-"}
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Top Performing Track", overview.analytics.topPerformingTrack?.title ?? "-"],
+              ["Most Pitched Track", overview.analytics.mostPitchedTrack?.title ?? "-"],
+              ["Best Playlist Category", overview.analytics.bestPlaylistCategory?.category ?? "-"],
+              ["Top Curator Source", overview.analytics.topCuratorSources?.[0]?.source ?? "-"],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">
+                  {label}
+                </p>
+                <p className="mt-1.5 truncate text-lg font-black text-white" title={String(value)}>
+                  {value}
+                </p>
               </div>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">Most Pitched Track</div>
-              <div className="mt-2 text-xl font-black text-white">
-                {overview.analytics.mostPitchedTrack?.title ?? "-"}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">Best Playlist Category</div>
-              <div className="mt-2 text-xl font-black text-white">
-                {overview.analytics.bestPlaylistCategory?.category ?? "-"}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <div className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">Top Curator Source</div>
-              <div className="mt-2 break-words text-xl font-black text-white">
-                {overview.analytics.topCuratorSources?.[0]?.source ?? "-"}
-              </div>
-            </div>
+            ))}
           </div>
 
-          <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-400">Campaign Flow</p>
-            <h3 className="mt-1 text-lg font-black text-white">Conversion Funnel</h3>
-
-            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs text-white/40">Drafts</div>
-                <div className="mt-1 text-2xl font-black text-white">{overview.analytics.conversionFunnel?.drafts ?? 0}</div>
+          <div className="mt-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="shrink-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-400">
+                  Campaign Flow
+                </p>
+                <h3 className="mt-1 text-lg font-black text-white">Conversion Funnel</h3>
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs text-white/40">Queued</div>
-                <div className="mt-1 text-2xl font-black text-white">{overview.analytics.conversionFunnel?.queued ?? 0}</div>
-              </div>
-
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs text-white/40">Sent</div>
-                <div className="mt-1 text-2xl font-black text-white">{overview.analytics.conversionFunnel?.sent ?? 0}</div>
-              </div>
-
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs text-white/40">Placements</div>
-                <div className="mt-1 text-2xl font-black text-white">{overview.analytics.conversionFunnel?.placements ?? 0}</div>
+              <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-4 lg:ml-6">
+                {[
+                  ["Drafts", overview.analytics.conversionFunnel?.drafts ?? 0],
+                  ["Queued", overview.analytics.conversionFunnel?.queued ?? 0],
+                  ["Sent", overview.analytics.conversionFunnel?.sent ?? 0],
+                  ["Placements", overview.analytics.conversionFunnel?.placements ?? 0],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-white/35">{label}</p>
+                    <p className="mt-1 text-xl font-black text-white">{value}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-white/55">
+            <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 border-t border-white/10 pt-3 text-xs text-white/45">
+              <span>
                 Draft → Queue{" "}<strong className="text-white">{overview.analytics.conversionFunnel?.draftToQueuedRate ?? 0}%</strong>
               </span>
-              <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-white/55">
+              <span>
                 Queue → Sent{" "}<strong className="text-white">{overview.analytics.conversionFunnel?.queuedToSentRate ?? 0}%</strong>
               </span>
-              <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-white/55">
+              <span>
                 Sent → Placement{" "}<strong className="text-white">{overview.analytics.conversionFunnel?.sentToPlacementRate ?? 0}%</strong>
               </span>
             </div>
