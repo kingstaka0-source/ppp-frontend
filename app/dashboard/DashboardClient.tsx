@@ -747,13 +747,13 @@ const placementRate = analytics?.placementRate ?? 0;
               <span className="font-semibold text-white">Track Intake</span> above.
             </div>
           ) : (
-            <div className="mt-6 grid gap-3 lg:grid-cols-2">
+            <div className="mt-5 grid gap-3 lg:grid-cols-3">
               {(overview.tracks ?? []).slice(0, 5).map((t) => (
                 <div
                   key={t.id}
-                  className="group flex min-w-0 items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-3 transition hover:border-emerald-400/25 hover:bg-white/[0.06]"
+                  className="group flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] p-3 transition hover:border-emerald-400/25 hover:bg-white/[0.06]"
                 >
-                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-zinc-900">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-zinc-900">
                     {t.albumImageUrl ? (
                       <img
                         src={t.albumImageUrl}
@@ -787,7 +787,7 @@ const placementRate = analytics?.placementRate ?? 0;
 
                   <Link
                     href={linkWithArtistId(`/tracks/${t.id}`, artistId)}
-                    className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-400 px-3.5 py-2.5 text-xs font-black text-zinc-950 transition hover:bg-emerald-300"
+                    className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-black text-zinc-950 transition hover:bg-emerald-300"
                   >
                     Open track
                   </Link>
