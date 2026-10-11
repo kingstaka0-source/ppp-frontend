@@ -13,10 +13,14 @@ export default async function DashboardPage() {
   }
 
   return (
-    <Suspense
-      fallback={<div className="max-w-5xl mx-auto p-8">Loading...</div>}
-    >
-      <DashboardClient />
-    </Suspense>
+    <div className="min-h-screen bg-zinc-950">
+      <Suspense
+        fallback={
+          <div className="mx-auto max-w-5xl p-8 text-white/60">Loading...</div>
+        }
+      >
+        <DashboardClient />
+      </Suspense>
+    </div>
   );
 }
