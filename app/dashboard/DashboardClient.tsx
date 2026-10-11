@@ -715,42 +715,53 @@ const placementRate = analytics?.placementRate ?? 0;
         </div>
       </nav>
       {!loading && !err && overview && (
-  <section className="rounded-2xl border bg-white p-6 shadow-sm">
-    <div className="flex flex-col gap-1">
-      <h2 className="text-2xl font-semibold">Campaign Analytics</h2>
-      <p className="text-sm text-gray-600">
-        Track your pitching activity and placement performance.
-      </p>
-    </div>
+        <section className="rounded-3xl border border-white/10 bg-zinc-950 p-6 shadow-xl md:p-7">
+          <div className="flex flex-col gap-1">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+              Performance
+            </p>
+            <h2 className="text-2xl font-black tracking-tight text-white">
+              Campaign Analytics
+            </h2>
+            <p className="text-sm text-white/45">
+              Track your pitching activity and placement performance.
+            </p>
+          </div>
 
-    <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-  {[
-    ["Campaigns", overview.analytics?.totalCampaigns ?? 0, "Campaign runs created"],
-    ["Sent", overview.analytics?.sentCount ?? 0, "Accepted for sending"],
-    ["Delivered", overview.analytics?.deliveredCount ?? 0, "Confirmed delivered by email provider"],
-    ["Drafts", overview.analytics?.draftCount ?? 0, "Ready to edit/send"],
-    ["Queued", overview.analytics?.queuedCount ?? 0, "Waiting to send"],
-    ["Placements", overview.analytics?.totalPlacements ?? 0, "Detected playlist adds"],
-    ["Placement Rate", `${overview.analytics?.placementRate ?? 0}%`, "Placements / sent pitches"],
-    ["Reply Rate", `${overview.analytics?.replyRate ?? 0}%`, "Email replies"],
-    ["Open Rate", `${overview.analytics?.openRate ?? 0}%`, "Email opens"],
-    ["Click Rate", `${overview.analytics?.clickRate ?? 0}%`, "Spotify link clicks"],
-    ["Interested Curators", overview.analytics?.interestedCurators ?? 0, "Positive responses"],
-    ["Total Opens", overview.analytics?.totalOpens ?? 0, "Tracked email opens"],
-    ["Total Clicks", overview.analytics?.totalClicks ?? 0, "Tracked Spotify clicks"],
-  ].map(([label, value, sub]) => (
-    <div key={label} className="rounded-xl border bg-gray-50 p-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-        {label}
-      </p>
-      <p className="mt-2 text-3xl font-bold">{value}</p>
-      <p className="mt-1 text-xs text-gray-500">{sub}</p>
-    </div>
-  ))}
-</div>
-  </section>
-)}
-
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Campaigns", overview.analytics?.totalCampaigns ?? 0, "Campaign runs created"],
+              ["Sent", overview.analytics?.sentCount ?? 0, "Accepted for sending"],
+              ["Delivered", overview.analytics?.deliveredCount ?? 0, "Confirmed delivered by email provider"],
+              ["Drafts", overview.analytics?.draftCount ?? 0, "Ready to edit/send"],
+              ["Queued", overview.analytics?.queuedCount ?? 0, "Waiting to send"],
+              ["Placements", overview.analytics?.totalPlacements ?? 0, "Detected playlist adds"],
+              ["Placement Rate", `${overview.analytics?.placementRate ?? 0}%`, "Placements / sent pitches"],
+              ["Reply Rate", `${overview.analytics?.replyRate ?? 0}%`, "Email replies"],
+              ["Open Rate", `${overview.analytics?.openRate ?? 0}%`, "Email opens"],
+              ["Click Rate", `${overview.analytics?.clickRate ?? 0}%`, "Spotify link clicks"],
+              ["Interested Curators", overview.analytics?.interestedCurators ?? 0, "Positive responses"],
+              ["Total Opens", overview.analytics?.totalOpens ?? 0, "Tracked email opens"],
+              ["Total Clicks", overview.analytics?.totalClicks ?? 0, "Tracked Spotify clicks"],
+            ].map(([label, value, sub]) => (
+              <div
+                key={label}
+                className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-emerald-400/20 hover:bg-white/[0.055]"
+              >
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/40">
+                  {label}
+                </p>
+                <p className="mt-2 text-3xl font-black tracking-tight text-white">
+                  {value}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-white/35">
+                  {sub}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 {!loading && !err && overview?.analytics && (
   <section className="rounded-2xl border bg-white p-6 shadow-sm">
     <h2 className="text-2xl font-semibold">Advanced Analytics</h2>
