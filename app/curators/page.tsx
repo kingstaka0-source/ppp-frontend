@@ -162,7 +162,7 @@ const res = await fetch(`${API}/curators/analytics`, {
                 </h1>
 
                 <p className="mt-1 text-sm text-white/40">
-                  Manage curator outreach, playlist contacts and campaign engagement.
+                  Manage playlist curators, contacts and campaign engagement.
                 </p>
               </div>
             </div>
