@@ -668,6 +668,52 @@ const placementRate = analytics?.placementRate ?? 0;
 </section>
 
               
+      <nav
+        aria-label="TuneReach workspace"
+        className="rounded-2xl border border-white/10 bg-zinc-950 p-2 shadow-xl"
+      >
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <Link
+            href={linkWithArtistId("/tracks", artistId)}
+            className="group rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 transition hover:border-emerald-400/30 hover:bg-emerald-400/[0.08]"
+          >
+            <div className="text-sm font-black text-white">Tracks</div>
+            <div className="mt-1 text-xs text-white/40 group-hover:text-emerald-300">
+              Manage your music
+            </div>
+          </Link>
+
+          <Link
+            href={linkWithArtistId("/pitches", artistId)}
+            className="group rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 transition hover:border-emerald-400/30 hover:bg-emerald-400/[0.08]"
+          >
+            <div className="text-sm font-black text-white">Pitches</div>
+            <div className="mt-1 text-xs text-white/40 group-hover:text-emerald-300">
+              Review campaign pitches
+            </div>
+          </Link>
+
+          <Link
+            href="/curators"
+            className="group rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 transition hover:border-emerald-400/30 hover:bg-emerald-400/[0.08]"
+          >
+            <div className="text-sm font-black text-white">Curators</div>
+            <div className="mt-1 text-xs text-white/40 group-hover:text-emerald-300">
+              Explore curator network
+            </div>
+          </Link>
+
+          <Link
+            href="/followups"
+            className="group rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 transition hover:border-emerald-400/30 hover:bg-emerald-400/[0.08]"
+          >
+            <div className="text-sm font-black text-white">Follow-ups</div>
+            <div className="mt-1 text-xs text-white/40 group-hover:text-emerald-300">
+              Manage conversations
+            </div>
+          </Link>
+        </div>
+      </nav>
       {!loading && !err && overview && (
   <section className="rounded-2xl border bg-white p-6 shadow-sm">
     <div className="flex flex-col gap-1">
@@ -977,36 +1023,7 @@ const placementRate = analytics?.placementRate ?? 0;
         </div>
       )}
 
-      <div className="flex gap-3 pt-2">
-        <Link
-          href={linkWithArtistId("/tracks", artistId)}
-          className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
-        >
-          Tracks
-        </Link>
 
-        <Link
-          href={linkWithArtistId("/pitches", artistId)}
-          className="px-4 py-2 rounded bg-black text-white hover:opacity-90 transition"
-        >
-          Pitches →
-        </Link>
-
-        <Link
-  href="/curators"
-  className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
->
-  Curators
-</Link>
-
-        <Link
-  href="/followups"
-  className="px-4 py-2 rounded border border-black hover:bg-black hover:text-white transition"
->
-  Follow-ups
-</Link>
-
-      </div>
     </div>
   );
 }
