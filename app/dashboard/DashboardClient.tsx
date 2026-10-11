@@ -1009,50 +1009,62 @@ const placementRate = analytics?.placementRate ?? 0;
         </section>
       )}
 
-            {!loading && !err && overview && (
-        <div className="border rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div className="text-xl font-bold">Recent Tracks</div>
+      {!loading && !err && overview && (
+        <section className="rounded-3xl border border-white/10 bg-zinc-950 p-6 shadow-xl md:p-7">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+                Music Library
+              </p>
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-white">
+                Recent Tracks
+              </h2>
+              <p className="mt-1 text-sm text-white/45">
+                Your latest imported tracks and their current playlist matches.
+              </p>
+            </div>
+
             <Link
               href={linkWithArtistId("/tracks", artistId)}
-              className="text-sm underline"
+              className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-bold text-white transition hover:border-emerald-400/30 hover:bg-emerald-400/[0.08] hover:text-emerald-300"
             >
               All tracks
             </Link>
           </div>
 
           {(overview.tracks ?? []).length === 0 ? (
-            <div className="mt-4 text-sm text-gray-600">
-              No tracks yet. Add one using <b>Intake Track</b> above.
+            <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-white/[0.025] p-6 text-sm text-white/45">
+              No tracks yet. Add one using{" "}
+              <span className="font-semibold text-white">Track Intake</span> above.
             </div>
           ) : (
-            <div className="mt-4 space-y-3">
+            <div className="mt-6 space-y-3">
               {(overview.tracks ?? []).slice(0, 5).map((t) => (
                 <div
                   key={t.id}
-                  className="flex items-center justify-between border rounded p-3"
+                  className="group flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-emerald-400/20 hover:bg-white/[0.055] sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div>
-                    <div className="font-semibold">{t.title}</div>
-                    <div className="text-sm text-gray-600">
+                  <div className="min-w-0">
+                    <div className="truncate font-bold text-white">{t.title}</div>
+                    <div className="mt-1 truncate text-sm text-white/45">
                       {(t.artists ?? []).join(", ")}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      matches: {t.matchCount}
+                    <div className="mt-2 inline-flex rounded-full border border-emerald-400/15 bg-emerald-400/[0.08] px-2.5 py-1 text-xs font-bold text-emerald-300">
+                      {t.matchCount} matches
                     </div>
                   </div>
 
                   <Link
-                    className="px-3 py-2 rounded bg-black text-white"
                     href={linkWithArtistId(`/tracks/${t.id}`, artistId)}
+                    className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-emerald-300"
                   >
-                    View →
+                    Open track
                   </Link>
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </section>
       )}
 
 
