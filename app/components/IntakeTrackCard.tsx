@@ -96,77 +96,106 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
   }, [jobId, status, onDone]);
 
   return (
-    <div className="border rounded-xl p-6 space-y-4">
-      <div className="text-xl font-bold">Intake Track</div>
-
-      <div className="space-y-2">
-        <label className="text-sm text-gray-600">Spotify track URL</label>
-        <input
-          className="w-full border rounded px-3 py-2"
-          value={spotifyUrl}
-          onChange={(e) => setSpotifyUrl(e.target.value)}
-          placeholder="https://open.spotify.com/track/..."
-        />
+    <section className="rounded-3xl border border-white/10 bg-zinc-950 p-6 shadow-xl md:p-7">
+      <div className="flex flex-col gap-1">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+          Track Intake
+        </p>
+        <h2 className="text-2xl font-black tracking-tight text-white">
+          Add a Track
+        </h2>
+        <p className="text-sm text-white/45">
+          Paste a Spotify track URL to import your music and start playlist matching.
+        </p>
       </div>
 
-      <button
-        onClick={submit}
-        disabled={submitting}
-        className="px-4 py-2 rounded bg-black text-white disabled:opacity-60"
-      >
-        {submitting ? "Submitting…" : "Submit & start matching"}
-      </button>
+      <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.035] p-4 md:p-5">
+        <label className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">
+          Spotify Track URL
+        </label>
+
+        <div className="mt-3 flex flex-col gap-3 lg:flex-row">
+          <input
+            className="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/10"
+            value={spotifyUrl}
+            onChange={(e) => setSpotifyUrl(e.target.value)}
+            placeholder="https://open.spotify.com/track/..."
+          />
+
+          <button
+            onClick={submit}
+            disabled={submitting}
+            className="rounded-xl bg-emerald-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {submitting ? "Submitting..." : "Submit & start matching"}
+          </button>
+        </div>
+      </div>
 
       {submitErr && (
-        <div className="text-red-600 whitespace-pre-wrap">{submitErr}</div>
+        <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300 whitespace-pre-wrap">
+          {submitErr}
+        </div>
       )}
 
       {jobId && (
-        <div className="border rounded-lg p-4 space-y-2 bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div className="font-semibold">Match job</div>
-            <div className="text-xs text-gray-600">jobId: {jobId}</div>
-          </div>
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-400">
+                Matching
+              </p>
+              <h3 className="mt-1 font-black text-white">Match Job</h3>
+            </div>
 
-          <div className="text-sm">
-            Status:{" "}
-            <span className="font-mono">
+            <span className="w-fit rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-bold text-white/60">
               {status}
-              {polling ? " (polling…)" : ""}
+              {polling ? " · polling..." : ""}
             </span>
           </div>
 
+          <div className="mt-3 break-all font-mono text-[11px] text-white/25">
+            jobId: {jobId}
+          </div>
+
           {pollErr && (
-            <div className="text-red-600 text-sm whitespace-pre-wrap">
+            <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300 whitespace-pre-wrap">
               {pollErr}
             </div>
           )}
 
           {job?.status === "FAILED" && (
-            <div className="text-red-700 text-sm whitespace-pre-wrap">
+            <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300 whitespace-pre-wrap">
               FAILED: {job?.lastError || "Unknown error"}
             </div>
           )}
 
           {job?.status === "SUCCEEDED" && (
-            <div className="space-y-2">
-              <div className="text-green-700 text-sm font-semibold">
-                ✅ Matching klaar
+            <div className="mt-5 space-y-4">
+              <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/[0.08] px-4 py-3 text-sm font-bold text-emerald-300">
+                Matching complete
               </div>
 
               {top.length > 0 ? (
-                <div className="space-y-2">
-                  <div className="text-sm font-semibold">Top matches</div>
-                  <div className="space-y-2">
+                <div>
+                  <div className="text-sm font-black text-white">Top matches</div>
+
+                  <div className="mt-3 grid gap-3 md:grid-cols-2">
                     {top.map((m: any) => (
-                      <div key={m.matchId} className="border rounded p-3 bg-white">
-                        <div className="font-semibold">
+                      <div
+                        key={m.matchId}
+                        className="rounded-xl border border-white/10 bg-black/20 p-4"
+                      >
+                        <div className="font-bold text-white">
                           {m.playlistName ?? m.playlistId}
                         </div>
-                        <div className="text-sm text-gray-700">
-                          Score: {m.fitScore}
+                        <div className="mt-2 text-sm text-white/50">
+                          Match score{" "}
+                          <span className="font-bold text-emerald-300">
+                            {m.fitScore}
+                          </span>
                         </div>
-                        <div className="text-xs text-gray-500 font-mono">
+                        <div className="mt-1 break-all font-mono text-[10px] text-white/25">
                           matchId: {m.matchId}
                         </div>
                       </div>
@@ -174,19 +203,23 @@ export default function IntakeTrackCard({ artistId, onDone }: Props) {
                   </div>
                 </div>
               ) : (
-                <div className="text-sm text-gray-700">
+                <div className="text-sm text-white/45">
                   No matches in result.top
                 </div>
               )}
 
-              <details className="text-xs">
-                <summary className="cursor-pointer">Raw result</summary>
-                <pre className="whitespace-pre-wrap">{prettyJson(job?.result)}</pre>
+              <details className="rounded-xl border border-white/10 bg-black/20 p-4 text-xs text-white/50">
+                <summary className="cursor-pointer font-bold text-white/70">
+                  Raw result
+                </summary>
+                <pre className="mt-3 overflow-x-auto whitespace-pre-wrap font-mono text-[11px] text-white/40">
+                  {prettyJson(job?.result)}
+                </pre>
               </details>
             </div>
           )}
         </div>
       )}
-    </div>
+    </section>
   );
 }
