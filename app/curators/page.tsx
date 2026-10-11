@@ -210,39 +210,77 @@ const res = await fetch(`${API}/curators/analytics`, {
               label: "Curators",
               value: filtered.length,
               description: "Visible contacts",
+              icon: (
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              ),
             },
             {
               label: "Sent",
               value: totals.sent,
               description: "Pitches delivered",
+              icon: (
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m22 2-7 20-4-9-9-4Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M22 2 11 13" />
+                </svg>
+              ),
             },
             {
               label: "Opens",
               value: totals.opens,
               description: "Tracked opens",
+              icon: (
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              ),
             },
             {
               label: "Clicks",
               value: totals.clicks,
               description: "Tracked clicks",
+              icon: (
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 7h3a5 5 0 0 1 0 10h-3M9 17H6A5 5 0 0 1 6 7h3M8 12h8" />
+                </svg>
+              ),
             },
             {
               label: "Interested",
               value: totals.interested,
               description: "Positive replies",
+              icon: (
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m8 11 2.5 2.5L16 8" />
+                </svg>
+              ),
             },
           ].map((metric) => (
             <div
               key={metric.label}
-              className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"
+              className="group rounded-2xl border border-white/10 bg-white/[0.035] p-5 transition hover:border-emerald-400/20 hover:bg-white/[0.05]"
             >
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-white/40">
-                {metric.label}
-              </p>
-              <p className="mt-3 text-3xl font-black text-white">
+              <div className="flex items-start justify-between gap-3">
+                <p className="pt-1 text-xs font-black uppercase tracking-[0.16em] text-white/40">
+                  {metric.label}
+                </p>
+
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-400/15 bg-emerald-400/[0.08] text-emerald-300">
+                  {metric.icon}
+                </span>
+              </div>
+
+              <p className="mt-2 text-3xl font-black tracking-tight text-white">
                 {metric.value}
               </p>
-              <p className="mt-2 text-sm text-white/40">
+
+              <p className="mt-1 text-sm text-white/40">
                 {metric.description}
               </p>
             </div>
