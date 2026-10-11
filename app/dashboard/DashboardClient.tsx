@@ -812,35 +812,44 @@ const placementRate = analytics?.placementRate ?? 0;
             </p>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
             {[
-              ["Campaigns", overview.analytics?.totalCampaigns ?? 0, "Campaign runs created"],
-              ["Sent", overview.analytics?.sentCount ?? 0, "Accepted for sending"],
-              ["Delivered", overview.analytics?.deliveredCount ?? 0, "Confirmed delivered by email provider"],
-              ["Drafts", overview.analytics?.draftCount ?? 0, "Ready to edit/send"],
-              ["Queued", overview.analytics?.queuedCount ?? 0, "Waiting to send"],
-              ["Placements", overview.analytics?.totalPlacements ?? 0, "Detected playlist adds"],
-              ["Placement Rate", `${overview.analytics?.placementRate ?? 0}%`, "Placements / sent pitches"],
-              ["Reply Rate", `${overview.analytics?.replyRate ?? 0}%`, "Email replies"],
-              ["Open Rate", `${overview.analytics?.openRate ?? 0}%`, "Email opens"],
-              ["Click Rate", `${overview.analytics?.clickRate ?? 0}%`, "Spotify link clicks"],
-              ["Interested Curators", overview.analytics?.interestedCurators ?? 0, "Positive responses"],
-              ["Total Opens", overview.analytics?.totalOpens ?? 0, "Tracked email opens"],
-              ["Total Clicks", overview.analytics?.totalClicks ?? 0, "Tracked Spotify clicks"],
-            ].map(([label, value, sub]) => (
+              ["Campaigns", overview.analytics?.totalCampaigns ?? 0],
+              ["Sent", overview.analytics?.sentCount ?? 0],
+              ["Placements", overview.analytics?.totalPlacements ?? 0],
+              ["Open Rate", `${overview.analytics?.openRate ?? 0}%`],
+              ["Click Rate", `${overview.analytics?.clickRate ?? 0}%`],
+              ["Reply Rate", `${overview.analytics?.replyRate ?? 0}%`],
+            ].map(([label, value]) => (
               <div
                 key={label}
-                className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-emerald-400/20 hover:bg-white/[0.055]"
+                className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5 transition hover:border-emerald-400/20 hover:bg-white/[0.055]"
               >
-                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/40">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
                   {label}
                 </p>
-                <p className="mt-2 text-3xl font-black tracking-tight text-white">
+                <p className="mt-1.5 text-2xl font-black tracking-tight text-white">
                   {value}
                 </p>
-                <p className="mt-1 text-xs leading-5 text-white/35">
-                  {sub}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-4 sm:grid-cols-4 lg:grid-cols-7">
+            {[
+              ["Delivered", overview.analytics?.deliveredCount ?? 0],
+              ["Drafts", overview.analytics?.draftCount ?? 0],
+              ["Queued", overview.analytics?.queuedCount ?? 0],
+              ["Placement Rate", `${overview.analytics?.placementRate ?? 0}%`],
+              ["Interested", overview.analytics?.interestedCurators ?? 0],
+              ["Total Opens", overview.analytics?.totalOpens ?? 0],
+              ["Total Clicks", overview.analytics?.totalClicks ?? 0],
+            ].map(([label, value]) => (
+              <div key={label} className="min-w-0">
+                <p className="truncate text-[10px] font-bold uppercase tracking-[0.12em] text-white/35">
+                  {label}
                 </p>
+                <p className="mt-1 text-lg font-black text-white">{value}</p>
               </div>
             ))}
           </div>
