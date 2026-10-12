@@ -408,6 +408,13 @@ const placementRate = analytics?.placementRate ?? 0;
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
 
 <div className="relative z-20 mb-4 flex flex-wrap items-center gap-2">
+  <Link href="/dashboard" className="mr-3 shrink-0" aria-label="TuneReach dashboard">
+    <img
+      src="/brand/logo.svg"
+      alt="TuneReach"
+      className="h-9 w-auto"
+    />
+  </Link>
   {usage?.plan && <PlanBadge plan={usage.plan} />}
 
   {access?.subscriptionStatus && (
