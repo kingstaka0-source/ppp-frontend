@@ -185,56 +185,56 @@ const res = await fetch(`${API}/followups/${id}/send`, {
         />
 
         <div className="relative z-10 mx-auto max-w-[1500px] px-5 py-8 md:px-8 md:py-10">
-          <div className="flex items-start justify-between gap-6">
-            <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-400">
-                Follow-ups
-              </p>
-
-              <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
-                Follow-ups
-              </h1>
-
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-300 md:text-base">
-                Curators who opened your pitch but have not replied yet.
-              </p>
-            </div>
-
+          <div className="flex items-center justify-between gap-6">
             <img
               src="/brand/logo.svg"
               alt="TuneReach"
               className="h-9 w-auto shrink-0 md:h-10"
             />
+
+            <div className="flex flex-wrap justify-end gap-3">
+              <Link
+                href="/dashboard"
+                className="rounded-xl border border-white/15 bg-black/30 px-4 py-2.5 text-sm font-medium text-zinc-200 backdrop-blur transition hover:border-white/30 hover:bg-white/10"
+              >
+                ← Dashboard
+              </Link>
+
+              <button
+                onClick={loadFollowups}
+                disabled={loading}
+                className="rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading ? "Refreshing..." : "Refresh"}
+              </button>
+            </div>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/dashboard"
-              className="rounded-xl border border-white/15 bg-black/30 px-4 py-2.5 text-sm font-medium text-zinc-200 backdrop-blur transition hover:border-white/30 hover:bg-white/10"
-            >
-              ← Dashboard
-            </Link>
+          <div className="mt-10">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-400">
+              Follow-ups
+            </p>
 
-            <button
-              onClick={loadFollowups}
-              disabled={loading}
-              className="rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loading ? "Refreshing..." : "Refresh"}
-            </button>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
+              Follow-ups
+            </h1>
+
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-300 md:text-base">
+              Curators who opened your pitch but have not replied yet.
+            </p>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-[1500px] space-y-6 px-5 py-7 md:px-8">
+      <div className="mx-auto max-w-[1500px] space-y-4 px-5 py-5 md:px-8">
         {err && (
           <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4 text-sm text-red-200">
             {err}
           </div>
         )}
 
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/70 p-5">
+        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/70 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
               Follow-ups
             </p>
@@ -247,7 +247,7 @@ const res = await fetch(`${API}/followups/${id}/send`, {
             <p className="mt-2 text-xs text-zinc-500">Needs your attention</p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/70 p-5">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/70 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
               Total Opens
             </p>
@@ -255,7 +255,7 @@ const res = await fetch(`${API}/followups/${id}/send`, {
             <p className="mt-2 text-xs text-zinc-500">From follow-up queue</p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/70 p-5">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/70 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
               Total Clicks
             </p>
@@ -263,7 +263,7 @@ const res = await fetch(`${API}/followups/${id}/send`, {
             <p className="mt-2 text-xs text-zinc-500">Links clicked</p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/70 p-5">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/70 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
               Replies
             </p>
@@ -272,7 +272,7 @@ const res = await fetch(`${API}/followups/${id}/send`, {
           </div>
         </section>
 
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+        <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
           <div className="min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/60">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
               <div>
@@ -298,16 +298,16 @@ const res = await fetch(`${API}/followups/${id}/send`, {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[900px] text-left text-sm">
+                <table className="w-full table-fixed text-left text-sm">
                   <thead>
                     <tr className="border-b border-white/10 bg-black/20 text-xs uppercase tracking-[0.12em] text-zinc-500">
-                      <th className="px-5 py-3 font-medium">Track</th>
-                      <th className="px-4 py-3 font-medium">Playlist</th>
-                      <th className="px-4 py-3 font-medium">Curator</th>
-                      <th className="px-4 py-3 text-center font-medium">Opens</th>
-                      <th className="px-4 py-3 text-center font-medium">Clicks</th>
-                      <th className="px-4 py-3 font-medium">Last Opened</th>
-                      <th className="px-5 py-3 font-medium">Action</th>
+                      <th className="w-[22%] px-4 py-3 font-medium">Track</th>
+                      <th className="w-[18%] px-3 py-3 font-medium">Playlist</th>
+                      <th className="w-[20%] px-3 py-3 font-medium">Curator</th>
+                      <th className="w-[7%] px-2 py-3 text-center font-medium">Opens</th>
+                      <th className="w-[7%] px-2 py-3 text-center font-medium">Clicks</th>
+                      <th className="w-[13%] px-3 py-3 font-medium">Last Opened</th>
+                      <th className="w-[13%] px-3 py-3 font-medium">Action</th>
                     </tr>
                   </thead>
 
@@ -332,53 +332,53 @@ const res = await fetch(`${API}/followups/${id}/send`, {
                               : "hover:bg-white/[0.035]"
                           }`}
                         >
-                          <td className="px-5 py-4">
-                            <p className="max-w-[210px] truncate font-medium text-white">
+                          <td className="px-3 py-4">
+                            <p className="truncate font-medium text-white">
                               {item.track.title}
                             </p>
-                            <p className="mt-1 max-w-[210px] truncate text-xs text-zinc-500">
+                            <p className="mt-1 truncate text-xs text-zinc-500">
                               {(item.track.artists ?? []).join(", ") || "Unknown artist"}
                             </p>
                           </td>
 
-                          <td className="px-4 py-4">
-                            <p className="max-w-[180px] truncate text-zinc-200">
+                          <td className="px-3 py-4">
+                            <p className="truncate text-zinc-200">
                               {item.playlist.name}
                             </p>
                           </td>
 
-                          <td className="px-4 py-4">
-                            <p className="max-w-[170px] truncate text-zinc-200">
+                          <td className="px-3 py-4">
+                            <p className="truncate text-zinc-200">
                               {item.curator?.name ?? "Unknown curator"}
                             </p>
-                            <p className="mt-1 max-w-[170px] truncate text-xs text-zinc-500">
+                            <p className="mt-1 truncate text-xs text-zinc-500">
                               {item.curator?.email ?? item.sentTo ?? "No email"}
                             </p>
                           </td>
 
-                          <td className="px-4 py-4 text-center font-medium text-zinc-200">
+                          <td className="px-2 py-4 text-center font-medium text-zinc-200">
                             {item.openCount}
                           </td>
 
-                          <td className="px-4 py-4 text-center font-medium text-zinc-200">
+                          <td className="px-2 py-4 text-center font-medium text-zinc-200">
                             {item.clickCount}
                           </td>
 
-                          <td className="px-4 py-4 text-xs text-zinc-400">
+                          <td className="px-3 py-4 text-xs leading-5 text-zinc-400">
                             {item.lastOpenedAt
                               ? new Date(item.lastOpenedAt).toLocaleString()
                               : "-"}
                           </td>
 
-                          <td className="px-5 py-4">
-                            <div className="flex gap-2">
+                          <td className="px-3 py-4">
+                            <div className="flex flex-col gap-2">
                               <button
                                 onClick={(event) => {
                                   event.stopPropagation();
                                   generateFollowup(item.id);
                                 }}
                                 disabled={generatingId === item.id}
-                                className="rounded-lg border border-emerald-400/30 bg-emerald-400/[0.06] px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-400/10 disabled:opacity-50"
+                                className="w-full whitespace-nowrap rounded-lg border border-emerald-400/30 bg-emerald-400/[0.06] px-2 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-400/10 disabled:opacity-50"
                               >
                                 {generatingId === item.id
                                   ? "Generating..."
@@ -391,7 +391,7 @@ const res = await fetch(`${API}/followups/${id}/send`, {
                                   markSent(item.id);
                                 }}
                                 disabled={workingId === item.id}
-                                className="rounded-lg bg-emerald-400 px-3 py-2 text-xs font-semibold text-zinc-950 transition hover:bg-emerald-300 disabled:opacity-50"
+                                className="w-full whitespace-nowrap rounded-lg bg-emerald-400 px-2 py-2 text-xs font-semibold text-zinc-950 transition hover:bg-emerald-300 disabled:opacity-50"
                               >
                                 {workingId === item.id ? "Saving..." : "Mark Sent"}
                               </button>
