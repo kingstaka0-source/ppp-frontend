@@ -334,62 +334,97 @@ async function markReply(
   }
 
   return (
-    <main className="min-h-screen bg-black px-6 py-12 text-white">
+    <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-8">
       <div className="mx-auto max-w-7xl">
-        <Link
-          href="/campaigns"
-          className="text-sm font-black text-emerald-300 hover:text-emerald-200"
-        >
-          ← Back to Campaign History
-        </Link>
+        <header className="rounded-2xl border border-white/10 bg-[#090b0b] px-5 py-5 sm:px-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0">
+              <Link href="/dashboard" className="inline-flex">
+                <img
+                  src="/brand/logo.svg"
+                  alt="TuneReach"
+                  className="h-9 w-auto"
+                />
+              </Link>
 
-        <div className="mt-7">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-4xl font-black">
-              {campaign.trackTitle}
-            </h1>
+              <p className="mt-7 text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
+                Campaign Workspace
+              </p>
 
-            <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-black text-emerald-300">
-              {campaign.status}
-            </span>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+                  {campaign.trackTitle}
+                </h1>
+
+                <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-black uppercase text-emerald-300">
+                  {campaign.status}
+                </span>
+              </div>
+
+              <p className="mt-2 text-sm text-white/55">
+                {campaign.trackArtists.join(", ")}
+              </p>
+
+              <p className="mt-2 text-xs text-white/35">
+                Started {new Date(campaign.createdAt).toLocaleString()}
+              </p>
+            </div>
+
+            <nav className="flex shrink-0 flex-wrap items-center gap-2">
+              <Link
+                href="/dashboard"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                href="/pitches"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Pitches
+              </Link>
+
+              <Link
+                href="/followups"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Follow-ups
+              </Link>
+
+              <Link
+                href="/curators"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Curators
+              </Link>
+
+              <Link
+                href="/campaigns"
+                className="rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-3.5 py-2 text-sm font-black text-emerald-300 transition hover:bg-emerald-400/20"
+              >
+                Campaigns
+              </Link>
+            </nav>
           </div>
+        </header>
 
-          <p className="mt-2 text-white/55">
-            {campaign.trackArtists.join(", ")}
-          </p>
-
-          <p className="mt-2 text-sm text-white/35">
-            Started{" "}
-            {new Date(campaign.createdAt).toLocaleString()}
-          </p>
-        </div>
-
-        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-8">
           <Metric label="Selected" value={campaign.selectedPlaylists} />
           <Metric label="Sent" value={campaign.emailsSent} />
           <Metric label="Opens" value={campaign.opens} />
           <Metric label="Clicks" value={campaign.clicks} />
-
           <Metric label="Replies" value={campaign.replies} />
-          <Metric
-            label="Interested"
-            value={campaign.interestedCurators}
-          />
-          <Metric
-            label="Placements"
-            value={campaign.placements}
-          />
+          <Metric label="Interested" value={campaign.interestedCurators} />
+          <Metric label="Placements" value={campaign.placements} />
           <Metric label="Failed" value={campaign.failed} />
         </section>
 
-        <section className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <Rate label="Open rate" value={campaign.openRate} />
           <Rate label="Click rate" value={campaign.clickRate} />
           <Rate label="Reply rate" value={campaign.replyRate} />
-          <Rate
-            label="Placement rate"
-            value={campaign.placementRate}
-          />
+          <Rate label="Placement rate" value={campaign.placementRate} />
         </section>
 
         <section className="mt-8 rounded-3xl border border-white/10 bg-[#0d0d0f] p-6">
