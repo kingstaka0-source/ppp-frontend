@@ -309,7 +309,7 @@ export default function CampaignsPage() {
                         </p>
                       </div>
 
-                      <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+                      <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 xl:min-w-[440px]">
                         <CompactMetric
                           label="Selected"
                           value={campaign.selectedPlaylists}
@@ -337,7 +337,7 @@ export default function CampaignsPage() {
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-x-5 gap-y-2 text-xs sm:grid-cols-4 xl:w-[310px] xl:grid-cols-2">
+                      <div className="grid grid-cols-2 gap-x-5 gap-y-2 text-xs sm:grid-cols-4 xl:w-[330px] xl:shrink-0 xl:grid-cols-2">
                         <CompactRate
                           label="Open rate"
                           value={`${campaign.openRate}%`}
