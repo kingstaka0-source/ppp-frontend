@@ -575,6 +575,7 @@ async function markReply(
                     </div>
                   </div>
 
+                  {item.pitch && (
                   <aside className="rounded-xl border border-white/[0.07] bg-white/[0.02] px-4 py-2 text-sm">
                     <Status label="Pitch" value={item.pitch?.status || "NO PITCH"} />
                     <Status label="Sent" value={formatDate(item.pitch?.sentAt)} />
@@ -598,6 +599,7 @@ async function markReply(
                       value={item.pitch?.playlistDetected ? "Yes" : "No"}
                     />
                   </aside>
+                  )}
                 </div>
               </article>
             ))}
