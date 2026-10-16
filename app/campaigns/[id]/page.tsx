@@ -427,226 +427,179 @@ async function markReply(
           <Rate label="Placement rate" value={campaign.placementRate} />
         </section>
 
-        <section className="mt-8 rounded-3xl border border-white/10 bg-[#0d0d0f] p-6">
-          <h2 className="text-2xl font-black">
-            Campaign activity
-          </h2>
+        <section className="mt-6 rounded-3xl border border-white/10 bg-[#0d0d0f] p-5 sm:p-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-300">
+                Campaign activity
+              </p>
+              <h2 className="mt-1 text-2xl font-black">
+                Playlist performance
+              </h2>
+            </div>
+
+            <p className="text-sm text-white/35">
+              {campaign.items.length} playlist{campaign.items.length === 1 ? "" : "s"}
+            </p>
+          </div>
 
           {campaign.events.length > 0 && (
-  <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-5">
-    <h3 className="text-lg font-black">
-      Activity timeline
-    </h3>
+            <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                {campaign.events.map((event) => (
+                  <div
+                    key={event.id}
+                    className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.025] px-3 py-2"
+                  >
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
 
-    <div className="mt-5 space-y-5">
-      {campaign.events.map((event, index) => (
-        <div
-          key={event.id}
-          className="relative flex gap-4"
-        >
-          <div className="flex flex-col items-center">
-            <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-emerald-400" />
+                    <div>
+                      <p className="text-xs font-black text-white/80">
+                        {formatEventLabel(event.type)}
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-white/35">
+                        {new Date(event.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-            {index < campaign.events.length - 1 && (
-              <div className="mt-2 h-full min-h-10 w-px bg-white/10" />
-            )}
-          </div>
-
-          <div className="pb-2">
-            <p className="font-black text-white">
-              {formatEventLabel(event.type)}
-            </p>
-
-            <p className="mt-1 text-sm text-white/40">
-              {new Date(event.createdAt).toLocaleString()}
-            </p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
-          <div className="mt-5 space-y-4">
+          <div className="mt-4 space-y-3">
             {campaign.items.map((item) => (
-              <div
+              <article
                 key={item.id}
-                className="rounded-2xl border border-white/10 bg-black/30 p-5"
+                className="rounded-2xl border border-white/10 bg-black/30 p-4 sm:p-5"
               >
-                <div className="flex flex-col gap-5 lg:flex-row lg:justify-between">
-                  <div className="max-w-3xl">
-                    <h3 className="text-lg font-black">
-                      {item.playlist?.name ||
-                        "Unknown playlist"}
-                    </h3>
+                <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-lg font-black">
+                          {item.playlist?.name || "Unknown playlist"}
+                        </h3>
+                        <p className="mt-1 text-sm text-white/45">
+                          Curator: {item.playlist?.curator?.name || "Unknown"}
+                        </p>
+                      </div>
 
-                    <p className="mt-1 text-sm text-white/45">
-                      Curator:{" "}
-                      {item.playlist?.curator?.name ||
-                        "Unknown"}
-                    </p>
+                      <span className={`rounded-full border px-3 py-1 text-[11px] font-black uppercase ${
+                        item.pitch?.status === "SENT"
+                          ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+                          : "border-white/10 bg-white/[0.04] text-white/45"
+                      }`}>
+                        {item.pitch?.status || "NO PITCH"}
+                      </span>
+                    </div>
 
-                    {item.pitch?.subject && (
-                      <p className="mt-4 font-bold">
-                        {item.pitch.subject}
-                      </p>
+                    {item.pitch ? (
+                      <div className="mt-4 rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
+                        {item.pitch.subject && (
+                          <p className="font-bold text-white/90">
+                            {item.pitch.subject}
+                          </p>
+                        )}
+
+                        {item.pitch.body && (
+                          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-white/55">
+                            {item.pitch.body}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="mt-4 rounded-xl border border-dashed border-white/10 bg-white/[0.015] px-4 py-3">
+                        <p className="text-sm text-white/35">
+                          No pitch was generated for this playlist.
+                        </p>
+                      </div>
                     )}
 
-                    {item.pitch?.body && (
-                      <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-white/60">
-                        {item.pitch.body}
-                      </p>
-                    )}
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                      {item.pitch?.positiveReply === true ? (
+                        <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3.5 py-2 text-sm font-black text-emerald-300">
+                          ✓ Interested
+                        </div>
+                      ) : item.pitch?.negativeReply === true ? (
+                        <div className="rounded-xl border border-red-400/20 bg-red-400/10 px-3.5 py-2 text-sm font-black text-red-300">
+                          Declined
+                        </div>
+                      ) : item.pitch?.status === "SENT" ? (
+                        <>
+                          <button
+                            type="button"
+                            disabled={replySaving === item.id}
+                            onClick={() => void markReply(item.id, "INTERESTED")}
+                            className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3.5 py-2 text-sm font-black text-emerald-300 transition hover:bg-emerald-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {replySaving === item.id ? "Saving..." : "Mark Interested"}
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={replySaving === item.id}
+                            onClick={() => void markReply(item.id, "DECLINED")}
+                            className="rounded-xl border border-red-400/20 bg-red-400/10 px-3.5 py-2 text-sm font-black text-red-300 transition hover:bg-red-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {replySaving === item.id ? "Saving..." : "Mark Declined"}
+                          </button>
+                        </>
+                      ) : null}
+
+                      {item.pitch?.playlistDetected === true ? (
+                        <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3.5 py-2 text-sm font-black text-emerald-300">
+                          ✓ Playlisted
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={playlistSaving === item.id}
+                          onClick={() => void markPlaylisted(item.id)}
+                          className="rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3.5 py-2 text-sm font-black text-cyan-300 transition hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {playlistSaving === item.id ? "Saving..." : "Mark Playlisted"}
+                        </button>
+                      )}
+
+                      {item.playlist?.spotifyPlaylistId && (
+                        <a
+                          href={`https://open.spotify.com/playlist/${item.playlist.spotifyPlaylistId}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="ml-0 inline-flex rounded-xl border border-white/10 px-3.5 py-2 text-sm font-black text-emerald-300 transition hover:bg-white/[0.04] sm:ml-auto"
+                        >
+                          Open playlist ↗
+                        </a>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="min-w-[260px] space-y-2 text-sm">
-                    <Status
-                      label="Pitch"
-                      value={item.pitch?.status || "NO PITCH"}
-                    />
-
-                    <Status
-                      label="Sent"
-                      value={formatDate(item.pitch?.sentAt)}
-                    />
-
+                  <aside className="rounded-xl border border-white/[0.07] bg-white/[0.02] px-4 py-2 text-sm">
+                    <Status label="Pitch" value={item.pitch?.status || "NO PITCH"} />
+                    <Status label="Sent" value={formatDate(item.pitch?.sentAt)} />
                     <Status
                       label="Opened"
-                      value={
-                        item.pitch?.openCount
-                          ? `${item.pitch.openCount}x`
-                          : "No"
-                      }
+                      value={item.pitch?.openCount ? `${item.pitch.openCount}x` : "No"}
                     />
-
-                    <Status
-                      label="Last opened"
-                      value={formatDate(
-                        item.pitch?.lastOpenedAt,
-                      )}
-                    />
-
+                    <Status label="Last opened" value={formatDate(item.pitch?.lastOpenedAt)} />
                     <Status
                       label="Clicked"
-                      value={
-                        item.pitch?.clickCount
-                          ? `${item.pitch.clickCount}x`
-                          : "No"
-                      }
+                      value={item.pitch?.clickCount ? `${item.pitch.clickCount}x` : "No"}
                     />
-
-                    <Status
-                      label="Last clicked"
-                      value={formatDate(
-                        item.pitch?.lastClickedAt,
-                      )}
-                    />
-
-                    <Status
-                      label="Replies"
-                      value={String(
-                        item.pitch?.replyCount ?? 0,
-                      )}
-                    />
-
+                    <Status label="Last clicked" value={formatDate(item.pitch?.lastClickedAt)} />
+                    <Status label="Replies" value={String(item.pitch?.replyCount ?? 0)} />
                     <Status
                       label="Interested"
-                      value={
-                        item.pitch?.positiveReply === true
-                          ? "Yes"
-                          : "No"
-                      }
+                      value={item.pitch?.positiveReply === true ? "Yes" : "No"}
                     />
-
                     <Status
                       label="Playlisted"
-                      value={
-                        item.pitch?.playlistDetected
-                          ? "Yes"
-                          : "No"
-                      }
+                      value={item.pitch?.playlistDetected ? "Yes" : "No"}
                     />
-                  </div>
+                  </aside>
                 </div>
-
-                <div className="mt-5 flex flex-wrap gap-3">
-  {item.pitch?.positiveReply === true ? (
-    <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-black text-emerald-300">
-      ✓ Interested
-    </div>
-  ) : item.pitch?.negativeReply === true ? (
-    <div className="rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-2 text-sm font-black text-red-300">
-      Declined
-    </div>
-  ) : item.pitch?.status === "SENT" ? (
-    <>
-      <button
-        type="button"
-        disabled={replySaving === item.id}
-        onClick={() =>
-          void markReply(
-            item.id,
-            "INTERESTED",
-          )
-        }
-        className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-black text-emerald-300 transition hover:bg-emerald-400/15 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {replySaving === item.id
-          ? "Saving..."
-          : "Mark Interested"}
-      </button>
-
-      <button
-        type="button"
-        disabled={replySaving === item.id}
-        onClick={() =>
-          void markReply(
-            item.id,
-            "DECLINED",
-          )
-        }
-        className="rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-2 text-sm font-black text-red-300 transition hover:bg-red-400/15 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {replySaving === item.id
-          ? "Saving..."
-          : "Mark Declined"}
-      </button>
-          </>
-  ) : null}
-</div>
-
-<div className="mt-3">
-  {item.pitch?.playlistDetected === true ? (
-    <div className="inline-flex rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-black text-emerald-300">
-      ✓ Playlisted
-    </div>
-  ) : (
-    <button
-      type="button"
-      disabled={playlistSaving === item.id}
-      onClick={() =>
-        void markPlaylisted(item.id)
-      }
-      className="rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-black text-cyan-300 transition hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      {playlistSaving === item.id
-        ? "Saving..."
-        : "Mark Playlisted"}
-    </button>
-  )}
-</div>
-
-                {item.playlist?.spotifyPlaylistId && (
-                  <a
-                    href={`https://open.spotify.com/playlist/${item.playlist.spotifyPlaylistId}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-5 inline-flex text-sm font-black text-emerald-300"
-                  >
-                    Open playlist ↗
-                  </a>
-                )}
-              </div>
+              </article>
             ))}
           </div>
         </section>
