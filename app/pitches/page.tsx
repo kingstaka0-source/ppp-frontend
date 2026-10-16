@@ -417,12 +417,35 @@ export default function PitchesPage() {
               className="h-9 w-auto"
             />
 
-            <Link
-              href="/dashboard"
-              className="text-sm font-medium text-zinc-400 transition hover:text-white"
-            >
-              ← Dashboard
-            </Link>
+            <div className="flex flex-wrap justify-end gap-2">
+              <Link
+                href="/dashboard"
+                className="rounded-xl border border-white/15 bg-black/30 px-4 py-2 text-sm font-medium text-zinc-200 backdrop-blur transition hover:border-white/30 hover:bg-white/10"
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                href="/followups"
+                className="rounded-xl border border-white/15 bg-black/30 px-4 py-2 text-sm font-medium text-zinc-200 backdrop-blur transition hover:border-white/30 hover:bg-white/10"
+              >
+                Follow-ups
+              </Link>
+
+              <Link
+                href="/curators"
+                className="rounded-xl border border-white/15 bg-black/30 px-4 py-2 text-sm font-medium text-zinc-200 backdrop-blur transition hover:border-white/30 hover:bg-white/10"
+              >
+                Curators
+              </Link>
+
+              <Link
+                href="/campaigns"
+                className="rounded-xl border border-white/15 bg-black/30 px-4 py-2 text-sm font-medium text-zinc-200 backdrop-blur transition hover:border-white/30 hover:bg-white/10"
+              >
+                Campaigns
+              </Link>
+            </div>
           </div>
 
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">

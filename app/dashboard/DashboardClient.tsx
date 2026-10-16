@@ -682,7 +682,7 @@ const placementRate = analytics?.placementRate ?? 0;
         aria-label="TuneReach workspace"
         className="rounded-2xl border border-white/10 bg-zinc-950 p-2 shadow-xl"
       >
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
           <Link
             href={linkWithArtistId("/tracks", artistId)}
             className="group rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 transition hover:border-emerald-400/30 hover:bg-emerald-400/[0.08]"
@@ -720,6 +720,16 @@ const placementRate = analytics?.placementRate ?? 0;
             <div className="text-sm font-black text-white">Follow-ups</div>
             <div className="mt-1 text-xs text-white/40 group-hover:text-emerald-300">
               Manage conversations
+            </div>
+          </Link>
+
+          <Link
+            href="/campaigns"
+            className="group rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 transition hover:border-emerald-400/30 hover:bg-emerald-400/[0.08]"
+          >
+            <div className="text-sm font-black text-white">Campaigns</div>
+            <div className="mt-1 text-xs text-white/40 group-hover:text-emerald-300">
+              Review campaign history
             </div>
           </Link>
         </div>

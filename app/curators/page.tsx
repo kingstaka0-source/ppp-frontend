@@ -139,8 +139,22 @@ const res = await fetch(`${API}/curators/analytics`, {
   return (
     <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-8">
       <div className="mx-auto max-w-6xl space-y-7">
-        <header className="rounded-2xl border border-white/10 bg-[#090b0b] px-5 py-4 sm:px-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <header className="relative min-h-[330px] overflow-hidden rounded-2xl border border-white/10 bg-[#050909] px-5 py-5 sm:px-7 sm:py-6">
+          <img
+            src="/curators-hero.png"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.94)_0%,rgba(0,0,0,0.78)_34%,rgba(0,0,0,0.30)_67%,rgba(0,0,0,0.18)_100%)]"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20"
+          />
+          <div className="relative z-10 flex min-h-[280px] flex-col justify-between gap-8 lg:flex-row lg:items-start">
             <div className="flex min-w-0 items-center gap-5">
               <Link
                 href="/dashboard"
@@ -157,17 +171,17 @@ const res = await fetch(`${API}/curators/analytics`, {
               <div className="hidden h-11 w-px shrink-0 bg-white/10 sm:block" />
 
               <div className="min-w-0">
-                <h1 className="text-2xl font-black tracking-tight text-white sm:text-[28px]">
+                <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
                   Curator CRM
                 </h1>
 
-                <p className="mt-1 text-sm text-white/40">
+                <p className="mt-2 max-w-md text-sm leading-6 text-white/70">
                   Manage playlist curators, contacts and campaign engagement.
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <span className="mr-1 hidden text-xs font-bold uppercase tracking-[0.14em] text-white/25 xl:inline">
                 {filtered.length} contacts
               </span>
@@ -180,17 +194,30 @@ const res = await fetch(`${API}/curators/analytics`, {
               </Link>
 
               <Link
+                href="/pitches"
+                className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Pitches
+              </Link>
+
+              <Link
                 href="/followups"
                 className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
               >
                 Follow-ups
               </Link>
 
+              <Link
+                href="/campaigns"
+                className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Campaigns
+              </Link>
               <button
                 type="button"
                 onClick={loadCurators}
                 disabled={loading}
-                className="inline-flex items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-3.5 py-2 text-sm font-black text-emerald-300 transition hover:bg-emerald-400/20 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "Refreshing..." : "Refresh"}
               </button>
@@ -280,7 +307,7 @@ const res = await fetch(`${API}/curators/analytics`, {
                 {metric.value}
               </p>
 
-              <p className="mt-1 text-sm text-white/40">
+              <p className="mt-2 max-w-md text-sm leading-6 text-white/70">
                 {metric.description}
               </p>
             </div>

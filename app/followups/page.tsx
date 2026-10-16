@@ -197,9 +197,29 @@ const res = await fetch(`${API}/followups/${id}/send`, {
                 href="/dashboard"
                 className="rounded-xl border border-white/15 bg-black/30 px-4 py-2.5 text-sm font-medium text-zinc-200 backdrop-blur transition hover:border-white/30 hover:bg-white/10"
               >
-                ← Dashboard
+                Dashboard
               </Link>
 
+              <Link
+                href="/pitches"
+                className="rounded-xl border border-white/15 bg-black/30 px-4 py-2.5 text-sm font-medium text-zinc-200 backdrop-blur transition hover:border-white/30 hover:bg-white/10"
+              >
+                Pitches
+              </Link>
+
+              <Link
+                href="/curators"
+                className="rounded-xl border border-white/15 bg-black/30 px-4 py-2.5 text-sm font-medium text-zinc-200 backdrop-blur transition hover:border-white/30 hover:bg-white/10"
+              >
+                Curators
+              </Link>
+
+              <Link
+                href="/campaigns"
+                className="rounded-xl border border-white/15 bg-black/30 px-4 py-2.5 text-sm font-medium text-zinc-200 backdrop-blur transition hover:border-white/30 hover:bg-white/10"
+              >
+                Campaigns
+              </Link>
               <button
                 onClick={loadFollowups}
                 disabled={loading}
