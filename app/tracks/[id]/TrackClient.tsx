@@ -165,6 +165,8 @@ const [sentPitchIds, setSentPitchIds] = useState<Record<string, boolean>>({});
 
 const [sendErrors, setSendErrors] = useState<Record<string, string>>({});
 
+const [expandedPitchIds, setExpandedPitchIds] = useState<Record<string, boolean>>({});
+
   const loadTrack = useCallback(async () => {
   setLoading(true);
   setError("");
@@ -1136,144 +1138,185 @@ const hasAudioFeatures =
           )}
 
           {generatedPitches[match.id] && (
-            <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
-  {generatedPitches[match.id].status === "SENT"
-    ? "Sent pitch"
-    : "Saved draft"}
-</p>
+            <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
+                      {generatedPitches[match.id].status === "SENT"
+                        ? "Sent pitch"
+                        : "Saved draft"}
+                    </span>
 
-              <p className="mt-4 text-sm text-white/45">
-                Subject
-              </p>
+                    <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[11px] font-bold text-white/50">
+                      {generatedPitches[match.id].channel}
+                    </span>
+                  </div>
 
-              <p className="mt-1 font-black">
-                {generatedPitches[match.id].subject}
-              </p>
+                  <p className="mt-2 truncate text-sm font-black text-white/90">
+                    {generatedPitches[match.id].subject}
+                  </p>
 
-              <p className="mt-5 text-sm text-white/45">
-                Message
-              </p>
-
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-white/70">
-                {generatedPitches[match.id].body}
-              </p>
-
-              <div className="mt-4 flex flex-wrap gap-3 text-xs">
-                <span className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-white/55">
-                  {generatedPitches[match.id].status}
-                </span>
-
-                <span className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-white/55">
-                  {generatedPitches[match.id].channel}
-                </span>
-              </div>
-
-              {generatedPitches[match.id].deliveryStatus && (
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <span
-                    className={`rounded-full border px-3 py-2 text-xs font-bold ${
-                      generatedPitches[match.id].deliveryStatus === "DELIVERED"
-                        ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
-                        : generatedPitches[match.id].deliveryStatus === "SENT"
-                          ? "border-sky-400/20 bg-sky-400/10 text-sky-300"
-                          : generatedPitches[match.id].deliveryStatus === "DELIVERY_DELAYED"
-                            ? "border-amber-400/20 bg-amber-400/10 text-amber-300"
-                            : "border-red-400/20 bg-red-400/10 text-red-300"
-                    }`}
-                  >
-                    {generatedPitches[match.id].deliveryStatus === "DELIVERED"
-                      ? "✓ Delivered"
-                      : generatedPitches[match.id].deliveryStatus === "SENT"
-                        ? "→ Sent"
-                        : generatedPitches[match.id].deliveryStatus === "DELIVERY_DELAYED"
-                          ? "⏳ Delayed"
-                          : generatedPitches[match.id].deliveryStatus === "SUPPRESSED"
-                            ? "⚠ Suppressed"
-                            : generatedPitches[match.id].deliveryStatus === "BOUNCED"
-                              ? "⚠ Bounced"
-                              : generatedPitches[match.id].deliveryStatus === "COMPLAINED"
-                                ? "⚠ Complained"
-                                : "⚠ Failed"}
-                  </span>
-
-                  {generatedPitches[match.id].deliveryStatus === "DELIVERED" &&
-                    generatedPitches[match.id].deliveredAt && (
-                      <span className="text-xs text-emerald-300/70">
-                        Delivered:{" "}
-                        {new Date(
-                          generatedPitches[match.id].deliveredAt!,
-                        ).toLocaleString()}
+                  {generatedPitches[match.id].status === "SENT" && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="rounded-full border border-emerald-400/20 bg-black/20 px-3 py-1.5 text-xs font-bold text-emerald-300">
+                        {generatedPitches[match.id].openCount ?? 0} Opens
                       </span>
-                    )}
+
+                      <span className="rounded-full border border-sky-400/20 bg-black/20 px-3 py-1.5 text-xs font-bold text-sky-300">
+                        {generatedPitches[match.id].clickCount ?? 0} Clicks
+                      </span>
+                    </div>
+                  )}
                 </div>
-              )}
 
-              {generatedPitches[match.id].deliveryError && (
-                <p className="mt-3 text-xs text-red-300">
-                  Delivery error: {generatedPitches[match.id].deliveryError}
-                </p>
-              )}
-              {generatedPitches[match.id].status === "SENT" && (
-  <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-    <div className="flex flex-wrap gap-3">
-      <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-bold text-emerald-300">
-        👁 {generatedPitches[match.id].openCount ?? 0} Opens
-      </span>
-
-      <span className="rounded-full border border-sky-400/20 bg-sky-400/10 px-3 py-2 text-xs font-bold text-sky-300">
-        🔗 {generatedPitches[match.id].clickCount ?? 0} Clicks
-      </span>
-    </div>
-
-    <div className="mt-3 space-y-1 text-xs text-white/40">
-      <p>
-        Last opened:{" "}
-        {generatedPitches[match.id].lastOpenedAt
-          ? new Date(
-              generatedPitches[match.id].lastOpenedAt!,
-            ).toLocaleString()
-          : "—"}
-      </p>
-
-      <p>
-        Last clicked:{" "}
-        {generatedPitches[match.id].lastClickedAt
-          ? new Date(
-              generatedPitches[match.id].lastClickedAt!,
-            ).toLocaleString()
-          : "—"}
-      </p>
-    </div>
-  </div>
-)}
-
-              {/* SEND SINGLE PITCH */}
-              <div className="mt-5 border-t border-emerald-400/15 pt-5">
                 <button
                   type="button"
                   onClick={() =>
-                    void sendPitch(generatedPitches[match.id].id)
+                    setExpandedPitchIds((current) => ({
+                      ...current,
+                      [match.id]: !current[match.id],
+                    }))
                   }
-                  disabled={
-                    sendingPitchId === generatedPitches[match.id].id ||
-                    sentPitchIds[generatedPitches[match.id].id] === true
-                  }
-                  className="rounded-xl bg-white px-5 py-3 text-sm font-black text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="shrink-0 rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-xs font-black text-white/70 transition hover:border-emerald-400/30 hover:text-emerald-300"
                 >
-                  {sendingPitchId === generatedPitches[match.id].id
-                    ? "Sending pitch…"
-                    : sentPitchIds[generatedPitches[match.id].id]
-                      ? "✓ Pitch sent"
-                      : "📧 Send Pitch"}
+                  {expandedPitchIds[match.id]
+                    ? "Hide pitch details"
+                    : "View pitch details"}
                 </button>
-
-                {sendErrors[generatedPitches[match.id].id] && (
-                  <p className="mt-3 text-sm text-red-300">
-                    {sendErrors[generatedPitches[match.id].id]}
-                  </p>
-                )}
               </div>
+
+              {expandedPitchIds[match.id] && (
+                <div className="mt-4 border-t border-emerald-400/15 pt-4">
+                  <p className="text-sm text-white/45">Subject</p>
+
+                  <p className="mt-1 font-black">
+                    {generatedPitches[match.id].subject}
+                  </p>
+
+                  <p className="mt-5 text-sm text-white/45">Message</p>
+
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-white/70">
+                    {generatedPitches[match.id].body}
+                  </p>
+
+                  <div className="mt-4 flex flex-wrap gap-3 text-xs">
+                    <span className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-white/55">
+                      {generatedPitches[match.id].status}
+                    </span>
+
+                    <span className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-white/55">
+                      {generatedPitches[match.id].channel}
+                    </span>
+                  </div>
+
+                  {generatedPitches[match.id].deliveryStatus && (
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <span
+                        className={`rounded-full border px-3 py-2 text-xs font-bold ${
+                          generatedPitches[match.id].deliveryStatus === "DELIVERED"
+                            ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+                            : generatedPitches[match.id].deliveryStatus === "SENT"
+                              ? "border-sky-400/20 bg-sky-400/10 text-sky-300"
+                              : generatedPitches[match.id].deliveryStatus === "DELIVERY_DELAYED"
+                                ? "border-amber-400/20 bg-amber-400/10 text-amber-300"
+                                : "border-red-400/20 bg-red-400/10 text-red-300"
+                        }`}
+                      >
+                        {generatedPitches[match.id].deliveryStatus === "DELIVERED"
+                          ? "Delivered"
+                          : generatedPitches[match.id].deliveryStatus === "SENT"
+                            ? "Sent"
+                            : generatedPitches[match.id].deliveryStatus === "DELIVERY_DELAYED"
+                              ? "Delayed"
+                              : generatedPitches[match.id].deliveryStatus === "SUPPRESSED"
+                                ? "Suppressed"
+                                : generatedPitches[match.id].deliveryStatus === "BOUNCED"
+                                  ? "Bounced"
+                                  : generatedPitches[match.id].deliveryStatus === "COMPLAINED"
+                                    ? "Complained"
+                                    : "Failed"}
+                      </span>
+
+                      {generatedPitches[match.id].deliveryStatus === "DELIVERED" &&
+                        generatedPitches[match.id].deliveredAt && (
+                          <span className="text-xs text-emerald-300/70">
+                            Delivered:{" "}
+                            {new Date(
+                              generatedPitches[match.id].deliveredAt!,
+                            ).toLocaleString()}
+                          </span>
+                        )}
+                    </div>
+                  )}
+
+                  {generatedPitches[match.id].deliveryError && (
+                    <p className="mt-3 text-xs text-red-300">
+                      Delivery error: {generatedPitches[match.id].deliveryError}
+                    </p>
+                  )}
+
+                  {generatedPitches[match.id].status === "SENT" && (
+                    <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+                      <div className="flex flex-wrap gap-3">
+                        <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-bold text-emerald-300">
+                          {generatedPitches[match.id].openCount ?? 0} Opens
+                        </span>
+
+                        <span className="rounded-full border border-sky-400/20 bg-sky-400/10 px-3 py-2 text-xs font-bold text-sky-300">
+                          {generatedPitches[match.id].clickCount ?? 0} Clicks
+                        </span>
+                      </div>
+
+                      <div className="mt-3 space-y-1 text-xs text-white/40">
+                        <p>
+                          Last opened:{" "}
+                          {generatedPitches[match.id].lastOpenedAt
+                            ? new Date(
+                                generatedPitches[match.id].lastOpenedAt!,
+                              ).toLocaleString()
+                            : "—"}
+                        </p>
+
+                        <p>
+                          Last clicked:{" "}
+                          {generatedPitches[match.id].lastClickedAt
+                            ? new Date(
+                                generatedPitches[match.id].lastClickedAt!,
+                              ).toLocaleString()
+                            : "—"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-5 border-t border-emerald-400/15 pt-5">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void sendPitch(generatedPitches[match.id].id)
+                      }
+                      disabled={
+                        sendingPitchId === generatedPitches[match.id].id ||
+                        sentPitchIds[generatedPitches[match.id].id] === true
+                      }
+                      className="rounded-xl bg-white px-5 py-3 text-sm font-black text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {sendingPitchId === generatedPitches[match.id].id
+                        ? "Sending pitch..."
+                        : sentPitchIds[generatedPitches[match.id].id]
+                          ? "Pitch sent"
+                          : "Send Pitch"}
+                    </button>
+
+                    {sendErrors[generatedPitches[match.id].id] && (
+                      <p className="mt-3 text-sm text-red-300">
+                        {sendErrors[generatedPitches[match.id].id]}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
