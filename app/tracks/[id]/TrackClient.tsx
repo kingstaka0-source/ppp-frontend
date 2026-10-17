@@ -20,6 +20,8 @@ type TrackResponse = {
   duration?: number;
   spotifyTrackId?: string | null;
   spotifyUrl?: string | null;
+  albumName?: string | null;
+  albumImageUrl?: string | null;
   matchCount?: number;
   matchesCount?: number;
 
@@ -782,9 +784,17 @@ const hasAudioFeatures =
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.18),transparent_42%)]" />
 
           <div className="relative grid gap-8 lg:grid-cols-[220px_1fr] lg:items-center">
-            <div className="flex aspect-square items-center justify-center rounded-[28px] border border-white/10 bg-gradient-to-br from-emerald-400 to-emerald-700 text-6xl font-black text-black shadow-2xl">
-              {initials || "♪"}
-            </div>
+            {track.albumImageUrl ? (
+              <img
+                src={track.albumImageUrl}
+                alt={track.albumName || `${title} artwork`}
+                className="aspect-square w-full rounded-[28px] border border-white/10 object-cover shadow-2xl"
+              />
+            ) : (
+              <div className="flex aspect-square items-center justify-center rounded-[28px] border border-white/10 bg-gradient-to-br from-emerald-400 to-emerald-700 text-6xl font-black text-black shadow-2xl">
+                {initials || "♪"}
+              </div>
+            )}
 
             <div>
               <p className="text-sm font-black uppercase tracking-[0.24em] text-emerald-400">
