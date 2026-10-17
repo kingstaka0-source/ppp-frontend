@@ -634,8 +634,10 @@ async function launchCampaign() {
     }
 
     if (!isSignedIn) {
-      setError("You must be signed in.");
-      setLoading(false);
+      if (!track) {
+        setError("You must be signed in.");
+        setLoading(false);
+      }
       return;
     }
 
