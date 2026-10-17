@@ -102,52 +102,100 @@ export default async function TracksPage() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl space-y-8 p-6 md:p-8">
-      <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="mb-2 text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
-            Music catalog
-          </p>
+    <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-8">
+      <div className="mx-auto max-w-7xl">
+        <header className="rounded-2xl border border-white/10 bg-[#090b0b] px-5 py-5 sm:px-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0">
+              <Link href="/dashboard" className="inline-flex">
+                <img
+                  src="/brand/logo.svg"
+                  alt="TuneReach"
+                  className="h-9 w-auto"
+                />
+              </Link>
 
-          <h1 className="text-3xl font-bold tracking-tight text-gray-950 md:text-4xl">
-            My Tracks
-          </h1>
+              <p className="mt-7 text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
+                Tracks Workspace
+              </p>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-            View your Spotify releases, metadata, and the number of
-            playlist matches found.
-          </p>
-        </div>
+              <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+                My Tracks
+              </h1>
 
-        <Link
-          href="/dashboard"
-          className="inline-flex w-fit items-center justify-center rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
-        >
-          ← Dashboard
-        </Link>
-      </section>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
+                Manage your Spotify catalog and open a track to review playlist
+                matches and campaign opportunities.
+              </p>
+            </div>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Total tracks" value={tracks.length} />
+            <nav className="flex shrink-0 flex-wrap items-center gap-2">
+              <Link
+                href="/dashboard"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Dashboard
+              </Link>
 
-        <StatCard
-          label="With artwork"
-          value={tracks.filter((track) => track.albumImageUrl).length}
-        />
+              <Link
+                href="/tracks"
+                className="rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-3.5 py-2 text-sm font-black text-emerald-300 transition hover:bg-emerald-400/20"
+              >
+                Tracks
+              </Link>
 
-        <StatCard
-          label="Totale matches"
-          value={tracks.reduce(
-            (total, track) => total + (track.matchCount ?? 0),
-            0
-          )}
-        />
+              <Link
+                href="/pitches"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Pitches
+              </Link>
 
-        <StatCard
-          label="Spotify gekoppeld"
-          value={tracks.filter((track) => track.spotifyUrl).length}
-        />
-      </section>
+              <Link
+                href="/followups"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Follow-ups
+              </Link>
+
+              <Link
+                href="/curators"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Curators
+              </Link>
+
+              <Link
+                href="/campaigns"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+              >
+                Campaigns
+              </Link>
+            </nav>
+          </div>
+        </header>
+
+        <section className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <StatCard label="Total tracks" value={tracks.length} />
+
+          <StatCard
+            label="With artwork"
+            value={tracks.filter((track) => track.albumImageUrl).length}
+          />
+
+          <StatCard
+            label="Playlist matches"
+            value={tracks.reduce(
+              (total, track) => total + (track.matchCount ?? 0),
+              0
+            )}
+          />
+
+          <StatCard
+            label="Spotify linked"
+            value={tracks.filter((track) => track.spotifyUrl).length}
+          />
+        </section>
 
       {errorMessage ? (
         <section className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800">
@@ -166,184 +214,228 @@ export default async function TracksPage() {
         </section>
       ) : (
         <>
-          <section className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm md:block">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left text-sm">
-                <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+          <section className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-[#0d0d0f]">
+            <div className="flex flex-col gap-2 border-b border-white/10 px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
+                  Music Catalog
+                </p>
+
+                <h2 className="mt-2 text-xl font-black tracking-tight text-white">
+                  Your Spotify tracks
+                </h2>
+
+                <p className="mt-1 text-sm text-white/45">
+                  Open a track workspace to review matches, pitches and campaign opportunities.
+                </p>
+              </div>
+
+              <div className="text-sm font-bold text-white/45">
+                {tracks.length} {tracks.length === 1 ? "track" : "tracks"}
+              </div>
+            </div>
+
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full min-w-[960px] text-left text-sm">
+                <thead className="border-b border-white/10 bg-white/[0.025] text-[11px] font-black uppercase tracking-[0.14em] text-white/35">
                   <tr>
-                    <th className="px-5 py-4">Track</th>
-                    <th className="px-5 py-4">Album</th>
-                    <th className="px-5 py-4">Release</th>
-                    <th className="px-5 py-4 text-center">Duration</th>
-                    <th className="px-5 py-4 text-center">Matches</th>
-                    <th className="px-5 py-4 text-right">Actions</th>
+                    <th className="px-5 py-3.5 sm:px-6">Track</th>
+                    <th className="px-5 py-3.5">Album</th>
+                    <th className="px-5 py-3.5">Release</th>
+                    <th className="px-5 py-3.5 text-center">Duration</th>
+                    <th className="px-5 py-3.5 text-center">Matches</th>
+                    <th className="px-5 py-3.5 text-right sm:px-6">Actions</th>
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-gray-100">
-                  {tracks.map((track) => (
-                    <tr
-                      key={track.id}
-                      className="transition hover:bg-gray-50/80"
-                    >
-                      <td className="px-5 py-4">
-                        <div className="flex min-w-0 items-center gap-4">
-                          <TrackArtwork track={track} />
+                <tbody className="divide-y divide-white/[0.07]">
+                  {tracks.map((track) => {
+                    const matchCount = track.matchCount ?? 0;
 
+                    return (
+                      <tr
+                        key={track.id}
+                        className="transition hover:bg-white/[0.035]"
+                      >
+                        <td className="px-5 py-4 sm:px-6">
+                          <div className="flex min-w-0 items-center gap-3.5">
+                            <TrackArtwork track={track} />
+
+                            <div className="min-w-0">
+                              <Link
+                                href={`/tracks/${track.id}`}
+                                className="block truncate font-black text-white transition hover:text-emerald-300"
+                              >
+                                {track.title}
+                              </Link>
+
+                              <div className="mt-1 flex min-w-0 items-center gap-2 text-xs text-white/40">
+                                <span className="truncate">
+                                  {(track.artists ?? []).join(", ") ||
+                                    "Unknown artist"}
+                                </span>
+
+                                {track.explicit ? (
+                                  <span className="shrink-0 rounded border border-white/10 bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-black text-white/55">
+                                    E
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="max-w-[230px] px-5 py-4">
+                          <div className="truncate font-medium text-white/65">
+                            {track.albumName || "Unknown album"}
+                          </div>
+
+                          {track.isrc ? (
+                            <div className="mt-1 truncate font-mono text-[11px] text-white/25">
+                              {track.isrc}
+                            </div>
+                          ) : null}
+                        </td>
+
+                        <td className="whitespace-nowrap px-5 py-4 text-white/55">
+                          {formatReleaseDate(track.releaseDate)}
+                        </td>
+
+                        <td className="px-5 py-4 text-center font-mono text-white/55">
+                          {msToMinSec(track.durationMs)}
+                        </td>
+
+                        <td className="px-5 py-4 text-center">
+                          <span
+                            className={
+                              matchCount > 0
+                                ? "inline-flex min-w-10 justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-black text-emerald-300"
+                                : "inline-flex min-w-10 justify-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-bold text-white/35"
+                            }
+                          >
+                            {matchCount}
+                          </span>
+                        </td>
+
+                        <td className="px-5 py-4 sm:px-6">
+                          <div className="flex items-center justify-end gap-2">
+                            {track.spotifyUrl ? (
+                              <a
+                                href={track.spotifyUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-bold text-white/60 transition hover:border-emerald-400/25 hover:text-emerald-300"
+                              >
+                                Spotify ↗
+                              </a>
+                            ) : null}
+
+                            <Link
+                              href={`/tracks/${track.id}`}
+                              className="inline-flex items-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-3 py-2 text-xs font-black text-emerald-300 transition hover:bg-emerald-400/20"
+                            >
+                              Open workspace →
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="divide-y divide-white/[0.07] md:hidden">
+              {tracks.map((track) => {
+                const matchCount = track.matchCount ?? 0;
+
+                return (
+                  <article key={track.id} className="p-5">
+                    <div className="flex gap-3.5">
+                      <TrackArtwork track={track} />
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <Link
                               href={`/tracks/${track.id}`}
-                              className="block truncate font-semibold text-gray-950 hover:underline"
+                              className="block truncate text-base font-black text-white"
                             >
                               {track.title}
                             </Link>
 
-                            <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
-                              <span className="truncate">
-                                {(track.artists ?? []).join(", ") ||
-                                  "Unknown artist"}
-                              </span>
-
-                              {track.explicit ? (
-                                <span className="rounded bg-gray-200 px-1.5 py-0.5 font-semibold text-gray-700">
-                                  E
-                                </span>
-                              ) : null}
-                            </div>
+                            <p className="mt-1 truncate text-sm text-white/45">
+                              {(track.artists ?? []).join(", ") ||
+                                "Unknown artist"}
+                            </p>
                           </div>
-                        </div>
-                      </td>
 
-                      <td className="max-w-[220px] px-5 py-4">
-                        <div className="truncate text-gray-700">
-                          {track.albumName || "Unknown album"}
-                        </div>
-
-                        {track.isrc ? (
-                          <div className="mt-1 truncate font-mono text-xs text-gray-400">
-                            {track.isrc}
-                          </div>
-                        ) : null}
-                      </td>
-
-                      <td className="whitespace-nowrap px-5 py-4 text-gray-700">
-                        {formatReleaseDate(track.releaseDate)}
-                      </td>
-
-                      <td className="px-5 py-4 text-center font-mono text-gray-700">
-                        {msToMinSec(track.durationMs)}
-                      </td>
-
-                      <td className="px-5 py-4 text-center">
-                        <span className="inline-flex min-w-10 justify-center rounded-full bg-gray-950 px-3 py-1 text-xs font-bold text-white">
-                          {track.matchCount ?? 0}
-                        </span>
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          {track.spotifyUrl ? (
-                            <a
-                              href={track.spotifyUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center rounded-lg border border-[#1DB954] px-3 py-2 text-xs font-semibold text-[#14833b] transition hover:bg-[#1DB954] hover:text-white"
-                            >
-                              Spotify
-                            </a>
-                          ) : null}
-
-                          <Link
-                            href={`/tracks/${track.id}`}
-                            className="inline-flex items-center rounded-lg bg-gray-950 px-3 py-2 text-xs font-semibold text-white transition hover:bg-gray-700"
+                          <span
+                            className={
+                              matchCount > 0
+                                ? "shrink-0 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-xs font-black text-emerald-300"
+                                : "shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs font-bold text-white/35"
+                            }
                           >
-                            View →
-                          </Link>
+                            {matchCount} matches
+                          </span>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+
+                        <p className="mt-2 truncate text-xs text-white/30">
+                          {track.albumName || "Unknown album"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <dl className="mt-4 grid grid-cols-2 gap-2">
+                      <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] px-3 py-2.5">
+                        <dt className="text-[10px] font-black uppercase tracking-wider text-white/30">
+                          Release
+                        </dt>
+                        <dd className="mt-1 text-xs font-bold text-white/65">
+                          {formatReleaseDate(track.releaseDate)}
+                        </dd>
+                      </div>
+
+                      <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] px-3 py-2.5">
+                        <dt className="text-[10px] font-black uppercase tracking-wider text-white/30">
+                          Duration
+                        </dt>
+                        <dd className="mt-1 font-mono text-xs font-bold text-white/65">
+                          {msToMinSec(track.durationMs)}
+                        </dd>
+                      </div>
+                    </dl>
+
+                    <div className="mt-4 flex gap-2">
+                      {track.spotifyUrl ? (
+                        <a
+                          href={track.spotifyUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-center text-sm font-bold text-white/60"
+                        >
+                          Spotify ↗
+                        </a>
+                      ) : null}
+
+                      <Link
+                        href={`/tracks/${track.id}`}
+                        className="flex-1 rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-3 py-2.5 text-center text-sm font-black text-emerald-300"
+                      >
+                        Open workspace →
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-          </section>
-
-          <section className="grid gap-4 md:hidden">
-            {tracks.map((track) => (
-              <article
-                key={track.id}
-                className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
-              >
-                <div className="flex gap-4">
-                  <TrackArtwork track={track} />
-
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      href={`/tracks/${track.id}`}
-                      className="block truncate text-base font-bold text-gray-950"
-                    >
-                      {track.title}
-                    </Link>
-
-                    <p className="mt-1 truncate text-sm text-gray-600">
-                      {(track.artists ?? []).join(", ") || "Unknown artist"}
-                    </p>
-
-                    <p className="mt-1 truncate text-xs text-gray-500">
-                      {track.albumName || "Unknown album"}
-                    </p>
-                  </div>
-                </div>
-
-                <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-gray-100 pt-4 text-center">
-                  <div>
-                    <dt className="text-xs text-gray-500">Release</dt>
-                    <dd className="mt-1 text-xs font-semibold text-gray-900">
-                      {formatReleaseDate(track.releaseDate)}
-                    </dd>
-                  </div>
-
-                  <div>
-                    <dt className="text-xs text-gray-500">Duration</dt>
-                    <dd className="mt-1 font-mono text-xs font-semibold text-gray-900">
-                      {msToMinSec(track.durationMs)}
-                    </dd>
-                  </div>
-
-                  <div>
-                    <dt className="text-xs text-gray-500">Matches</dt>
-                    <dd className="mt-1 text-xs font-bold text-gray-900">
-                      {track.matchCount ?? 0}
-                    </dd>
-                  </div>
-                </dl>
-
-                <div className="mt-4 flex gap-2">
-                  {track.spotifyUrl ? (
-                    <a
-                      href={track.spotifyUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex-1 rounded-xl border border-[#1DB954] px-3 py-2.5 text-center text-sm font-semibold text-[#14833b]"
-                    >
-                      Spotify
-                    </a>
-                  ) : null}
-
-                  <Link
-                    href={`/tracks/${track.id}`}
-                    className="flex-1 rounded-xl bg-gray-950 px-3 py-2.5 text-center text-sm font-semibold text-white"
-                  >
-                    View
-                  </Link>
-                </div>
-              </article>
-            ))}
           </section>
         </>
       )}
 
       
+      </div>
     </main>
   );
 }
@@ -360,7 +452,7 @@ function TrackArtwork({ track }: { track: Track }) {
   }
 
   return (
-    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-xl text-gray-400">
+    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-xl text-white/30">
       ♪
     </div>
   );
@@ -374,9 +466,9 @@ function StatCard({
   value: number;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="mt-2 text-3xl font-bold tracking-tight text-gray-950">
+    <div className="rounded-2xl border border-white/10 bg-[#0d0d0f] p-5">
+      <p className="text-xs font-black uppercase tracking-[0.12em] text-white/35">{label}</p>
+      <p className="mt-2 text-3xl font-black tracking-tight text-white">
         {value.toLocaleString("en-US")}
       </p>
     </div>
