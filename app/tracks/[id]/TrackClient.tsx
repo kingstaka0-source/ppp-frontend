@@ -747,17 +747,35 @@ const hasAudioFeatures =
   return (
     <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <Link
-            href="/dashboard"
-            className="inline-flex rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold transition hover:bg-white/10"
-          >
-            ← Dashboard
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <Link href="/dashboard" className="inline-flex shrink-0">
+            <img
+              src="/brand/logo.svg"
+              alt="TuneReach"
+              className="h-9 w-auto"
+            />
           </Link>
 
-          <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-bold text-emerald-300">
-            Track workspace
-          </div>
+          <nav className="flex shrink-0 flex-wrap items-center gap-2">
+            <Link href="/dashboard" className="rounded-xl border border-white/10 bg-white/[0.035] px-3.5 py-2 text-sm font-bold text-white/70 transition hover:bg-white/[0.10] hover:text-white">
+              Dashboard
+            </Link>
+            <Link href="/tracks" className="rounded-xl border border-emerald-400/30 bg-emerald-400/15 px-3.5 py-2 text-sm font-black text-emerald-300 transition hover:bg-emerald-400/25">
+              Tracks
+            </Link>
+            <Link href="/pitches" className="rounded-xl border border-white/10 bg-white/[0.035] px-3.5 py-2 text-sm font-bold text-white/70 transition hover:bg-white/[0.10] hover:text-white">
+              Pitches
+            </Link>
+            <Link href="/followups" className="rounded-xl border border-white/10 bg-white/[0.035] px-3.5 py-2 text-sm font-bold text-white/70 transition hover:bg-white/[0.10] hover:text-white">
+              Follow-ups
+            </Link>
+            <Link href="/curators" className="rounded-xl border border-white/10 bg-white/[0.035] px-3.5 py-2 text-sm font-bold text-white/70 transition hover:bg-white/[0.10] hover:text-white">
+              Curators
+            </Link>
+            <Link href="/campaigns" className="rounded-xl border border-white/10 bg-white/[0.035] px-3.5 py-2 text-sm font-bold text-white/70 transition hover:bg-white/[0.10] hover:text-white">
+              Campaigns
+            </Link>
+          </nav>
         </div>
 
         <section className="relative mt-7 overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-zinc-950 via-zinc-950 to-emerald-950 p-7 shadow-2xl sm:p-10">
