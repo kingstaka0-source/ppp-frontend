@@ -104,10 +104,19 @@ export default async function TracksPage() {
   return (
     <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-8">
       <div className="mx-auto max-w-7xl">
-        <header className="rounded-2xl border border-white/10 bg-[#090b0b] px-5 py-5 sm:px-6">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0">
-              <Link href="/dashboard" className="inline-flex">
+        <header className="relative min-h-[400px] overflow-hidden rounded-2xl border border-white/10 bg-[#090b0b]">
+          <img
+            src="/tracks-hero.png"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/25" />
+
+          <div className="relative z-10 flex min-h-[400px] flex-col justify-between px-5 py-5 sm:px-6">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+              <Link href="/dashboard" className="inline-flex shrink-0">
                 <img
                   src="/brand/logo.svg"
                   alt="TuneReach"
@@ -115,63 +124,65 @@ export default async function TracksPage() {
                 />
               </Link>
 
-              <p className="mt-7 text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
+              <nav className="flex shrink-0 flex-wrap items-center gap-2">
+                <Link
+                  href="/dashboard"
+                  className="rounded-xl border border-white/10 bg-black/35 px-3.5 py-2 text-sm font-bold text-white/70 backdrop-blur-sm transition hover:bg-white/[0.10] hover:text-white"
+                >
+                  Dashboard
+                </Link>
+
+                <Link
+                  href="/tracks"
+                  className="rounded-xl border border-emerald-400/30 bg-emerald-400/15 px-3.5 py-2 text-sm font-black text-emerald-300 backdrop-blur-sm transition hover:bg-emerald-400/25"
+                >
+                  Tracks
+                </Link>
+
+                <Link
+                  href="/pitches"
+                  className="rounded-xl border border-white/10 bg-black/35 px-3.5 py-2 text-sm font-bold text-white/70 backdrop-blur-sm transition hover:bg-white/[0.10] hover:text-white"
+                >
+                  Pitches
+                </Link>
+
+                <Link
+                  href="/followups"
+                  className="rounded-xl border border-white/10 bg-black/35 px-3.5 py-2 text-sm font-bold text-white/70 backdrop-blur-sm transition hover:bg-white/[0.10] hover:text-white"
+                >
+                  Follow-ups
+                </Link>
+
+                <Link
+                  href="/curators"
+                  className="rounded-xl border border-white/10 bg-black/35 px-3.5 py-2 text-sm font-bold text-white/70 backdrop-blur-sm transition hover:bg-white/[0.10] hover:text-white"
+                >
+                  Curators
+                </Link>
+
+                <Link
+                  href="/campaigns"
+                  className="rounded-xl border border-white/10 bg-black/35 px-3.5 py-2 text-sm font-bold text-white/70 backdrop-blur-sm transition hover:bg-white/[0.10] hover:text-white"
+                >
+                  Campaigns
+                </Link>
+              </nav>
+            </div>
+
+            <div className="max-w-xl pb-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
                 Tracks Workspace
               </p>
 
-              <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+              <h1 className="mt-3 text-4xl font-black tracking-tight text-white sm:text-5xl">
                 My Tracks
               </h1>
 
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
+              <p className="mt-3 text-sm leading-6 text-white/65 sm:text-base">
                 Manage your Spotify catalog and open a track to review playlist
                 matches and campaign opportunities.
               </p>
             </div>
-
-            <nav className="flex shrink-0 flex-wrap items-center gap-2">
-              <Link
-                href="/dashboard"
-                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
-              >
-                Dashboard
-              </Link>
-
-              <Link
-                href="/tracks"
-                className="rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-3.5 py-2 text-sm font-black text-emerald-300 transition hover:bg-emerald-400/20"
-              >
-                Tracks
-              </Link>
-
-              <Link
-                href="/pitches"
-                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
-              >
-                Pitches
-              </Link>
-
-              <Link
-                href="/followups"
-                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
-              >
-                Follow-ups
-              </Link>
-
-              <Link
-                href="/curators"
-                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
-              >
-                Curators
-              </Link>
-
-              <Link
-                href="/campaigns"
-                className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm font-bold text-white/65 transition hover:bg-white/[0.08] hover:text-white"
-              >
-                Campaigns
-              </Link>
-            </nav>
           </div>
         </header>
 
