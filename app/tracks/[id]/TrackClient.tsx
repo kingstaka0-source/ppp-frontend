@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
@@ -125,7 +125,6 @@ function formatDuration(ms?: number) {
 }
 
 export default function TrackClient({ trackId }: TrackClientProps) {
-  const { isLoaded, isSignedIn } = useUser();
   const { getToken } = useAuth();
 
   const [track, setTrack] = useState<TrackResponse | null>(null);
@@ -629,20 +628,8 @@ async function launchCampaign() {
 } 
 
   useEffect(() => {
-    if (!isLoaded) {
-      return;
-    }
-
-    if (!isSignedIn) {
-      if (!track) {
-        setError("You must be signed in.");
-        setLoading(false);
-      }
-      return;
-    }
-
     void loadTrack();
-  }, [isLoaded, isSignedIn, loadTrack]);
+  }, [loadTrack]);
 
   if (loading) {
     return (
