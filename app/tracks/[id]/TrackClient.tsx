@@ -854,11 +854,11 @@ const hasAudioFeatures =
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-bold text-emerald-400">
-                  Audio profile
+                  Matching signals
                 </p>
 
                 <h2 className="mt-2 text-2xl font-black">
-                  Track analysis
+                  How TuneReach matches this track
                 </h2>
               </div>
 
@@ -867,26 +867,78 @@ const hasAudioFeatures =
               </div>
             </div>
 
-            <div className="mt-7 space-y-5">
-  <FeatureRow label="Energy" value={energy} />
-  <FeatureRow label="Danceability" value={danceability} />
-  <FeatureRow label="Tempo" value={tempo} />
-  <FeatureRow label="Mood" value={mood} />
-</div>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/35">
+                  Playlist matches
+                </p>
+                <p className="mt-2 text-2xl font-black text-emerald-300">
+                  {matchCount}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-white/40">
+                  Current matches stored for this track.
+                </p>
+              </div>
 
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/35">
+                  Track metadata
+                </p>
+                <p className="mt-2 text-sm font-black text-white">
+                  Available
+                </p>
+                <p className="mt-1 text-xs leading-5 text-white/40">
+                  Spotify track, artist, album and duration signals.
+                </p>
+              </div>
 
-{!hasAudioFeatures && (
-  <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-    <p className="text-sm font-bold text-white/70">
-      Audio features unavailable
-    </p>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/35">
+                  Playlist context
+                </p>
+                <p className="mt-2 text-sm font-black text-white">
+                  Active
+                </p>
+                <p className="mt-1 text-xs leading-5 text-white/40">
+                  Playlist genres, names, descriptions and matching rules.
+                </p>
+              </div>
 
-    <p className="mt-2 text-sm leading-6 text-white/40">
-      Spotify audio analysis is currently unavailable for this track.
-      TuneReach uses genre, metadata and playlist signals for matching.
-    </p>
-  </div>
-)}
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/35">
+                  Audio analysis
+                </p>
+                <p className={`mt-2 text-sm font-black ${hasAudioFeatures ? "text-emerald-300" : "text-white/55"}`}>
+                  {hasAudioFeatures ? "Available" : "Unavailable"}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-white/40">
+                  {hasAudioFeatures
+                    ? "Spotify audio features are included in matching."
+                    : "Not used when Spotify audio features are unavailable."}
+                </p>
+              </div>
+            </div>
+
+            {hasAudioFeatures && (
+              <div className="mt-6 space-y-5">
+                <FeatureRow label="Energy" value={energy} />
+                <FeatureRow label="Danceability" value={danceability} />
+                <FeatureRow label="Tempo" value={tempo} />
+                <FeatureRow label="Mood" value={mood} />
+              </div>
+            )}
+
+            {!hasAudioFeatures && (
+              <div className="mt-6 rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.05] p-4">
+                <p className="text-sm font-bold text-emerald-300">
+                  Matching continues without audio features
+                </p>
+                <p className="mt-2 text-sm leading-6 text-white/45">
+                  TuneReach does not estimate missing tempo, energy, danceability or mood.
+                  Matching continues with the available metadata and playlist signals.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-zinc-950 p-7">
