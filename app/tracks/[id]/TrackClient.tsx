@@ -394,11 +394,56 @@ async function startMatching() {
       );
     }
 
-    setMatchMessage("🎉 Matching started...");
+    const jobId = data.matchJob?.jobId;
 
-    window.setTimeout(() => {
-      void loadTrack();
-    }, 3000);
+    if (!jobId) {
+      throw new Error("Matching started without a job ID.");
+    }
+
+    setMatchMessage("Matching playlists...");
+
+    const maxAttempts = 30;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      await new Promise((resolve) => window.setTimeout(resolve, 2000));
+
+      const jobResponse = await fetch(
+        `${API_URL}/match-jobs/${encodeURIComponent(jobId)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: "no-store",
+        },
+      );
+
+      const jobData = await jobResponse.json();
+
+      if (!jobResponse.ok) {
+        throw new Error(
+          jobData.message ||
+            jobData.error ||
+            "Unable to check matching status.",
+        );
+      }
+
+      if (jobData.job?.status === "SUCCEEDED") {
+        setMatchMessage("Matching complete. Loading new results...");
+        await loadTrack();
+        setMatchMessage("Playlist matches updated.");
+        return;
+      }
+
+      if (jobData.job?.status === "FAILED") {
+        throw new Error(
+          jobData.job.lastError || "Playlist matching failed.",
+        );
+      }
+    }
+
+    throw new Error(
+      "Matching is taking longer than expected. Refresh the page in a moment.",
+    );
   } catch (err) {
     setMatchMessage(
       err instanceof Error
