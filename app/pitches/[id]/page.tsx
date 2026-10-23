@@ -67,6 +67,8 @@ type Pitch = {
     id: string;
     title: string;
     spotifyTrackId?: string | null;
+    albumName?: string | null;
+    albumImageUrl?: string | null;
   };
 
   playlist?: Playlist | null;
@@ -364,26 +366,52 @@ export default function PitchEditorPage() {
                 />
               </Link>
 
-              <p className="mt-7 text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
-                Pitch Workspace
-              </p>
+              <div className="mt-7 flex flex-col gap-5 sm:flex-row sm:items-center">
+                {pitch.track?.albumImageUrl ? (
+                  <img
+                    src={pitch.track.albumImageUrl}
+                    alt={
+                      pitch.track.albumName ||
+                      `${pitch.track.title} artwork`
+                    }
+                    className="h-32 w-32 shrink-0 rounded-2xl border border-white/10 object-cover shadow-2xl sm:h-36 sm:w-36"
+                  />
+                ) : (
+                  <div className="flex h-32 w-32 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-400 to-emerald-700 text-5xl font-black text-black shadow-2xl sm:h-36 sm:w-36">
+                    {pitch.track?.title?.trim().charAt(0).toUpperCase() ||
+                      "♪"}
+                  </div>
+                )}
 
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-                  {pitch.track?.title || "Untitled track"}
-                </h1>
+                <div className="min-w-0">
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
+                    Pitch Workspace
+                  </p>
 
-                <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-black uppercase text-emerald-300">
-                  {pitch.status}
-                </span>
+                  <div className="mt-3 flex flex-wrap items-center gap-3">
+                    <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+                      {pitch.track?.title || "Untitled track"}
+                    </h1>
+
+                    <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-black uppercase text-emerald-300">
+                      {pitch.status}
+                    </span>
+                  </div>
+
+                  {pitch.track?.albumName ? (
+                    <p className="mt-2 text-sm text-white/40">
+                      {pitch.track.albumName}
+                    </p>
+                  ) : null}
+
+                  <p className="mt-3 max-w-3xl text-sm text-white/50">
+                    {pitch.playlist?.name || "Unknown playlist"}
+                    {curator?.name
+                      ? ` • Curator: ${curator.name}`
+                      : ""}
+                  </p>
+                </div>
               </div>
-
-              <p className="mt-3 max-w-3xl text-sm text-white/50">
-                {pitch.playlist?.name || "Unknown playlist"}
-                {curator?.name
-                  ? ` • Curator: ${curator.name}`
-                  : ""}
-              </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
