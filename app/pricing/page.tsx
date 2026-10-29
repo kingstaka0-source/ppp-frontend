@@ -1,59 +1,114 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3100";
 
+type BillingStatus = {
+  plan: "FREE" | "TRIAL" | "PRO";
+  subscriptionStatus:
+    | "NONE"
+    | "TRIALING"
+    | "ACTIVE"
+    | "PAST_DUE"
+    | "CANCELED"
+    | "INCOMPLETE";
+};
+
 export default function PricingPage() {
   const { getToken } = useAuth();
 
+  const [billing, setBilling] = useState<BillingStatus | null>(null);
+  const [billingLoading, setBillingLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    async function loadBillingStatus() {
+      try {
+        setBillingLoading(true);
+        setError(null);
+
+        const token = await getToken();
+
+        if (!token) {
+          throw new Error("You must be signed in.");
+        }
+
+        const r = await fetch(`${API}/billing/status`, {
+          cache: "no-store",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const j = await r.json().catch(() => ({}));
+
+        if (!r.ok) {
+          throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
+        }
+
+        setBilling(j?.artist ?? null);
+      } catch (e: any) {
+        setError(e?.message ?? "Failed to load billing status");
+      } finally {
+        setBillingLoading(false);
+      }
+    }
+
+    loadBillingStatus();
+  }, [getToken]);
+
   async function upgradeToPro() {
-  try {
-    setLoading(true);
-    setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-    const token = await getToken();
+      const token = await getToken();
 
-    if (!token) {
-      throw new Error("You must be signed in.");
+      if (!token) {
+        throw new Error("You must be signed in.");
+      }
+
+      const r = await fetch(`${API}/billing/create-checkout-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const j = await r.json().catch(() => ({}));
+
+      if (!r.ok) {
+        throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
+      }
+
+      if (!j?.url) {
+        throw new Error("No checkout URL returned");
+      }
+
+      window.location.href = j.url;
+    } catch (e: any) {
+      setError(e?.message ?? "Upgrade failed");
+    } finally {
+      setLoading(false);
     }
-
-    const r = await fetch(`${API}/billing/create-checkout-session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const j = await r.json().catch(() => ({}));
-
-    if (!r.ok) {
-      throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
-    }
-
-    if (!j?.url) {
-      throw new Error("No checkout URL returned");
-    }
-
-    window.location.href = j.url;
-  } catch (e: any) {
-    setError(e?.message ?? "Upgrade failed");
-  } finally {
-    setLoading(false);
   }
-}
+
+  const currentPlan = billing?.plan ?? null;
 
   return (
     <div className="max-w-5xl mx-auto p-8 space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold">Pricing</h1>
-        <Link href="/dashboard" className="px-4 py-2 rounded border border-black">
+
+        <Link
+          href="/dashboard"
+          className="px-4 py-2 rounded border border-black"
+        >
           ← Dashboard
         </Link>
       </div>
@@ -68,7 +123,9 @@ export default function PricingPage() {
         <div className="border rounded-2xl p-6 space-y-4">
           <div className="text-sm text-gray-500">FREE</div>
           <div className="text-3xl font-bold">€0</div>
-          <div className="text-gray-700">For testing and emerging artists.</div>
+          <div className="text-gray-700">
+            For testing and emerging artists.
+          </div>
 
           <ul className="space-y-2 text-sm text-gray-700">
             <li>3 pitches per month</li>
@@ -87,17 +144,33 @@ export default function PricingPage() {
           <ul className="space-y-2 text-sm text-gray-700">
             <li>Unlimited AI pitch generation</li>
             <li>Campaign launch</li>
-            <li>Email queue & send</li>
+            <li>Email queue &amp; send</li>
             <li>Better scalability</li>
           </ul>
 
-          <button
-            onClick={upgradeToPro}
-            disabled={loading}
-            className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
-          >
-            {loading ? "Loading..." : "Upgrade to PRO"}
-          </button>
+          {billingLoading ? (
+            <button
+              disabled
+              className="px-4 py-2 rounded bg-black text-white opacity-50"
+            >
+              Loading plan...
+            </button>
+          ) : currentPlan === "FREE" ? (
+            <button
+              onClick={upgradeToPro}
+              disabled={loading}
+              className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
+            >
+              {loading ? "Loading..." : "Upgrade to PRO"}
+            </button>
+          ) : currentPlan === "TRIAL" || currentPlan === "PRO" ? (
+            <Link
+              href="/upgrade"
+              className="inline-flex px-4 py-2 rounded border border-black"
+            >
+              Manage billing
+            </Link>
+          ) : null}
         </div>
       </div>
     </div>
