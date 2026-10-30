@@ -50,7 +50,7 @@ export default function PricingPage() {
           throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
         }
 
-        setBilling(j?.artist ?? null);
+        setBilling(j?.billing ?? null);
       } catch (e: any) {
         setError(e?.message ?? "Failed to load billing status");
       } finally {
