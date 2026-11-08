@@ -173,7 +173,7 @@ const res = await fetch(`${API}/followups/${id}/send`, {
       <section className="relative overflow-hidden border-b border-white/10">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[url('/followups-hero.png')] bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/followups-hero.png')" }}
         />
         <div
           aria-hidden="true"

@@ -112,6 +112,15 @@ export default function CuratorDashboardClient() {
         <main className="min-h-screen bg-[#090b0a] px-5 py-10 text-white">
             <div className="mx-auto max-w-6xl">
                 <header className="mb-10">
+    <div className="mb-8 border-b border-white/10 pb-6">
+        <a href="/curator" aria-label="TuneReach Curator Dashboard">
+            <img
+                src="/brand/logo.svg"
+                alt="TuneReach"
+                className="h-12 w-auto max-w-[220px] object-contain"
+            />
+        </a>
+    </div>
                     <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#1ed760]">
                         TuneReach Curator
                     </p>

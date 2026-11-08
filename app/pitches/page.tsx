@@ -398,7 +398,7 @@ export default function PitchesPage() {
       <section className="relative overflow-hidden border-b border-white/10">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[url('/pitches-hero.png')] bg-cover bg-[position:center_48%]"
+          className="absolute inset-0 bg-cover bg-[position:center_48%]" style={{ backgroundImage: "url('/pitches-hero.png')" }}
         />
         <div
           aria-hidden="true"
