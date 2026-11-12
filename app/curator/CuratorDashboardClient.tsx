@@ -112,15 +112,15 @@ export default function CuratorDashboardClient() {
         <main className="min-h-screen bg-[#090b0a] px-5 py-10 text-white">
             <div className="mx-auto max-w-6xl">
                 <header className="mb-10">
-    <div className="mb-8 border-b border-white/10 pb-6">
-        <a href="/curator" aria-label="TuneReach Curator Dashboard">
-            <img
-                src="/brand/logo.svg"
-                alt="TuneReach"
-                className="h-12 w-auto max-w-[220px] object-contain"
-            />
-        </a>
-    </div>
+                    <div className="mb-8 border-b border-white/10 pb-6">
+                        <a href="/curator" aria-label="TuneReach Curator Dashboard">
+                            <img
+                                src="/brand/logo.svg"
+                                alt="TuneReach"
+                                className="h-12 w-auto max-w-[220px] object-contain"
+                            />
+                        </a>
+                    </div>
                     <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#1ed760]">
                         TuneReach Curator
                     </p>
@@ -130,8 +130,15 @@ export default function CuratorDashboardClient() {
                     </h1>
 
                     <p className="mt-3 text-zinc-400">
-                        Manage your verified Spotify playlists.
+                        Manage your verified Spotify playlists and incoming track submissions.
                     </p>
+
+                    <a
+                        href="/curator/submissions"
+                        className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#1ed760] px-5 py-3 text-sm font-bold text-black transition hover:bg-[#1fef6d]"
+                    >
+                        Submission Inbox
+                    </a>
                 </header>
 
                 {!isLoaded || loading ? (
@@ -216,84 +223,84 @@ export default function CuratorDashboardClient() {
                                             className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
                                         >
                                             <div className="flex flex-wrap items-start justify-between gap-4">
-    <div className="flex min-w-0 items-center gap-4">
-        {playlist.imageUrl?.startsWith("https://") ? (
-            <img
-                src={playlist.imageUrl}
-                alt={`${playlist.name} Spotify playlist cover`}
-                className="h-24 w-24 shrink-0 rounded-2xl object-cover"
-            />
-        ) : (
-            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-zinc-900 text-3xl text-[#1ed760]">
-                ♫
-            </div>
-        )}
+                                                <div className="flex min-w-0 items-center gap-4">
+                                                    {playlist.imageUrl?.startsWith("https://") ? (
+                                                        <img
+                                                            src={playlist.imageUrl}
+                                                            alt={`${playlist.name} Spotify playlist cover`}
+                                                            className="h-24 w-24 shrink-0 rounded-2xl object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-zinc-900 text-3xl text-[#1ed760]">
+                                                            ♫
+                                                        </div>
+                                                    )}
 
-        <div className="min-w-0">
-            <h3 className="break-words text-xl font-bold">
-                {playlist.name}
-            </h3>
-            <p className="mt-1 text-sm text-zinc-400">
-                Owner: {playlist.ownerDisplayName || "Unknown"}
-            </p>
-        </div>
-    </div>
+                                                    <div className="min-w-0">
+                                                        <h3 className="break-words text-xl font-bold">
+                                                            {playlist.name}
+                                                        </h3>
+                                                        <p className="mt-1 text-sm text-zinc-400">
+                                                            Owner: {playlist.ownerDisplayName || "Unknown"}
+                                                        </p>
+                                                    </div>
+                                                </div>
 
-    <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-bold text-emerald-300">
-        VERIFIED
-    </span>
-</div>
+                                                <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-bold text-emerald-300">
+                                                    VERIFIED
+                                                </span>
+                                            </div>
 
-{playlist.description && (
-    <p className="mt-4 text-sm text-zinc-400">
-        {playlist.description}
-    </p>
-)}
+                                            {playlist.description && (
+                                                <p className="mt-4 text-sm text-zinc-400">
+                                                    {playlist.description}
+                                                </p>
+                                            )}
 
-{playlist.genres.length > 0 && (
-    <div className="mt-4 flex flex-wrap gap-2">
-        {playlist.genres.map((genre) => (
-            <span
-                key={genre}
-                className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300"
-            >
-                {genre}
-            </span>
-        ))}
-    </div>
-)}
+                                            {playlist.genres.length > 0 && (
+                                                <div className="mt-4 flex flex-wrap gap-2">
+                                                    {playlist.genres.map((genre) => (
+                                                        <span
+                                                            key={genre}
+                                                            className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300"
+                                                        >
+                                                            {genre}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
 
-<div className="mt-5 flex flex-wrap items-center gap-4">
-    {playlist.spotifyUrl && (
-        <a
-            href={playlist.spotifyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-bold text-[#1ed760] hover:underline"
-        >
-            Open on Spotify
-        </a>
-    )}
+                                            <div className="mt-5 flex flex-wrap items-center gap-4">
+                                                {playlist.spotifyUrl && (
+                                                    <a
+                                                        href={playlist.spotifyUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-sm font-bold text-[#1ed760] hover:underline"
+                                                    >
+                                                        Open on Spotify
+                                                    </a>
+                                                )}
 
-    <a
-        href={`/curator/playlists/${encodeURIComponent(playlist.id)}`}
-        className="inline-flex items-center justify-center rounded-xl bg-[#1ed760] px-5 py-3 text-sm font-bold text-black transition hover:bg-[#1fef6d]"
-    >
-        Manage Playlist
-    </a>
-</div>
-                    </article>
+                                                <a
+                                                    href={`/curator/playlists/${encodeURIComponent(playlist.id)}`}
+                                                    className="inline-flex items-center justify-center rounded-xl bg-[#1ed760] px-5 py-3 text-sm font-bold text-black transition hover:bg-[#1fef6d]"
+                                                >
+                                                    Manage Playlist
+                                                </a>
+                                            </div>
+                                        </article>
                                     ))}
-            </div>
+                                </div>
                             )}
-        </section>
+                        </section>
                     </>
                 ) : (
-        <p className="text-zinc-400">
-            No dashboard data available.
-        </p>
-    )
-}
+                    <p className="text-zinc-400">
+                        No dashboard data available.
+                    </p>
+                )
+                }
             </div >
         </main >
     );
