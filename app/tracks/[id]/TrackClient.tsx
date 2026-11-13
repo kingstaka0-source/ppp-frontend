@@ -60,10 +60,20 @@ type MatchResponse = {
       websiteUrl?: string | null;
       instagramUrl?: string | null;
       canEmail?: boolean;
+      canSubmit?: boolean;
     } | null;
   } | null;
 };
 
+type SubmissionResponse = {
+  id: string;
+  trackId: string;
+  playlistId: string;
+  status: string;
+  submittedAt?: string;
+  track?: { id: string; title?: string } | null;
+  playlist?: { id: string; name?: string } | null;
+};
 type PitchResponse = {
   id: string;
   matchId: string;
@@ -167,6 +177,12 @@ const [sendErrors, setSendErrors] = useState<Record<string, string>>({});
 
 const [expandedPitchIds, setExpandedPitchIds] = useState<Record<string, boolean>>({});
 
+  const [submissionsByPlaylist, setSubmissionsByPlaylist] = useState<
+    Record<string, SubmissionResponse>
+  >({});
+  const [submittingPlaylistId, setSubmittingPlaylistId] = useState<string | null>(null);
+  const [submissionErrors, setSubmissionErrors] = useState<Record<string, string>>({});
+  const [submissionsLoading, setSubmissionsLoading] = useState(true);
   const loadTrack = useCallback(async () => {
   setLoading(true);
   setError("");
@@ -264,6 +280,38 @@ setMatches(list);
       setMatches([]);
     }
 
+    // LOAD INTERNAL CURATOR SUBMISSIONS
+    setSubmissionsLoading(true);
+    try {
+      const submissionsResponse = await fetch(`${API_URL}/submissions/mine`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+
+      if (!submissionsResponse.ok) {
+        throw new Error(`Could not load submissions (${submissionsResponse.status}).`);
+      }
+
+      const submissionsData = await submissionsResponse.json();
+      const existing: SubmissionResponse[] = Array.isArray(submissionsData.submissions)
+        ? submissionsData.submissions
+        : [];
+
+      const byPlaylist: Record<string, SubmissionResponse> = {};
+      for (const submission of existing) {
+        const submissionTrackId = submission.trackId ?? submission.track?.id;
+        const submissionPlaylistId = submission.playlistId ?? submission.playlist?.id;
+
+        if (submissionTrackId === trackId && submissionPlaylistId) {
+          byPlaylist[submissionPlaylistId] = submission;
+        }
+      }
+      setSubmissionsByPlaylist(byPlaylist);
+    } catch (submissionError) {
+      console.error("Could not load curator submissions:", submissionError);
+    } finally {
+      setSubmissionsLoading(false);
+    }
     // =====================================
     // LOAD EXISTING PITCHES + TRACKING
     // =====================================
@@ -358,6 +406,71 @@ for (const pitch of pitchList) {
 }, [getToken, trackId]);
 
        
+async function submitToCurator(playlistId: string) {
+  if (submittingPlaylistId || submissionsLoading || submissionsByPlaylist[playlistId]) {
+    return;
+  }
+
+  setSubmittingPlaylistId(playlistId);
+  setSubmissionErrors((current) => ({ ...current, [playlistId]: "" }));
+
+  try {
+    const token = await getToken();
+    if (!token) {
+      throw new Error("Could not get authentication token.");
+    }
+
+    const response = await fetch(`${API_URL}/submissions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ trackId, playlistId }),
+    });
+
+    const data = await response.json();
+
+    if (response.status === 409) {
+      const existingResponse = await fetch(`${API_URL}/submissions/mine`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      if (existingResponse.ok) {
+        const existingData = await existingResponse.json();
+        const existing = existingData.submissions?.find(
+          (item: SubmissionResponse) =>
+            (item.trackId ?? item.track?.id) === trackId &&
+            (item.playlistId ?? item.playlist?.id) === playlistId,
+        );
+        if (existing) {
+          setSubmissionsByPlaylist((current) => ({
+            ...current,
+            [playlistId]: existing,
+          }));
+          return;
+        }
+      }
+      throw new Error("This track was already submitted to this playlist.");
+    }
+
+    if (!response.ok || !data.submission) {
+      throw new Error(data.message || data.error || "Submission failed.");
+    }
+
+    setSubmissionsByPlaylist((current) => ({
+      ...current,
+      [playlistId]: data.submission as SubmissionResponse,
+    }));
+  } catch (err) {
+    setSubmissionErrors((current) => ({
+      ...current,
+      [playlistId]: err instanceof Error ? err.message : "Submission failed.",
+    }));
+  } finally {
+    setSubmittingPlaylistId(null);
+  }
+}
 async function startMatching() {
   try {
     setMatching(true);
@@ -1212,6 +1325,34 @@ const hasAudioFeatures =
           )}
         </div>
 
+        {/* INTERNAL CURATOR SUBMISSION */}
+        {match.playlist?.curator?.canSubmit && (
+          <div className="mt-4 border-t border-white/10 pt-4">
+            {submissionsByPlaylist[match.playlistId] ? (
+              <span className="inline-flex rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-4 py-2 text-sm font-bold text-emerald-300">
+                Submission: {submissionsByPlaylist[match.playlistId].status.replaceAll("_", " ")}
+              </span>
+            ) : (
+              <button
+                type="button"
+                disabled={submissionsLoading || submittingPlaylistId !== null}
+                onClick={() => void submitToCurator(match.playlistId)}
+                className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-black text-black transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {submittingPlaylistId === match.playlistId
+                  ? "Submitting..."
+                  : submissionsLoading
+                    ? "Checking submissions..."
+                    : "Submit to Curator"}
+              </button>
+            )}
+            {submissionErrors[match.playlistId] && (
+              <p className="mt-2 text-sm text-red-300">
+                {submissionErrors[match.playlistId]}
+              </p>
+            )}
+          </div>
+        )}
         {/* AI PITCH */}
         {match.playlist?.curator?.canEmail && (
         <div className="mt-5 border-t border-white/10 pt-5">
